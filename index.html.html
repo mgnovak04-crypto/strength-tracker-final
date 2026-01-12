@@ -1,0 +1,871 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Strength">
+    <meta name="theme-color" content="#2E5A88">
+    <title>12-Month Strength Tracker</title>
+    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect fill='%232E5A88' width='100' height='100' rx='20'/><text x='50' y='65' font-size='50' text-anchor='middle' fill='white'>💪</text></svg>">
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: #f5f5f7;
+            padding-top: env(safe-area-inset-top);
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+        #root {
+            min-height: 100vh;
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+    <script type="text/babel">
+        const { useState, useEffect, useRef } = React;
+
+        // Phase and exercise configuration
+        const phases = [
+            { id: 1, name: 'Foundation', months: '1-3', reps: '3x12-15', color: '#C6E0B4' },
+            { id: 2, name: 'Strength', months: '4-6', reps: '4x6-8', color: '#FFE699' },
+            { id: 3, name: 'Power', months: '7-9', reps: '5x3-5', color: '#F4B084' },
+            { id: 4, name: 'Peak', months: '10-12', reps: '3x5-8', color: '#B4C7E7' },
+        ];
+
+        const workoutDays = [
+            { id: 1, name: 'Lower Power', icon: '🦵' },
+            { id: 2, name: 'Upper + Core', icon: '💪' },
+            { id: 3, name: 'Single Leg', icon: '🏃' },
+        ];
+
+        const exercisesByPhaseAndDay = {
+            1: {
+                1: ['Goblet Squat', 'Romanian Deadlift', 'Hip Thrust', 'Box Step-ups', 'Jump Squats', 'Calf Raises'],
+                2: ['Push-ups', 'Bent-Over Rows', 'DB Shoulder Press', 'Face Pulls', 'Pallof Press', 'Farmers Carry'],
+                3: ['Bulgarian Split Squat', 'Single-Leg RDL', 'Step-ups', 'TKE', 'Eccentric Calf Raises', 'Dead Bugs'],
+            },
+            2: {
+                1: ['Back Squat', 'Trap Bar Deadlift', 'Barbell Hip Thrust', 'Walking Lunges', 'Squat Jumps', 'Seated Calf Raises'],
+                2: ['DB Bench Press', 'Barbell Rows', 'Overhead Press', 'Cable Rows', 'Woodchops', 'Suitcase Carry'],
+                3: ['RFESS', 'Weighted Single-Leg RDL', 'Lateral Step-ups', 'Spanish Squats', 'Single-Leg Calf Raises', 'Bird Dogs'],
+            },
+            3: {
+                1: ['Front Squat', 'Power Clean', 'Pause Hip Thrust', 'Jump Lunges', 'Depth Jumps', 'Explosive Calf Raises'],
+                2: ['Incline DB Press', 'Weighted Pull-ups', 'Push Press', 'Chest Supported Rows', 'Landmine Rotation', 'Overhead Carry'],
+                3: ['Pistol Squat Prog.', 'Single-Leg Hip Thrust', 'Skater Hops', 'Nordic Curls', 'Deficit Calf Raises', 'Copenhagen Plank'],
+            },
+            4: {
+                1: ['Goblet Squat', 'Romanian Deadlift', 'Hip Thrust', 'Reverse Lunges', 'Box Jumps', 'Calf Complex'],
+                2: ['DB Bench Press', 'Single-Arm Rows', 'Arnold Press', 'Band Pull-aparts', 'Anti-Rotation Press', 'Mixed Carry'],
+                3: ['Bulgarian Split Squat', 'Single-Leg RDL', 'Step-up to Rev Lunge', 'Wall Sits', 'Eccentric Calf', 'Plank Variations'],
+            },
+        };
+
+        const keyExercises = [
+            'Split Squat', 'Hip Thrust', 'Calf Raises', 'Bench/Push', 'Rows', 'Squat Variation'
+        ];
+
+        // Storage helpers
+        const saveData = (key, data) => {
+            localStorage.setItem(key, JSON.stringify(data));
+        };
+
+        const loadData = (key, defaultValue) => {
+            const stored = localStorage.getItem(key);
+            return stored ? JSON.parse(stored) : defaultValue;
+        };
+
+        // Components
+        const Header = ({ title, onBack, rightAction }) => (
+            <div style={{
+                background: 'linear-gradient(135deg, #2E5A88 0%, #4A7FB5 100%)',
+                color: 'white',
+                padding: '16px 20px',
+                paddingTop: `calc(16px + env(safe-area-inset-top))`,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                position: 'sticky',
+                top: 0,
+                zIndex: 100,
+            }}>
+                {onBack ? (
+                    <button onClick={onBack} style={{
+                        background: 'none',
+                        border: 'none',
+                        color: 'white',
+                        fontSize: '24px',
+                        cursor: 'pointer',
+                        padding: '0 8px',
+                    }}>←</button>
+                ) : <div style={{ width: 40 }} />}
+                <h1 style={{ margin: 0, fontSize: '18px', fontWeight: '600' }}>{title}</h1>
+                {rightAction || <div style={{ width: 40 }} />}
+            </div>
+        );
+
+        const TabBar = ({ activeTab, setActiveTab }) => (
+            <div style={{
+                position: 'fixed',
+                bottom: 0,
+                left: 0,
+                right: 0,
+                background: 'white',
+                borderTop: '1px solid #e0e0e0',
+                display: 'flex',
+                paddingBottom: 'env(safe-area-inset-bottom)',
+                zIndex: 100,
+            }}>
+                {[
+                    { id: 'workout', icon: '🏋️', label: 'Workout' },
+                    { id: 'track', icon: '📊', label: 'Track' },
+                    { id: 'progress', icon: '📈', label: 'Progress' },
+                    { id: 'settings', icon: '⚙️', label: 'Settings' },
+                ].map(tab => (
+                    <button
+                        key={tab.id}
+                        onClick={() => setActiveTab(tab.id)}
+                        style={{
+                            flex: 1,
+                            padding: '10px 0',
+                            border: 'none',
+                            background: 'none',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'center',
+                            gap: '4px',
+                            color: activeTab === tab.id ? '#2E5A88' : '#999',
+                            fontSize: '10px',
+                            fontWeight: activeTab === tab.id ? '600' : '400',
+                        }}
+                    >
+                        <span style={{ fontSize: '24px' }}>{tab.icon}</span>
+                        {tab.label}
+                    </button>
+                ))}
+            </div>
+        );
+
+        const Card = ({ children, style }) => (
+            <div style={{
+                background: 'white',
+                borderRadius: '12px',
+                padding: '16px',
+                marginBottom: '12px',
+                boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+                ...style,
+            }}>
+                {children}
+            </div>
+        );
+
+        // Workout Tab
+        const WorkoutTab = ({ currentPhase, currentWeek, workoutData, setWorkoutData }) => {
+            const [selectedDay, setSelectedDay] = useState(null);
+            const [selectedExercise, setSelectedExercise] = useState(null);
+
+            const phase = phases[currentPhase - 1];
+            const exercises = exercisesByPhaseAndDay[currentPhase];
+
+            const getWorkoutKey = (day, exercise) => `p${currentPhase}_w${currentWeek}_d${day}_${exercise}`;
+
+            const handleWeightChange = (day, exercise, value) => {
+                const key = getWorkoutKey(day, exercise);
+                const newData = { ...workoutData, [key]: value };
+                setWorkoutData(newData);
+                saveData('workoutData', newData);
+            };
+
+            if (selectedExercise !== null) {
+                const exercise = exercises[selectedDay][selectedExercise];
+                const key = getWorkoutKey(selectedDay, exercise);
+                const currentWeight = workoutData[key] || '';
+
+                return (
+                    <div>
+                        <Header 
+                            title={exercise} 
+                            onBack={() => setSelectedExercise(null)} 
+                        />
+                        <div style={{ padding: '20px' }}>
+                            <Card>
+                                <div style={{ textAlign: 'center', marginBottom: '20px' }}>
+                                    <div style={{ fontSize: '14px', color: '#666', marginBottom: '8px' }}>
+                                        Phase {currentPhase} • Week {currentWeek} • Day {selectedDay}
+                                    </div>
+                                    <div style={{ 
+                                        fontSize: '16px', 
+                                        fontWeight: '600',
+                                        color: '#2E5A88',
+                                        background: phase.color,
+                                        padding: '8px 16px',
+                                        borderRadius: '8px',
+                                        display: 'inline-block',
+                                    }}>
+                                        Target: {phase.reps}
+                                    </div>
+                                </div>
+                                <div style={{ marginBottom: '20px' }}>
+                                    <label style={{ 
+                                        display: 'block', 
+                                        marginBottom: '8px',
+                                        fontWeight: '600',
+                                        color: '#333',
+                                    }}>
+                                        Weight Used (kg)
+                                    </label>
+                                    <input
+                                        type="number"
+                                        inputMode="decimal"
+                                        value={currentWeight}
+                                        onChange={(e) => handleWeightChange(selectedDay, exercise, e.target.value)}
+                                        placeholder="Enter weight..."
+                                        style={{
+                                            width: '100%',
+                                            padding: '16px',
+                                            fontSize: '24px',
+                                            fontWeight: '600',
+                                            border: '2px solid #e0e0e0',
+                                            borderRadius: '12px',
+                                            textAlign: 'center',
+                                        }}
+                                    />
+                                </div>
+                                <button
+                                    onClick={() => setSelectedExercise(null)}
+                                    style={{
+                                        width: '100%',
+                                        padding: '16px',
+                                        background: '#2E5A88',
+                                        color: 'white',
+                                        border: 'none',
+                                        borderRadius: '12px',
+                                        fontSize: '16px',
+                                        fontWeight: '600',
+                                        cursor: 'pointer',
+                                    }}
+                                >
+                                    ✓ Save & Back
+                                </button>
+                            </Card>
+                        </div>
+                    </div>
+                );
+            }
+
+            if (selectedDay !== null) {
+                const dayExercises = exercises[selectedDay];
+                return (
+                    <div>
+                        <Header 
+                            title={`Day ${selectedDay}: ${workoutDays[selectedDay - 1].name}`} 
+                            onBack={() => setSelectedDay(null)} 
+                        />
+                        <div style={{ padding: '16px', paddingBottom: '100px' }}>
+                            <div style={{
+                                background: phase.color,
+                                padding: '12px 16px',
+                                borderRadius: '8px',
+                                marginBottom: '16px',
+                                textAlign: 'center',
+                            }}>
+                                <strong>Phase {currentPhase}: {phase.name}</strong> • Week {currentWeek} • {phase.reps}
+                            </div>
+                            {dayExercises.map((exercise, idx) => {
+                                const key = getWorkoutKey(selectedDay, exercise);
+                                const weight = workoutData[key];
+                                return (
+                                    <Card 
+                                        key={idx}
+                                        style={{ cursor: 'pointer' }}
+                                    >
+                                        <div 
+                                            onClick={() => setSelectedExercise(idx)}
+                                            style={{
+                                                display: 'flex',
+                                                justifyContent: 'space-between',
+                                                alignItems: 'center',
+                                            }}
+                                        >
+                                            <div>
+                                                <div style={{ fontWeight: '600', marginBottom: '4px' }}>
+                                                    {exercise}
+                                                </div>
+                                                <div style={{ fontSize: '13px', color: '#666' }}>
+                                                    {phase.reps}
+                                                </div>
+                                            </div>
+                                            <div style={{
+                                                background: weight ? '#C6E0B4' : '#f0f0f0',
+                                                padding: '8px 16px',
+                                                borderRadius: '8px',
+                                                fontWeight: '600',
+                                                color: weight ? '#2E5A88' : '#999',
+                                            }}>
+                                                {weight ? `${weight} kg` : 'Add →'}
+                                            </div>
+                                        </div>
+                                    </Card>
+                                );
+                            })}
+                        </div>
+                    </div>
+                );
+            }
+
+            return (
+                <div>
+                    <Header title="Today's Workout" />
+                    <div style={{ padding: '16px', paddingBottom: '100px' }}>
+                        <Card style={{ background: `linear-gradient(135deg, ${phase.color} 0%, white 100%)` }}>
+                            <div style={{ textAlign: 'center' }}>
+                                <div style={{ fontSize: '14px', color: '#666' }}>Current Program</div>
+                                <div style={{ fontSize: '24px', fontWeight: '700', color: '#2E5A88' }}>
+                                    Phase {currentPhase}: {phase.name}
+                                </div>
+                                <div style={{ fontSize: '14px', color: '#666', marginTop: '4px' }}>
+                                    Months {phase.months} • Week {currentWeek} of 12 • {phase.reps}
+                                </div>
+                            </div>
+                        </Card>
+
+                        <h3 style={{ margin: '20px 0 12px', color: '#333' }}>Select Workout Day</h3>
+                        {workoutDays.map((day) => {
+                            const dayExercises = exercises[day.id];
+                            const completed = dayExercises.filter(ex => 
+                                workoutData[getWorkoutKey(day.id, ex)]
+                            ).length;
+                            const total = dayExercises.length;
+
+                            return (
+                                <Card 
+                                    key={day.id} 
+                                    style={{ cursor: 'pointer' }}
+                                >
+                                    <div onClick={() => setSelectedDay(day.id)}>
+                                        <div style={{
+                                            display: 'flex',
+                                            justifyContent: 'space-between',
+                                            alignItems: 'center',
+                                        }}>
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                                <span style={{ fontSize: '32px' }}>{day.icon}</span>
+                                                <div>
+                                                    <div style={{ fontWeight: '600', fontSize: '16px' }}>
+                                                        Day {day.id}: {day.name}
+                                                    </div>
+                                                    <div style={{ fontSize: '13px', color: '#666' }}>
+                                                        {total} exercises
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div style={{
+                                                background: completed === total ? '#C6E0B4' : '#f0f0f0',
+                                                padding: '8px 12px',
+                                                borderRadius: '20px',
+                                                fontSize: '13px',
+                                                fontWeight: '600',
+                                                color: completed === total ? '#2E5A88' : '#666',
+                                            }}>
+                                                {completed}/{total}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </Card>
+                            );
+                        })}
+                    </div>
+                </div>
+            );
+        };
+
+        // Track Tab (Weight Tracker)
+        const TrackTab = ({ currentPhase, weightTrackerData, setWeightTrackerData }) => {
+            const [selectedExercise, setSelectedExercise] = useState(null);
+            const phase = phases[currentPhase - 1];
+
+            const handleWeightChange = (exercise, month, value) => {
+                const key = `p${currentPhase}_${exercise}_m${month}`;
+                const newData = { ...weightTrackerData, [key]: value };
+                setWeightTrackerData(newData);
+                saveData('weightTrackerData', newData);
+            };
+
+            const getBest = (exercise) => {
+                let best = 0;
+                for (let m = 1; m <= 3; m++) {
+                    const val = parseFloat(weightTrackerData[`p${currentPhase}_${exercise}_m${m}`]) || 0;
+                    if (val > best) best = val;
+                }
+                return best;
+            };
+
+            if (selectedExercise !== null) {
+                const exercise = keyExercises[selectedExercise];
+                return (
+                    <div>
+                        <Header 
+                            title={exercise} 
+                            onBack={() => setSelectedExercise(null)} 
+                        />
+                        <div style={{ padding: '16px', paddingBottom: '100px' }}>
+                            <Card style={{ background: phase.color }}>
+                                <div style={{ textAlign: 'center' }}>
+                                    <strong>Phase {currentPhase}: {phase.name}</strong>
+                                    <div style={{ fontSize: '13px', marginTop: '4px' }}>
+                                        Months {phase.months}
+                                    </div>
+                                </div>
+                            </Card>
+
+                            {[1, 2, 3].map(month => {
+                                const globalMonth = (currentPhase - 1) * 3 + month;
+                                const key = `p${currentPhase}_${exercise}_m${month}`;
+                                return (
+                                    <Card key={month}>
+                                        <label style={{ 
+                                            display: 'block', 
+                                            marginBottom: '8px',
+                                            fontWeight: '600',
+                                        }}>
+                                            Month {globalMonth} Peak Weight (kg)
+                                        </label>
+                                        <input
+                                            type="number"
+                                            inputMode="decimal"
+                                            value={weightTrackerData[key] || ''}
+                                            onChange={(e) => handleWeightChange(exercise, month, e.target.value)}
+                                            placeholder="Enter peak weight..."
+                                            style={{
+                                                width: '100%',
+                                                padding: '14px',
+                                                fontSize: '18px',
+                                                border: '2px solid #e0e0e0',
+                                                borderRadius: '8px',
+                                                textAlign: 'center',
+                                            }}
+                                        />
+                                    </Card>
+                                );
+                            })}
+
+                            <Card style={{ background: '#C6E0B4' }}>
+                                <div style={{ textAlign: 'center' }}>
+                                    <div style={{ fontSize: '14px', color: '#666' }}>Phase Best</div>
+                                    <div style={{ fontSize: '28px', fontWeight: '700', color: '#2E5A88' }}>
+                                        {getBest(exercise) || '—'} kg
+                                    </div>
+                                </div>
+                            </Card>
+                        </div>
+                    </div>
+                );
+            }
+
+            return (
+                <div>
+                    <Header title="Weight Tracker" />
+                    <div style={{ padding: '16px', paddingBottom: '100px' }}>
+                        <Card style={{ background: `linear-gradient(135deg, ${phase.color} 0%, white 100%)` }}>
+                            <div style={{ textAlign: 'center' }}>
+                                <div style={{ fontSize: '14px', color: '#666' }}>Tracking</div>
+                                <div style={{ fontSize: '20px', fontWeight: '700', color: '#2E5A88' }}>
+                                    Phase {currentPhase}: {phase.name}
+                                </div>
+                                <div style={{ fontSize: '13px', color: '#666' }}>
+                                    Months {phase.months}
+                                </div>
+                            </div>
+                        </Card>
+
+                        <h3 style={{ margin: '20px 0 12px', color: '#333' }}>Key Exercises</h3>
+                        {keyExercises.map((exercise, idx) => {
+                            const best = getBest(exercise);
+                            return (
+                                <Card 
+                                    key={idx}
+                                    style={{ cursor: 'pointer' }}
+                                >
+                                    <div 
+                                        onClick={() => setSelectedExercise(idx)}
+                                        style={{
+                                            display: 'flex',
+                                            justifyContent: 'space-between',
+                                            alignItems: 'center',
+                                        }}
+                                    >
+                                        <div style={{ fontWeight: '600' }}>{exercise}</div>
+                                        <div style={{
+                                            background: best ? '#C6E0B4' : '#f0f0f0',
+                                            padding: '8px 16px',
+                                            borderRadius: '8px',
+                                            fontWeight: '600',
+                                            color: best ? '#2E5A88' : '#999',
+                                        }}>
+                                            {best ? `${best} kg` : 'Track →'}
+                                        </div>
+                                    </div>
+                                </Card>
+                            );
+                        })}
+                    </div>
+                </div>
+            );
+        };
+
+        // Progress Tab
+        const ProgressTab = ({ weightTrackerData }) => {
+            const chartRef = useRef(null);
+            const chartInstance = useRef(null);
+
+            useEffect(() => {
+                if (chartRef.current) {
+                    if (chartInstance.current) {
+                        chartInstance.current.destroy();
+                    }
+
+                    const ctx = chartRef.current.getContext('2d');
+                    const labels = Array.from({ length: 12 }, (_, i) => `M${i + 1}`);
+
+                    const getMonthlyData = (exercise) => {
+                        return labels.map((_, idx) => {
+                            const phase = Math.floor(idx / 3) + 1;
+                            const monthInPhase = (idx % 3) + 1;
+                            const key = `p${phase}_${exercise}_m${monthInPhase}`;
+                            return parseFloat(weightTrackerData[key]) || null;
+                        });
+                    };
+
+                    chartInstance.current = new Chart(ctx, {
+                        type: 'line',
+                        data: {
+                            labels,
+                            datasets: [
+                                {
+                                    label: 'Split Squat',
+                                    data: getMonthlyData('Split Squat'),
+                                    borderColor: '#2E5A88',
+                                    backgroundColor: 'rgba(46, 90, 136, 0.1)',
+                                    tension: 0.3,
+                                    spanGaps: true,
+                                },
+                                {
+                                    label: 'Hip Thrust',
+                                    data: getMonthlyData('Hip Thrust'),
+                                    borderColor: '#4CAF50',
+                                    backgroundColor: 'rgba(76, 175, 80, 0.1)',
+                                    tension: 0.3,
+                                    spanGaps: true,
+                                },
+                                {
+                                    label: 'Rows',
+                                    data: getMonthlyData('Rows'),
+                                    borderColor: '#FF9800',
+                                    backgroundColor: 'rgba(255, 152, 0, 0.1)',
+                                    tension: 0.3,
+                                    spanGaps: true,
+                                },
+                            ],
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: {
+                                    position: 'bottom',
+                                    labels: { boxWidth: 12, padding: 15 }
+                                }
+                            },
+                            scales: {
+                                y: {
+                                    beginAtZero: true,
+                                    title: { display: true, text: 'kg' }
+                                }
+                            }
+                        }
+                    });
+                }
+
+                return () => {
+                    if (chartInstance.current) {
+                        chartInstance.current.destroy();
+                    }
+                };
+            }, [weightTrackerData]);
+
+            // Calculate PRs
+            const getPR = (exercise) => {
+                let best = 0;
+                for (let p = 1; p <= 4; p++) {
+                    for (let m = 1; m <= 3; m++) {
+                        const val = parseFloat(weightTrackerData[`p${p}_${exercise}_m${m}`]) || 0;
+                        if (val > best) best = val;
+                    }
+                }
+                return best;
+            };
+
+            return (
+                <div>
+                    <Header title="Progress Dashboard" />
+                    <div style={{ padding: '16px', paddingBottom: '100px' }}>
+                        <Card>
+                            <h3 style={{ margin: '0 0 12px', color: '#2E5A88' }}>Strength Progression</h3>
+                            <div style={{ height: '250px' }}>
+                                <canvas ref={chartRef}></canvas>
+                            </div>
+                        </Card>
+
+                        <h3 style={{ margin: '20px 0 12px', color: '#333' }}>12-Month PRs</h3>
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                            {keyExercises.map((exercise, idx) => {
+                                const pr = getPR(exercise);
+                                return (
+                                    <Card key={idx} style={{ textAlign: 'center' }}>
+                                        <div style={{ fontSize: '13px', color: '#666', marginBottom: '4px' }}>
+                                            {exercise}
+                                        </div>
+                                        <div style={{ 
+                                            fontSize: '24px', 
+                                            fontWeight: '700', 
+                                            color: pr ? '#2E5A88' : '#ccc' 
+                                        }}>
+                                            {pr || '—'}
+                                            <span style={{ fontSize: '14px', fontWeight: '400' }}> kg</span>
+                                        </div>
+                                    </Card>
+                                );
+                            })}
+                        </div>
+
+                        <h3 style={{ margin: '20px 0 12px', color: '#333' }}>Phase Summary</h3>
+                        {phases.map((phase) => {
+                            const phaseExerciseCount = keyExercises.filter(ex => {
+                                for (let m = 1; m <= 3; m++) {
+                                    if (weightTrackerData[`p${phase.id}_${ex}_m${m}`]) return true;
+                                }
+                                return false;
+                            }).length;
+
+                            return (
+                                <Card key={phase.id} style={{ background: phase.color }}>
+                                    <div style={{
+                                        display: 'flex',
+                                        justifyContent: 'space-between',
+                                        alignItems: 'center',
+                                    }}>
+                                        <div>
+                                            <div style={{ fontWeight: '600' }}>
+                                                Phase {phase.id}: {phase.name}
+                                            </div>
+                                            <div style={{ fontSize: '13px', color: '#666' }}>
+                                                Months {phase.months} • {phase.reps}
+                                            </div>
+                                        </div>
+                                        <div style={{
+                                            background: 'white',
+                                            padding: '8px 12px',
+                                            borderRadius: '8px',
+                                            fontWeight: '600',
+                                        }}>
+                                            {phaseExerciseCount}/{keyExercises.length}
+                                        </div>
+                                    </div>
+                                </Card>
+                            );
+                        })}
+                    </div>
+                </div>
+            );
+        };
+
+        // Settings Tab
+        const SettingsTab = ({ currentPhase, setCurrentPhase, currentWeek, setCurrentWeek }) => {
+            const handleExport = () => {
+                const data = {
+                    workoutData: loadData('workoutData', {}),
+                    weightTrackerData: loadData('weightTrackerData', {}),
+                    currentPhase,
+                    currentWeek,
+                    exportDate: new Date().toISOString(),
+                };
+                const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `strength-tracker-backup-${new Date().toISOString().split('T')[0]}.json`;
+                a.click();
+            };
+
+            const handleClearData = () => {
+                if (confirm('Are you sure you want to clear ALL data? This cannot be undone.')) {
+                    localStorage.clear();
+                    window.location.reload();
+                }
+            };
+
+            return (
+                <div>
+                    <Header title="Settings" />
+                    <div style={{ padding: '16px', paddingBottom: '100px' }}>
+                        <Card>
+                            <h3 style={{ margin: '0 0 16px', color: '#2E5A88' }}>Current Program</h3>
+                            <div style={{ marginBottom: '16px' }}>
+                                <label style={{ display: 'block', marginBottom: '8px', fontWeight: '600' }}>
+                                    Phase
+                                </label>
+                                <select
+                                    value={currentPhase}
+                                    onChange={(e) => {
+                                        const val = parseInt(e.target.value);
+                                        setCurrentPhase(val);
+                                        saveData('currentPhase', val);
+                                    }}
+                                    style={{
+                                        width: '100%',
+                                        padding: '12px',
+                                        fontSize: '16px',
+                                        borderRadius: '8px',
+                                        border: '2px solid #e0e0e0',
+                                    }}
+                                >
+                                    {phases.map(p => (
+                                        <option key={p.id} value={p.id}>
+                                            Phase {p.id}: {p.name} (Months {p.months})
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+                            <div>
+                                <label style={{ display: 'block', marginBottom: '8px', fontWeight: '600' }}>
+                                    Week (1-12)
+                                </label>
+                                <input
+                                    type="number"
+                                    min="1"
+                                    max="12"
+                                    value={currentWeek}
+                                    onChange={(e) => {
+                                        const val = Math.min(12, Math.max(1, parseInt(e.target.value) || 1));
+                                        setCurrentWeek(val);
+                                        saveData('currentWeek', val);
+                                    }}
+                                    style={{
+                                        width: '100%',
+                                        padding: '12px',
+                                        fontSize: '16px',
+                                        borderRadius: '8px',
+                                        border: '2px solid #e0e0e0',
+                                    }}
+                                />
+                            </div>
+                        </Card>
+
+                        <Card>
+                            <h3 style={{ margin: '0 0 16px', color: '#2E5A88' }}>Data Management</h3>
+                            <button
+                                onClick={handleExport}
+                                style={{
+                                    width: '100%',
+                                    padding: '14px',
+                                    background: '#2E5A88',
+                                    color: 'white',
+                                    border: 'none',
+                                    borderRadius: '8px',
+                                    fontSize: '16px',
+                                    fontWeight: '600',
+                                    marginBottom: '12px',
+                                    cursor: 'pointer',
+                                }}
+                            >
+                                📤 Export Data Backup
+                            </button>
+                            <button
+                                onClick={handleClearData}
+                                style={{
+                                    width: '100%',
+                                    padding: '14px',
+                                    background: '#ff4444',
+                                    color: 'white',
+                                    border: 'none',
+                                    borderRadius: '8px',
+                                    fontSize: '16px',
+                                    fontWeight: '600',
+                                    cursor: 'pointer',
+                                }}
+                            >
+                                🗑️ Clear All Data
+                            </button>
+                        </Card>
+
+                        <Card>
+                            <h3 style={{ margin: '0 0 12px', color: '#2E5A88' }}>Add to Home Screen</h3>
+                            <p style={{ margin: 0, color: '#666', fontSize: '14px', lineHeight: '1.5' }}>
+                                To install this app on your iPhone:
+                                <br />1. Tap the Share button (□↑)
+                                <br />2. Scroll down and tap "Add to Home Screen"
+                                <br />3. Tap "Add"
+                            </p>
+                        </Card>
+                    </div>
+                </div>
+            );
+        };
+
+        // Main App
+        const App = () => {
+            const [activeTab, setActiveTab] = useState('workout');
+            const [currentPhase, setCurrentPhase] = useState(() => loadData('currentPhase', 1));
+            const [currentWeek, setCurrentWeek] = useState(() => loadData('currentWeek', 1));
+            const [workoutData, setWorkoutData] = useState(() => loadData('workoutData', {}));
+            const [weightTrackerData, setWeightTrackerData] = useState(() => loadData('weightTrackerData', {}));
+
+            return (
+                <div style={{ paddingBottom: '80px' }}>
+                    {activeTab === 'workout' && (
+                        <WorkoutTab
+                            currentPhase={currentPhase}
+                            currentWeek={currentWeek}
+                            workoutData={workoutData}
+                            setWorkoutData={setWorkoutData}
+                        />
+                    )}
+                    {activeTab === 'track' && (
+                        <TrackTab
+                            currentPhase={currentPhase}
+                            weightTrackerData={weightTrackerData}
+                            setWeightTrackerData={setWeightTrackerData}
+                        />
+                    )}
+                    {activeTab === 'progress' && (
+                        <ProgressTab weightTrackerData={weightTrackerData} />
+                    )}
+                    {activeTab === 'settings' && (
+                        <SettingsTab
+                            currentPhase={currentPhase}
+                            setCurrentPhase={setCurrentPhase}
+                            currentWeek={currentWeek}
+                            setCurrentWeek={setCurrentWeek}
+                        />
+                    )}
+                    <TabBar activeTab={activeTab} setActiveTab={setActiveTab} />
+                </div>
+            );
+        };
+
+        ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+    </script>
+</body>
+</html>
