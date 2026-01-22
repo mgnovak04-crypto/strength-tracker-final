@@ -1,284 +1,380 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="Strength">
-    <meta name="theme-color" content="#0d1a10">
-    <title>Knee-Safe Strength Tracker</title>
-    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect fill='%23169B62' width='100' height='100' rx='20'/><text x='50' y='65' font-size='50' text-anchor='middle' fill='white'>💪</text></svg>">
-    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        :root {
-            --primary: #169B62; --primary-dark: #0f7a4d; --secondary: #FF883E;
-            --accent: #FF7733; --success: #20c997; --warning: #FF883E;
-            --bg-dark: #0d1a10; --bg-card: #142318; --bg-card-light: #1c3422;
-            --text-primary: #ffffff; --text-secondary: #a8c4ac; --border: #2a4a30;
-            --strava: #fc4c02;
-            --irish-green: #169B62; --irish-orange: #FF883E; --irish-white: #FFFFFF;
-        }
-        .light-mode {
-            --bg-dark: #f5f8f5; --bg-card: #ffffff; --bg-card-light: #e8f5e9;
-            --text-primary: #1a2e1f; --text-secondary: #4a6350; --border: #c8e6c9;
-        }
-        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; margin: 0; padding: 0; background: var(--bg-dark); color: var(--text-primary); padding-top: env(safe-area-inset-top); padding-bottom: env(safe-area-inset-bottom); transition: background 0.3s, color 0.3s; }
-        #root { min-height: 100vh; }
-        @keyframes confetti-fall { 0% { transform: translateY(-100vh) rotate(0deg); opacity: 1; } 100% { transform: translateY(100vh) rotate(720deg); opacity: 0; } }
-        .confetti { position: fixed; width: 10px; height: 10px; top: 0; animation: confetti-fall 3s ease-out forwards; z-index: 9999; pointer-events: none; }
-        @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
-        .pulse { animation: pulse 0.5s ease-in-out 3; }
-        @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
-        .slide-in { animation: slideIn 0.3s ease-out; }
-        ::-webkit-scrollbar { width: 6px; } ::-webkit-scrollbar-track { background: var(--bg-dark); } ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
-        .haptic { transition: transform 0.1s; } .haptic:active { transform: scale(0.97); }
-        input[type="number"] { -moz-appearance: textfield; } input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
-    </style>
-</head>
-<body>
-    <div id="root"></div>
-    <script type="text/babel">
-        const { useState, useEffect, useRef } = React;
+: 'var(--text-muted)', textTransform: 'uppercase' }}>Months</div>
+                                </div>
+                            </div>
+                        </div>
 
-        const GOOGLE_SHEETS_CONFIG = { enabled: false, apiKey: 'YOUR_API_KEY', clientId: 'YOUR_CLIENT_ID', spreadsheetId: 'YOUR_SPREADSHEET_ID' };
+                        <div className="card animate-fadeInUp stagger-1" style={{ padding: '16px', marginBottom: '20px', background: 'linear-gradient(135deg, rgba(32,201,151,0.1) 0%, var(--bg-card) 100%)', borderColor: 'var(--success)' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                <span style={{ fontSize: '24px' }}>🛡️</span>
+                                <div>
+                                    <div style={{ fontWeight: 700, fontSize: '14px', color: 'var(--success)' }}>100% Knee-Safe</div>
+                                    <div style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>Zero patellofemoral compression • Hip hinge + open chain only</div>
+                                </div>
+                            </div>
+                        </div>
 
-        // ============ KNEE-SAFE 5-DAY PROGRAM v5.1 ============
-        // ZERO patellofemoral compression exercises
-        // All lower body work is hip-hinge or open-chain
-        // Designed for: Patellar cartilage fissures + medial femoral condyle damage
-        // Goals: Weight loss (91kg → 80kg), full body strength, knee protection
+                        <h3 style={{ fontSize: '12px', textTransform: 'uppercase', letterSpacing: '1px', color: 'var(--text-muted)', marginBottom: '12px' }} className="animate-fadeIn">
+                            5-Day Split
+                        </h3>
 
-        const phases = [
-            { id: 1, name: 'Foundation', months: '1-3', reps: '3×12-15', color: '#169B62', sets: 3, description: 'Build base strength, learn movements, protect knee' },
-            { id: 2, name: 'Build', months: '4-6', reps: '3×10-12', color: '#FF883E', sets: 3, description: 'Increase load progressively, maintain knee-safe form' },
-            { id: 3, name: 'Strengthen', months: '7-9', reps: '4×8-10', color: '#169B62', sets: 4, description: 'Higher intensity, continued knee protection' },
-            { id: 4, name: 'Maintain', months: '10-12', reps: '3×10-12', color: '#FF883E', sets: 3, description: 'Sustainable long-term strength maintenance' },
-        ];
+                        {workoutDays.map((day, idx) => {
+                            const dayExercises = exercises[day.id];
+                            const completed = dayExercises.filter(ex => workoutData[getWorkoutKey(day.id, ex.name)]?.completedSets > 0).length;
+                            const total = dayExercises.length;
+                            const progress = (completed / total) * 100;
+                            const isComplete = completed === total;
 
-        const workoutDays = [
-            { id: 1, name: 'Upper Push', icon: 'fa-solid fa-arrows-up-down', muscles: 'Chest, Shoulders, Triceps' },
-            { id: 2, name: 'Lower Knee-Safe', icon: 'fa-solid fa-heart-pulse', muscles: 'Glutes, Hamstrings, Calves (VMO focus)' },
-            { id: 3, name: 'Upper Pull', icon: 'fa-solid fa-hand-back-fist', muscles: 'Back, Biceps, Rear Delts' },
-            { id: 4, name: 'Core & Cardio', icon: 'fa-solid fa-fire', muscles: 'Core, HIIT, Calorie Burn' },
-            { id: 5, name: 'Full Body Light', icon: 'fa-solid fa-person', muscles: 'Active Recovery, Mobility, Rehab' },
-        ];
+                            return (
+                                <div key={day.id} className={`day-card animate-fadeInUp stagger-${idx + 2} ${isComplete ? 'complete' : ''}`} onClick={() => { setSelectedDay(day.id); haptic(); }} style={{ marginBottom: '12px' }}>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                                        <div style={{ width: '52px', height: '52px', borderRadius: 'var(--radius-lg)', background: isComplete ? phaseColor : 'var(--bg-elevated)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '24px', transition: 'all var(--timing-normal)' }}>
+                                            {isComplete ? '✓' : day.emoji}
+                                        </div>
+                                        <div style={{ flex: 1 }}>
+                                            <div style={{ fontWeight: 700, fontSize: '16px', marginBottom: '2px' }}>Day {day.id}: {day.name}</div>
+                                            <div style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>{day.muscles}</div>
+                                        </div>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                                            <ProgressRing progress={progress} size={40} strokeWidth={3} color={isComplete ? 'var(--success)' : phaseColor} />
+                                            <i className="fa-solid fa-chevron-right" style={{ color: 'var(--text-muted)', fontSize: '14px' }}></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            );
+                        })}
+                    </div>
 
-        const exercisesByPhaseAndDay = {
-            1: { // Foundation Phase - Learn movements, no knee compression
-                1: [ // Upper Push
-                    { name: 'Push-ups', reps: '12-15', muscle: 'Chest', notes: 'Knees down if needed' },
-                    { name: 'DB Bench Press', reps: '12-15', muscle: 'Chest', notes: 'Flat or slight incline' },
-                    { name: 'DB Shoulder Press', reps: '12-15', muscle: 'Shoulders', notes: 'Seated for stability' },
-                    { name: 'Lateral Raises', reps: '12-15', muscle: 'Shoulders', notes: 'Light weight, control' },
-                    { name: 'Tricep Dips (bench)', reps: '12-15', muscle: 'Triceps', notes: 'Bench dips or machine' },
-                    { name: 'Tricep Pushdowns', reps: '12-15', muscle: 'Triceps', notes: 'Cable or band' },
-                ],
-                2: [ // Lower Knee-Safe - ALL hip hinge or open chain
-                    { name: 'Glute Bridges', reps: '15-20', muscle: 'Glutes', notes: '⭐ Zero knee compression' },
-                    { name: 'Romanian Deadlift', reps: '12-15', muscle: 'Hamstrings', notes: '⭐ Hip hinge, knees soft' },
-                    { name: 'Hip Thrust', reps: '12-15', muscle: 'Glutes', notes: '⭐ Bench supported' },
-                    { name: 'Lying Leg Curl', reps: '12-15', muscle: 'Hamstrings', notes: '⭐ Open chain - knee safe' },
-                    { name: 'Standing Calf Raises', reps: '15-20', muscle: 'Calves', notes: 'Slow eccentric 3 sec down' },
-                    { name: 'TKE (Terminal Knee Ext)', reps: '15-20', muscle: 'VMO', notes: '⭐ KEY rehab exercise' },
-                ],
-                3: [ // Upper Pull
-                    { name: 'Lat Pulldown', reps: '12-15', muscle: 'Lats', notes: 'Wide or neutral grip' },
-                    { name: 'Seated Cable Row', reps: '12-15', muscle: 'Back', notes: 'Squeeze shoulder blades' },
-                    { name: 'DB Rows', reps: '12-15', muscle: 'Back', notes: 'Single arm, bench support' },
-                    { name: 'Face Pulls', reps: '15-20', muscle: 'Rear Delts', notes: 'Posture correction' },
-                    { name: 'Bicep Curls', reps: '12-15', muscle: 'Biceps', notes: 'DB or cable' },
-                    { name: 'Hammer Curls', reps: '12-15', muscle: 'Biceps', notes: 'Neutral grip' },
-                ],
-                4: [ // Core & Cardio - knee-friendly options only
-                    { name: 'Plank', reps: '30-45s', muscle: 'Core', notes: 'Hold with good form' },
-                    { name: 'Dead Bug', reps: '10-12/side', muscle: 'Core', notes: 'Anti-extension' },
-                    { name: 'Pallof Press', reps: '12-15/side', muscle: 'Core', notes: 'Anti-rotation' },
-                    { name: 'Bird Dog', reps: '10-12/side', muscle: 'Core', notes: 'Stability' },
-                    { name: 'Rowing Machine', reps: '10-15 min', muscle: 'Cardio', notes: '⭐ Knee-friendly cardio' },
-                    { name: 'Battle Ropes', reps: '30s on/30s off x5', muscle: 'Cardio', notes: '⭐ Upper body cardio burn' },
-                ],
-                5: [ // Full Body Light / Rehab - zero impact
-                    { name: 'Prone Leg Raise', reps: '12-15/leg', muscle: 'Glutes/Hams', notes: '⭐ Lying face down, lift straight leg' },
-                    { name: 'Glute Bridge Hold', reps: '30s', muscle: 'Glutes', notes: '⭐ Isometric, no knee stress' },
-                    { name: 'Clamshells', reps: '15-20/side', muscle: 'Hip Abductors', notes: '⭐ Side-lying, band optional' },
-                    { name: 'Straight Leg Raise', reps: '12-15/leg', muscle: 'Quads/Hip Flexors', notes: '⭐ Lying on back, knee straight' },
-                    { name: 'Foam Rolling', reps: '5-10 min', muscle: 'Recovery', notes: 'Quads, IT band, calves' },
-                    { name: 'Swimming/Pool Walk', reps: '20-30 min', muscle: 'Low Impact Cardio', notes: '⭐ Best option for knee' },
-                ],
-            },
-            2: { // Build Phase - Progressive loading, still zero compression
-                1: [ // Upper Push
-                    { name: 'Incline DB Press', reps: '10-12', muscle: 'Upper Chest', notes: 'Progress weight' },
-                    { name: 'Flat DB Press', reps: '10-12', muscle: 'Chest', notes: 'Heavier than Phase 1' },
-                    { name: 'Arnold Press', reps: '10-12', muscle: 'Shoulders', notes: 'Rotation through press' },
-                    { name: 'Cable Flyes', reps: '12-15', muscle: 'Chest', notes: 'Squeeze at center' },
-                    { name: 'Overhead Tricep Ext', reps: '10-12', muscle: 'Triceps', notes: 'Cable or DB' },
-                    { name: 'Close Grip Push-ups', reps: '10-15', muscle: 'Triceps', notes: 'Tricep emphasis' },
-                ],
-                2: [ // Lower Knee-Safe - heavier hip hinge work
-                    { name: 'Barbell Hip Thrust', reps: '10-12', muscle: 'Glutes', notes: '⭐ Progress load here' },
-                    { name: 'Romanian Deadlift', reps: '10-12', muscle: 'Hamstrings', notes: '⭐ DB or barbell' },
-                    { name: 'Cable Pull-Through', reps: '12-15', muscle: 'Glutes/Hams', notes: '⭐ Hip hinge pattern' },
-                    { name: 'Nordic Curl (assisted)', reps: '6-8', muscle: 'Hamstrings', notes: '⭐ Eccentric focus, knee safe' },
-                    { name: 'Seated Calf Raise', reps: '12-15', muscle: 'Soleus', notes: 'Targets deep calf' },
-                    { name: 'TKE with Band', reps: '15-20', muscle: 'VMO', notes: '⭐ Heavier band' },
-                ],
-                3: [ // Upper Pull
-                    { name: 'Pull-ups/Assisted', reps: '8-12', muscle: 'Lats', notes: 'Progress to bodyweight' },
-                    { name: 'Chest Supported Row', reps: '10-12', muscle: 'Back', notes: 'No momentum' },
-                    { name: 'Single Arm Cable Row', reps: '10-12/arm', muscle: 'Back', notes: 'Core engagement' },
-                    { name: 'Reverse Flyes', reps: '12-15', muscle: 'Rear Delts', notes: 'Light, controlled' },
-                    { name: 'Preacher Curls', reps: '10-12', muscle: 'Biceps', notes: 'Full stretch' },
-                    { name: 'Cable Curls', reps: '12-15', muscle: 'Biceps', notes: 'Constant tension' },
-                ],
-                4: [ // Core & Cardio
-                    { name: 'Ab Wheel Rollout', reps: '8-12', muscle: 'Core', notes: 'Kneeling on pad' },
-                    { name: 'Hanging Knee Raise', reps: '10-15', muscle: 'Core', notes: 'Or captain chair' },
-                    { name: 'Woodchops', reps: '12-15/side', muscle: 'Core', notes: 'Cable rotation' },
-                    { name: 'Farmers Carry', reps: '40m', muscle: 'Core/Grip', notes: 'Heavy DBs, walk flat' },
-                    { name: 'Assault Bike', reps: '12-15 min', muscle: 'Cardio', notes: '⭐ Arms + legs, low impact' },
-                    { name: 'Med Ball Slams', reps: '3x10', muscle: 'Cardio/Power', notes: '⭐ Stand and slam' },
-                ],
-                5: [ // Full Body Light / Rehab
-                    { name: 'Single Leg Glute Bridge', reps: '10-12/leg', muscle: 'Glutes', notes: '⭐ Unilateral, no knee load' },
-                    { name: 'Side-lying Hip Abduction', reps: '15-20/side', muscle: 'Glute Med', notes: '⭐ With band' },
-                    { name: 'Prone Hip Extension', reps: '12-15/leg', muscle: 'Glutes', notes: '⭐ Face down, lift leg' },
-                    { name: 'Ankle Band 4-Way', reps: '15 each direction', muscle: 'Ankle Stability', notes: 'Seated or standing' },
-                    { name: 'Hip CARs', reps: '5-8/direction', muscle: 'Hip Mobility', notes: 'Controlled rotation' },
-                    { name: 'Swimming', reps: '20-30 min', muscle: 'Cardio', notes: '⭐ Any stroke' },
-                ],
-            },
-            3: { // Strengthen Phase - Peak intensity, still protecting knee
-                1: [ // Upper Push
-                    { name: 'Barbell Bench Press', reps: '8-10', muscle: 'Chest', notes: 'Main lift' },
-                    { name: 'Incline DB Press', reps: '8-10', muscle: 'Upper Chest', notes: 'Heavier' },
-                    { name: 'Overhead Press', reps: '8-10', muscle: 'Shoulders', notes: 'Standing or seated' },
-                    { name: 'Dips', reps: '8-12', muscle: 'Chest/Triceps', notes: 'Add weight if able' },
-                    { name: 'Skull Crushers', reps: '10-12', muscle: 'Triceps', notes: 'EZ bar or DBs' },
-                    { name: 'Lateral Raises', reps: '12-15', muscle: 'Shoulders', notes: 'Higher volume' },
-                ],
-                2: [ // Lower Knee-Safe - Peak hip hinge loading
-                    { name: 'Heavy Hip Thrust', reps: '8-10', muscle: 'Glutes', notes: '⭐ Your main lower lift' },
-                    { name: 'Stiff Leg Deadlift', reps: '8-10', muscle: 'Hamstrings', notes: '⭐ Full range hinge' },
-                    { name: 'Good Mornings', reps: '10-12', muscle: 'Posterior Chain', notes: '⭐ Light bar, hip hinge' },
-                    { name: 'Lying Leg Curl', reps: '10-12', muscle: 'Hamstrings', notes: '⭐ Machine, heavier' },
-                    { name: 'Donkey Calf Raise', reps: '12-15', muscle: 'Calves', notes: 'Machine or partner' },
-                    { name: 'TKE + Straight Leg Raise', reps: '12-15', muscle: 'VMO/Quads', notes: '⭐ Superset these two' },
-                ],
-                3: [ // Upper Pull
-                    { name: 'Weighted Pull-ups', reps: '6-8', muscle: 'Lats', notes: 'Add weight belt' },
-                    { name: 'Barbell Row', reps: '8-10', muscle: 'Back', notes: 'Pendlay or bent over' },
-                    { name: 'T-Bar Row', reps: '8-10', muscle: 'Back', notes: 'Chest supported option' },
-                    { name: 'Face Pulls', reps: '15-20', muscle: 'Rear Delts', notes: 'Always include' },
-                    { name: 'Barbell Curls', reps: '8-10', muscle: 'Biceps', notes: 'Heavier' },
-                    { name: 'Incline DB Curls', reps: '10-12', muscle: 'Biceps', notes: 'Full stretch' },
-                ],
-                4: [ // Core & Cardio
-                    { name: 'Dragon Flag Progression', reps: '6-10', muscle: 'Core', notes: 'Advanced, build up' },
-                    { name: 'Weighted Plank', reps: '30-45s', muscle: 'Core', notes: 'Plate on back' },
-                    { name: 'Landmine Rotation', reps: '10-12/side', muscle: 'Core', notes: 'Explosive' },
-                    { name: 'Suitcase Carry', reps: '40m/side', muscle: 'Core', notes: 'Anti-lateral flexion' },
-                    { name: 'Ski Erg', reps: '15 min', muscle: 'Cardio', notes: '⭐ Full body, zero knee' },
-                    { name: 'Boxing/Bag Work', reps: '3x3 min rounds', muscle: 'Cardio', notes: '⭐ Upper body focus' },
-                ],
-                5: [ // Full Body Light / Rehab
-                    { name: 'Frog Pumps', reps: '20-25', muscle: 'Glutes', notes: '⭐ Feet together, knees out' },
-                    { name: 'Fire Hydrants', reps: '15/side', muscle: 'Glute Med', notes: '⭐ On all fours' },
-                    { name: 'Banded Hip March', reps: '12-15/leg', muscle: 'Hip Flexors', notes: '⭐ Standing, band around feet' },
-                    { name: 'Supine Leg Circles', reps: '8-10/direction', muscle: 'Hip Mobility', notes: 'Lying on back' },
-                    { name: 'TKE (light)', reps: '20', muscle: 'VMO', notes: '⭐ Active recovery' },
-                    { name: 'Pool Running', reps: '20-30 min', muscle: 'Cardio', notes: '⭐ Deep water if possible' },
-                ],
-            },
-            4: { // Maintain Phase - Sustainable long-term
-                1: [ // Upper Push
-                    { name: 'DB Bench Press', reps: '10-12', muscle: 'Chest', notes: 'Sustainable load' },
-                    { name: 'Incline Push-ups', reps: '12-15', muscle: 'Chest', notes: 'Or flat' },
-                    { name: 'DB Shoulder Press', reps: '10-12', muscle: 'Shoulders', notes: 'Moderate' },
-                    { name: 'Cable Crossover', reps: '12-15', muscle: 'Chest', notes: 'Finish movement' },
-                    { name: 'Tricep Pushdown', reps: '12-15', muscle: 'Triceps', notes: 'Various grips' },
-                    { name: 'Lateral Raises', reps: '12-15', muscle: 'Shoulders', notes: 'Light' },
-                ],
-                2: [ // Lower Knee-Safe - Maintain gains
-                    { name: 'Hip Thrust', reps: '10-12', muscle: 'Glutes', notes: '⭐ Maintain strength' },
-                    { name: 'RDL', reps: '10-12', muscle: 'Hamstrings', notes: '⭐ DB or barbell' },
-                    { name: 'Glute Bridge March', reps: '10-12/leg', muscle: 'Glutes', notes: '⭐ Alternating legs' },
-                    { name: 'Lying Leg Curl', reps: '12-15', muscle: 'Hamstrings', notes: '⭐ Machine' },
-                    { name: 'Standing Calf Raise', reps: '15-20', muscle: 'Calves', notes: 'Slow eccentric' },
-                    { name: 'TKE', reps: '15-20', muscle: 'VMO', notes: '⭐ Always include forever' },
-                ],
-                3: [ // Upper Pull
-                    { name: 'Lat Pulldown', reps: '10-12', muscle: 'Lats', notes: 'Vary grip weekly' },
-                    { name: 'Cable Row', reps: '10-12', muscle: 'Back', notes: 'Squeeze' },
-                    { name: 'DB Row', reps: '10-12/arm', muscle: 'Back', notes: 'Controlled' },
-                    { name: 'Face Pulls', reps: '15-20', muscle: 'Rear Delts', notes: 'Non-negotiable' },
-                    { name: 'Bicep Curls', reps: '12-15', muscle: 'Biceps', notes: 'Various' },
-                    { name: 'Reverse Curls', reps: '12-15', muscle: 'Forearms', notes: 'Grip health' },
-                ],
-                4: [ // Core & Cardio
-                    { name: 'Plank Variations', reps: '45-60s', muscle: 'Core', notes: 'Side, front, etc' },
-                    { name: 'Dead Bug', reps: '12-15/side', muscle: 'Core', notes: 'Control' },
-                    { name: 'Pallof Press', reps: '12-15/side', muscle: 'Core', notes: 'Anti-rotation' },
-                    { name: 'Farmers Carry', reps: '40m', muscle: 'Core', notes: 'Heavy' },
-                    { name: 'Rowing', reps: '15-20 min', muscle: 'Cardio', notes: '⭐ Steady state' },
-                    { name: 'Arm Ergometer', reps: '10-15 min', muscle: 'Cardio', notes: '⭐ Upper body bike' },
-                ],
-                5: [ // Full Body Light / Rehab
-                    { name: 'Glute Bridge', reps: '20', muscle: 'Glutes', notes: '⭐ Activation' },
-                    { name: 'Clamshells', reps: '15/side', muscle: 'Hip', notes: '⭐ Band' },
-                    { name: 'Straight Leg Raise', reps: '15/leg', muscle: 'Quads', notes: '⭐ Lying, knee locked' },
-                    { name: 'Prone Hip Extension', reps: '15/leg', muscle: 'Glutes', notes: '⭐ Face down' },
-                    { name: 'Full Body Stretch', reps: '15-20 min', muscle: 'Mobility', notes: 'Hips, hamstrings focus' },
-                    { name: 'Walk/Swim/Cycle', reps: '30 min', muscle: 'Cardio', notes: '⭐ Low impact always' },
-                ],
-            },
+                    <Toast {...toast} onClose={() => setToast(t => ({ ...t, visible: false }))} />
+                </>
+            );
         };
 
-        const keyExercises = [{ name: 'Hip Thrust', icon: '🍑' }, { name: 'RDL', icon: '🦵' }, { name: 'TKE', icon: '🦿' }, { name: 'Bench Press', icon: '💪' }, { name: 'Pull-up/Row', icon: '🔙' }, { name: 'Plank', icon: '🧘' }];
+        const ProgressTab = ({ workoutData, workoutHistory }) => {
+            const chartRef = useRef(null);
+            const chartInstance = useRef(null);
 
-        const saveData = (key, data) => localStorage.setItem(key, JSON.stringify(data));
-        const loadData = (key, defaultValue) => { try { const stored = localStorage.getItem(key); return stored ? JSON.parse(stored) : defaultValue; } catch { return defaultValue; } };
+            useEffect(() => {
+                if (chartRef.current) {
+                    if (chartInstance.current) chartInstance.current.destroy();
+                    const ctx = chartRef.current.getContext('2d');
+                    
+                    const getPhaseAverages = (keyword) => [1, 2, 3, 4].map(phase => {
+                        const data = Object.keys(workoutData)
+                            .filter(k => k.startsWith(`p${phase}_`) && k.includes(keyword))
+                            .map(k => workoutData[k]?.average || 0)
+                            .filter(v => v > 0);
+                        return data.length > 0 ? (data.reduce((a, b) => a + b, 0) / data.length).toFixed(1) : null;
+                    });
 
-        const migrateWorkoutData = (data) => {
-            if (!data) return {};
-            const migrated = {};
-            Object.keys(data).forEach(key => {
-                const entry = data[key];
-                if (entry && entry.sets) {
-                    if (typeof entry.sets[0] === 'object') { migrated[key] = entry; }
-                    else { migrated[key] = { ...entry, sets: entry.sets.map(weight => ({ weight: weight || '', reps: '' })) }; }
-                } else { migrated[key] = entry; }
-            });
-            return migrated;
+                    chartInstance.current = new Chart(ctx, {
+                        type: 'bar',
+                        data: {
+                            labels: ['Phase 1', 'Phase 2', 'Phase 3', 'Phase 4'],
+                            datasets: [
+                                { label: 'Hip Thrust', data: getPhaseAverages('Hip'), backgroundColor: '#169B62', borderRadius: 6 },
+                                { label: 'RDL', data: getPhaseAverages('Romanian'), backgroundColor: '#FF883E', borderRadius: 6 },
+                                { label: 'Bench', data: getPhaseAverages('Bench'), backgroundColor: '#8fa88f', borderRadius: 6 },
+                            ]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: { position: 'bottom', labels: { boxWidth: 12, padding: 16, color: '#8fa88f', font: { size: 11 } } }
+                            },
+                            scales: {
+                                y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#5a7a5a', font: { size: 10 } } },
+                                x: { grid: { display: false }, ticks: { color: '#5a7a5a', font: { size: 10 } } }
+                            }
+                        }
+                    });
+                }
+                return () => { if (chartInstance.current) chartInstance.current.destroy(); };
+            }, [workoutData]);
+
+            const getPR = (keyword) => {
+                let best = 0;
+                Object.keys(workoutData).forEach(key => {
+                    if (key.toLowerCase().includes(keyword.toLowerCase())) {
+                        const val = workoutData[key]?.max || 0;
+                        if (val > best) best = val;
+                    }
+                });
+                return best;
+            };
+
+            const getTotalVolume = () => Object.keys(workoutData).reduce((t, k) => t + (workoutData[k]?.totalVolume || 0), 0);
+            const totalWorkouts = workoutHistory.length;
+            const totalVol = getTotalVolume();
+
+            const prExercises = [
+                { name: 'Hip Thrust', key: 'Hip', icon: '🍑' },
+                { name: 'RDL', key: 'Romanian', icon: '🦵' },
+                { name: 'TKE', key: 'TKE', icon: '🦿' },
+                { name: 'Bench', key: 'Bench', icon: '💪' },
+                { name: 'Row', key: 'Row', icon: '🔙' },
+                { name: 'Press', key: 'Press', icon: '⬆️' },
+            ];
+
+            return (
+                <>
+                    <div className="app-header">
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                            <div>
+                                <div style={{ fontSize: '12px', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '2px' }}>IronClad</div>
+                                <h1 style={{ margin: 0, fontSize: '20px', fontWeight: 800 }} className="gradient-text">Progress</h1>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="app-content">
+                        <div className="irish-stripe animate-fadeIn" style={{ marginBottom: '20px' }} />
+
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '20px' }}>
+                            <div className="stat-card animate-fadeInUp">
+                                <div className="stat-value" style={{ color: 'var(--irish-green)' }}>{totalWorkouts}</div>
+                                <div className="stat-label">Workouts</div>
+                            </div>
+                            <div className="stat-card animate-fadeInUp stagger-1">
+                                <div className="stat-value" style={{ color: 'var(--irish-orange)' }}>{totalVol.toLocaleString()}</div>
+                                <div className="stat-label">Total Volume (kg)</div>
+                            </div>
+                        </div>
+
+                        <div className="card animate-fadeInUp stagger-2" style={{ padding: '20px', marginBottom: '20px' }}>
+                            <h3 style={{ margin: '0 0 16px', fontSize: '14px', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                <i className="fa-solid fa-chart-column" style={{ color: 'var(--irish-green)' }}></i>
+                                Key Lifts by Phase
+                            </h3>
+                            <div style={{ height: '200px' }}>
+                                <canvas ref={chartRef}></canvas>
+                            </div>
+                        </div>
+
+                        <h3 style={{ fontSize: '12px', textTransform: 'uppercase', letterSpacing: '1px', color: 'var(--text-muted)', marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '8px' }} className="animate-fadeIn">
+                            <span>☘️</span> Personal Records
+                        </h3>
+
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '10px' }}>
+                            {prExercises.map((ex, idx) => {
+                                const pr = getPR(ex.key);
+                                return (
+                                    <div key={ex.key} className={`card animate-fadeInUp stagger-${Math.min(idx + 3, 6)}`} style={{ padding: '16px', textAlign: 'center' }}>
+                                        <div style={{ fontSize: '24px', marginBottom: '6px' }}>{ex.icon}</div>
+                                        <div style={{ fontSize: '10px', color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '4px' }}>{ex.name}</div>
+                                        <div style={{ fontSize: '20px', fontWeight: 800, fontFamily: "'JetBrains Mono', monospace", color: pr ? 'var(--irish-orange)' : 'var(--text-muted)' }}>
+                                            {pr || '—'}<span style={{ fontSize: '10px', fontWeight: 500 }}>{pr ? ' kg' : ''}</span>
+                                        </div>
+                                    </div>
+                                );
+                            })}
+                        </div>
+
+                        {workoutHistory.length > 0 && (
+                            <>
+                                <h3 style={{ fontSize: '12px', textTransform: 'uppercase', letterSpacing: '1px', color: 'var(--text-muted)', margin: '24px 0 12px' }} className="animate-fadeIn">
+                                    Recent Workouts
+                                </h3>
+                                {workoutHistory.slice(0, 5).map((workout, idx) => (
+                                    <div key={idx} className="card animate-fadeInUp" style={{ padding: '14px', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                        <div style={{ width: '40px', height: '40px', borderRadius: 'var(--radius-md)', background: 'var(--bg-elevated)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '18px' }}>
+                                            {workoutDays[workout.day - 1]?.emoji || '💪'}
+                                        </div>
+                                        <div style={{ flex: 1 }}>
+                                            <div style={{ fontWeight: 600, fontSize: '14px' }}>Day {workout.day}: {workoutDays[workout.day - 1]?.name}</div>
+                                            <div style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>Phase {workout.phase} • Week {workout.week}</div>
+                                        </div>
+                                        <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>
+                                            {new Date(workout.date).toLocaleDateString()}
+                                        </div>
+                                    </div>
+                                ))}
+                            </>
+                        )}
+                    </div>
+                </>
+            );
         };
 
-        const triggerConfetti = () => { const colors = ['#169B62', '#FF883E', '#FFFFFF']; for (let i = 0; i < 50; i++) { const c = document.createElement('div'); c.className = 'confetti'; c.style.left = Math.random() * 100 + 'vw'; c.style.background = colors[Math.floor(Math.random() * colors.length)]; c.style.animationDelay = Math.random() * 2 + 's'; c.style.borderRadius = Math.random() > 0.5 ? '50%' : '0'; document.body.appendChild(c); setTimeout(() => c.remove(), 5000); } };
+        const SettingsTab = ({ currentPhase, setCurrentPhase, currentWeek, setCurrentWeek }) => {
+            const handleExport = () => {
+                const data = {
+                    workoutData: loadData('workoutData', {}),
+                    workoutHistory: loadData('workoutHistory', []),
+                    currentPhase,
+                    currentWeek,
+                    exportDate: new Date().toISOString(),
+                    version: '6.0-ios'
+                };
+                const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `ironclad-backup-${new Date().toISOString().split('T')[0]}.json`;
+                a.click();
+                haptic('success');
+            };
 
-        const Header = ({ title, onBack, rightAction, subtitle }) => (<div style={{ background: 'linear-gradient(135deg, var(--bg-card) 0%, var(--bg-card-light) 100%)', padding: '16px 20px', paddingTop: 'calc(16px + env(safe-area-inset-top))', display: 'flex', flexDirection: 'column', position: 'sticky', top: 0, zIndex: 100, borderBottom: '1px solid var(--border)' }}><div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>{onBack ? <button onClick={onBack} className="haptic" style={{ background: 'none', border: 'none', color: 'var(--primary)', fontSize: '18px', cursor: 'pointer', padding: '8px', borderRadius: '8px' }}><i className="fa-solid fa-chevron-left"></i></button> : <div style={{ width: 40 }} />}<h1 style={{ margin: 0, fontSize: '18px', fontWeight: '600' }}>{title}</h1>{rightAction || <div style={{ width: 40 }} />}</div>{subtitle && <div style={{ textAlign: 'center', fontSize: '13px', color: 'var(--text-secondary)', marginTop: '4px' }}>{subtitle}</div>}</div>);
+            const handleImport = (e) => {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = (event) => {
+                        try {
+                            const data = JSON.parse(event.target.result);
+                            if (data.workoutData) saveData('workoutData', migrateWorkoutData(data.workoutData));
+                            if (data.workoutHistory) saveData('workoutHistory', data.workoutHistory);
+                            if (data.currentPhase) saveData('currentPhase', data.currentPhase);
+                            if (data.currentWeek) saveData('currentWeek', data.currentWeek);
+                            alert('Data imported! Refreshing...');
+                            window.location.reload();
+                        } catch { alert('Error importing data.'); }
+                    };
+                    reader.readAsText(file);
+                }
+            };
 
-        const TabBar = ({ activeTab, setActiveTab }) => (<div style={{ position: 'fixed', bottom: 0, left: 0, right: 0, background: 'var(--bg-card)', borderTop: '1px solid var(--border)', display: 'flex', paddingBottom: 'env(safe-area-inset-bottom)', zIndex: 100 }}>{[{ id: 'workout', icon: 'fa-solid fa-dumbbell', label: 'Workout' }, { id: 'progress', icon: 'fa-solid fa-chart-line', label: 'Progress' }, { id: 'settings', icon: 'fa-solid fa-gear', label: 'Settings' }].map(tab => (<button key={tab.id} onClick={() => setActiveTab(tab.id)} className="haptic" style={{ flex: 1, padding: '10px 0 8px', border: 'none', background: 'none', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', color: activeTab === tab.id ? 'var(--primary)' : 'var(--text-secondary)', fontSize: '10px', fontWeight: activeTab === tab.id ? '600' : '400', cursor: 'pointer' }}><i className={tab.icon} style={{ fontSize: '20px' }}></i>{tab.label}</button>))}</div>);
+            return (
+                <>
+                    <div className="app-header">
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                            <div>
+                                <div style={{ fontSize: '12px', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '2px' }}>IronClad</div>
+                                <h1 style={{ margin: 0, fontSize: '20px', fontWeight: 800 }} className="gradient-text">Settings</h1>
+                            </div>
+                        </div>
+                    </div>
 
-        const Card = ({ children, style, onClick, className }) => (<div onClick={onClick} className={`haptic ${className || ''}`} style={{ background: 'var(--bg-card)', borderRadius: '16px', padding: '16px', marginBottom: '12px', border: '1px solid var(--border)', cursor: onClick ? 'pointer' : 'default', transition: 'transform 0.2s, box-shadow 0.2s', ...style }}>{children}</div>);
+                    <div className="app-content">
+                        <div className="irish-stripe animate-fadeIn" style={{ marginBottom: '20px' }} />
 
-        const ProgressRing = ({ progress, size = 60, strokeWidth = 6, color }) => { const radius = (size - strokeWidth) / 2; const circumference = radius * 2 * Math.PI; const offset = circumference - (progress / 100) * circumference; return (<svg width={size} height={size} style={{ transform: 'rotate(-90deg)' }}><circle stroke="var(--border)" fill="transparent" strokeWidth={strokeWidth} r={radius} cx={size/2} cy={size/2} /><circle stroke={color || 'var(--primary)'} fill="transparent" strokeWidth={strokeWidth} strokeLinecap="round" r={radius} cx={size/2} cy={size/2} style={{ strokeDasharray: circumference, strokeDashoffset: offset, transition: 'stroke-dashoffset 0.5s ease' }} /></svg>); };
+                        <div className="card animate-fadeInUp" style={{ padding: '20px', marginBottom: '16px', background: 'linear-gradient(135deg, rgba(32,201,151,0.1) 0%, var(--bg-card) 100%)', borderColor: 'var(--success)' }}>
+                            <h3 style={{ margin: '0 0 12px', fontSize: '14px', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                <span>🛡️</span> Knee-Safe Principles
+                            </h3>
+                            <ul style={{ margin: 0, paddingLeft: '20px', fontSize: '13px', color: 'var(--text-secondary)', lineHeight: '1.8' }}>
+                                <li><strong style={{ color: 'var(--text-primary)' }}>Hip hinge over knee bend</strong> — RDLs, hip thrusts primary</li>
+                                <li><strong style={{ color: 'var(--text-primary)' }}>Open chain leg work</strong> — Leg curls, straight leg raises</li>
+                                <li><strong style={{ color: 'var(--text-primary)' }}>TKE every lower day</strong> — Strengthens VMO safely</li>
+                                <li><strong style={{ color: 'var(--text-primary)' }}>Zero deep squats</strong> — No wall sits, no leg press</li>
+                                <li><strong style={{ color: 'var(--irish-orange)' }}>Stop if pain</strong> — Sharp knee pain = stop immediately</li>
+                            </ul>
+                        </div>
 
-        const RestTimer = ({ isOpen, onClose, defaultTime = 90 }) => { const [timeLeft, setTimeLeft] = useState(defaultTime); const [isRunning, setIsRunning] = useState(false); const [selectedTime, setSelectedTime] = useState(defaultTime); const intervalRef = useRef(null); useEffect(() => { if (isRunning && timeLeft > 0) { intervalRef.current = setInterval(() => setTimeLeft(t => t - 1), 1000); } else if (timeLeft === 0) { setIsRunning(false); if (navigator.vibrate) navigator.vibrate([200, 100, 200]); } return () => clearInterval(intervalRef.current); }, [isRunning, timeLeft]); const resetTimer = (time) => { setSelectedTime(time); setTimeLeft(time); setIsRunning(false); }; if (!isOpen) return null; const progress = (timeLeft / selectedTime) * 100; const minutes = Math.floor(timeLeft / 60); const seconds = timeLeft % 60; return (<div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.8)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: '20px' }}><Card style={{ width: '100%', maxWidth: '320px', textAlign: 'center' }}><div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '20px' }}><h3 style={{ margin: 0 }}>Rest Timer</h3><button onClick={onClose} style={{ background: 'none', border: 'none', color: 'var(--text-secondary)', fontSize: '20px', cursor: 'pointer' }}><i className="fa-solid fa-xmark"></i></button></div><div style={{ position: 'relative', display: 'inline-block', marginBottom: '20px' }}><ProgressRing progress={progress} size={180} strokeWidth={12} color={timeLeft === 0 ? 'var(--success)' : 'var(--primary)'} /><div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '48px', fontWeight: '700', fontVariantNumeric: 'tabular-nums' }}>{minutes}:{seconds.toString().padStart(2, '0')}</div></div><div style={{ display: 'flex', gap: '8px', marginBottom: '16px', justifyContent: 'center' }}>{[60, 90, 120, 180].map(time => (<button key={time} onClick={() => resetTimer(time)} className="haptic" style={{ padding: '8px 12px', border: 'none', borderRadius: '8px', background: selectedTime === time ? 'var(--primary)' : 'var(--bg-card-light)', color: selectedTime === time ? 'white' : 'var(--text-primary)', cursor: 'pointer', fontSize: '14px' }}>{time}s</button>))}</div><div style={{ display: 'flex', gap: '12px' }}><button onClick={() => setIsRunning(!isRunning)} className="haptic" style={{ flex: 1, padding: '14px', border: 'none', borderRadius: '12px', background: isRunning ? 'var(--accent)' : 'var(--primary)', color: 'white', fontSize: '16px', fontWeight: '600', cursor: 'pointer' }}><i className={`fa-solid ${isRunning ? 'fa-pause' : 'fa-play'}`}></i> {isRunning ? 'Pause' : 'Start'}</button><button onClick={() => resetTimer(selectedTime)} className="haptic" style={{ padding: '14px 20px', border: 'none', borderRadius: '12px', background: 'var(--bg-card-light)', color: 'var(--text-primary)', fontSize: '16px', cursor: 'pointer' }}><i className="fa-solid fa-rotate-right"></i></button></div></Card></div>); };
+                        <div className="card animate-fadeInUp stagger-1" style={{ padding: '20px', marginBottom: '16px' }}>
+                            <h3 style={{ margin: '0 0 16px', fontSize: '14px', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                <i className="fa-solid fa-calendar" style={{ color: 'var(--irish-green)' }}></i>
+                                Program Settings
+                            </h3>
+                            
+                            <div style={{ marginBottom: '16px' }}>
+                                <label style={{ display: 'block', marginBottom: '8px', fontSize: '12px', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Phase</label>
+                                <select value={currentPhase} onChange={(e) => { const val = parseInt(e.target.value); setCurrentPhase(val); saveData('currentPhase', val); haptic(); }} style={{ width: '100%', padding: '14px', fontSize: '15px', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-subtle)', background: 'var(--bg-tertiary)', color: 'var(--text-primary)', fontFamily: 'inherit' }}>
+                                    {phases.map(p => <option key={p.id} value={p.id}>Phase {p.id}: {p.name} ({p.months})</option>)}
+                                </select>
+                            </div>
 
-        const SetTracker = ({ exercise, phase, sets, onSave, initialData, onClose }) => { const [setData, setSetData] = useState(() => { if (initialData?.sets) { return initialData.sets.map(s => typeof s === 'object' ? { weight: s.weight || '', reps: s.reps || '' } : { weight: s || '', reps: '' }); } return Array(sets).fill(null).map(() => ({ weight: '', reps: '' })); }); const [showTimer, setShowTimer] = useState(false); const handleSetChange = (index, field, value) => { const newData = [...setData]; newData[index] = { ...newData[index], [field]: value }; setSetData(newData); }; const getAverageWeight = () => { const v = setData.filter(s => s.weight && parseFloat(s.weight) > 0).map(s => parseFloat(s.weight)); return v.length === 0 ? 0 : (v.reduce((a, b) => a + b, 0) / v.length).toFixed(1); }; const getMaxWeight = () => { const v = setData.filter(s => s.weight && parseFloat(s.weight) > 0).map(s => parseFloat(s.weight)); return v.length > 0 ? Math.max(...v) : 0; }; const getTotalReps = () => setData.reduce((t, s) => t + (parseInt(s.reps) || 0), 0); const getTotalVolume = () => setData.reduce((t, s) => t + ((parseFloat(s.weight) || 0) * (parseInt(s.reps) || 0)), 0).toFixed(0); const handleSave = () => { onSave({ sets: setData, average: parseFloat(getAverageWeight()), max: getMaxWeight(), totalReps: getTotalReps(), totalVolume: parseFloat(getTotalVolume()), completedSets: setData.filter(s => s.weight && parseFloat(s.weight) > 0).length }); onClose(); }; const isSetComplete = (s) => s.weight && parseFloat(s.weight) > 0; return (<div className="slide-in"><Header title={exercise.name} subtitle={`${exercise.muscle} • ${sets}×${exercise.reps}`} onBack={onClose} rightAction={<button onClick={() => setShowTimer(true)} className="haptic" style={{ background: 'var(--primary)', border: 'none', color: 'white', padding: '8px 12px', borderRadius: '8px', cursor: 'pointer' }}><i className="fa-solid fa-clock"></i></button>} /><div style={{ padding: '20px', paddingBottom: '100px' }}><Card style={{ background: `linear-gradient(135deg, ${phase.color}22 0%, var(--bg-card) 100%)` }}><div style={{ textAlign: 'center' }}><div style={{ fontSize: '14px', color: 'var(--text-secondary)', marginBottom: '8px' }}>Target</div><div style={{ fontSize: '28px', fontWeight: '700', color: phase.color }}>{sets} × {exercise.reps}</div>{exercise.notes && <div style={{ fontSize: '12px', color: exercise.notes.includes('⭐') ? 'var(--success)' : 'var(--text-secondary)', marginTop: '8px', padding: '8px', background: 'var(--bg-card-light)', borderRadius: '8px' }}>{exercise.notes}</div>}</div></Card><h3 style={{ margin: '20px 0 12px', fontSize: '14px', textTransform: 'uppercase', letterSpacing: '1px', color: 'var(--text-secondary)' }}>Log Each Set</h3>{Array.from({ length: sets }).map((_, idx) => (<Card key={idx} style={{ padding: '12px 16px' }}><div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}><div style={{ width: '36px', height: '36px', borderRadius: '50%', background: isSetComplete(setData[idx]) ? phase.color : 'var(--bg-card-light)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: isSetComplete(setData[idx]) ? 'white' : 'var(--text-secondary)', fontWeight: '700', flexShrink: 0 }}>{idx + 1}</div><div style={{ flex: 1, display: 'flex', gap: '8px' }}><div style={{ flex: 1 }}><label style={{ fontSize: '10px', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Weight (kg)</label><input type="number" inputMode="decimal" value={setData[idx].weight} onChange={(e) => handleSetChange(idx, 'weight', e.target.value)} placeholder="0" style={{ width: '100%', padding: '10px', fontSize: '18px', fontWeight: '600', border: '1px solid var(--border)', borderRadius: '8px', background: 'var(--bg-card-light)', color: 'var(--text-primary)', textAlign: 'center' }} /></div><div style={{ flex: 1 }}><label style={{ fontSize: '10px', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Reps</label><input type="number" inputMode="numeric" value={setData[idx].reps} onChange={(e) => handleSetChange(idx, 'reps', e.target.value)} placeholder="0" style={{ width: '100%', padding: '10px', fontSize: '18px', fontWeight: '600', border: '1px solid var(--border)', borderRadius: '8px', background: 'var(--bg-card-light)', color: 'var(--text-primary)', textAlign: 'center' }} /></div></div>{isSetComplete(setData[idx]) && <i className="fa-solid fa-check-circle" style={{ color: 'var(--success)', fontSize: '20px', flexShrink: 0 }}></i>}</div></Card>))}<Card style={{ background: 'var(--bg-card-light)', marginTop: '20px' }}><div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', textAlign: 'center' }}><div><div style={{ fontSize: '12px', color: 'var(--text-secondary)', marginBottom: '4px' }}>Avg Weight</div><div style={{ fontSize: '24px', fontWeight: '700', color: 'var(--primary)' }}>{getAverageWeight()} kg</div></div><div><div style={{ fontSize: '12px', color: 'var(--text-secondary)', marginBottom: '4px' }}>Max Weight</div><div style={{ fontSize: '24px', fontWeight: '700', color: 'var(--secondary)' }}>{getMaxWeight()} kg</div></div><div><div style={{ fontSize: '12px', color: 'var(--text-secondary)', marginBottom: '4px' }}>Total Reps</div><div style={{ fontSize: '24px', fontWeight: '700', color: 'var(--success)' }}>{getTotalReps()}</div></div><div><div style={{ fontSize: '12px', color: 'var(--text-secondary)', marginBottom: '4px' }}>Volume</div><div style={{ fontSize: '24px', fontWeight: '700', color: 'var(--irish-orange)' }}>{getTotalVolume()} kg</div></div></div></Card><button onClick={handleSave} className="haptic" style={{ width: '100%', padding: '16px', marginTop: '20px', background: 'linear-gradient(135deg, var(--irish-green) 0%, var(--irish-orange) 100%)', color: 'white', border: 'none', borderRadius: '12px', fontSize: '16px', fontWeight: '600', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}><i className="fa-solid fa-check"></i> Save Exercise</button></div><RestTimer isOpen={showTimer} onClose={() => setShowTimer(false)} /></div>); };
+                            <div>
+                                <label style={{ display: 'block', marginBottom: '8px', fontSize: '12px', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Week (1-12)</label>
+                                <input type="number" min="1" max="12" value={currentWeek} onChange={(e) => { const val = Math.min(12, Math.max(1, parseInt(e.target.value) || 1)); setCurrentWeek(val); saveData('currentWeek', val); }} style={{ width: '100%', padding: '14px', fontSize: '15px', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-subtle)', background: 'var(--bg-tertiary)', color: 'var(--text-primary)', fontFamily: "'JetBrains Mono', monospace", textAlign: 'center' }} />
+                            </div>
+                        </div>
 
-        const WorkoutTab = ({ currentPhase, currentWeek, workoutData, setWorkoutData, workoutHistory, setWorkoutHistory }) => { const [selectedDay, setSelectedDay] = useState(null); const [selectedExercise, setSelectedExercise] = useState(null); const [notes, setNotes] = useState(''); const phase = phases[currentPhase - 1]; const exercises = exercisesByPhaseAndDay[currentPhase]; const getWorkoutKey = (day, exerciseName) => `p${currentPhase}_w${currentWeek}_d${day}_${exerciseName}`; const handleSaveExercise = (day, exerciseName, data) => { const key = getWorkoutKey(day, exerciseName); const prevBest = getPreviousBestAvg(exerciseName); if (data.average && prevBest && data.average > prevBest) triggerConfetti(); const newData = { ...workoutData, [key]: data }; setWorkoutData(newData); saveData('workoutData', newData); }; const getPreviousBestAvg = (exerciseName) => { let best = 0; Object.keys(workoutData).forEach(key => { if (key.includes(exerciseName)) { const val = workoutData[key]?.average || 0; if (val > best) best = val; } }); return best; }; const completeWorkout = (day) => { const timestamp = new Date().toISOString(); const dayExercises = exercises[day]; const workoutLog = { date: timestamp, phase: currentPhase, week: currentWeek, day: day, exercises: dayExercises.map(ex => ({ name: ex.name, data: workoutData[getWorkoutKey(day, ex.name)] || null })), notes: notes }; const newHistory = [workoutLog, ...workoutHistory].slice(0, 100); setWorkoutHistory(newHistory); saveData('workoutHistory', newHistory); setSelectedDay(null); setNotes(''); }; if (selectedExercise !== null && selectedDay !== null) { const exercise = exercises[selectedDay][selectedExercise]; const key = getWorkoutKey(selectedDay, exercise.name); return <SetTracker exercise={exercise} phase={phase} sets={phase.sets} initialData={workoutData[key]} onSave={(data) => handleSaveExercise(selectedDay, exercise.name, data)} onClose={() => setSelectedExercise(null)} />; } if (selectedDay !== null) { const dayExercises = exercises[selectedDay]; const completedCount = dayExercises.filter(ex => workoutData[getWorkoutKey(selectedDay, ex.name)]?.completedSets > 0).length; const progress = (completedCount / dayExercises.length) * 100; return (<div className="slide-in"><Header title={`Day ${selectedDay}: ${workoutDays[selectedDay - 1].name}`} subtitle={workoutDays[selectedDay - 1].muscles} onBack={() => setSelectedDay(null)} /><div style={{ padding: '16px', paddingBottom: '100px' }}><Card style={{ background: `linear-gradient(135deg, ${phase.color}33 0%, var(--bg-card) 100%)` }}><div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}><ProgressRing progress={progress} size={60} color={phase.color} /><div style={{ flex: 1 }}><div style={{ fontWeight: '600', marginBottom: '4px' }}>Phase {currentPhase}: {phase.name}</div><div style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>Week {currentWeek} • {phase.sets} sets × {phase.reps.split('×')[1]}</div></div><div style={{ fontSize: '24px', fontWeight: '700', color: phase.color }}>{completedCount}/{dayExercises.length}</div></div></Card>{dayExercises.map((exercise, idx) => { const key = getWorkoutKey(selectedDay, exercise.name); const data = workoutData[key]; const prevBest = getPreviousBestAvg(exercise.name); const isPR = data?.average && prevBest && data.average > prevBest; return (<Card key={idx} onClick={() => setSelectedExercise(idx)} className={isPR ? 'pulse' : ''} style={isPR ? { borderColor: 'var(--secondary)', borderWidth: '2px' } : {}}><div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}><div style={{ flex: 1 }}><div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}><span style={{ fontWeight: '600' }}>{exercise.name}</span>{isPR && <span style={{ fontSize: '12px' }}>☘️ PR!</span>}</div><div style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>{phase.sets}×{exercise.reps} • {exercise.muscle}</div>{exercise.notes && <div style={{ fontSize: '11px', color: exercise.notes.includes('⭐') ? 'var(--success)' : 'var(--text-secondary)', marginTop: '4px' }}>{exercise.notes}</div>}{data && <div style={{ fontSize: '12px', color: 'var(--primary)', marginTop: '4px' }}>Avg: {data.average}kg • {data.totalReps || '—'} reps • Vol: {data.totalVolume || '—'}kg</div>}</div><div style={{ background: data ? `${phase.color}33` : 'var(--bg-card-light)', padding: '10px 16px', borderRadius: '10px', fontWeight: '600', color: data ? phase.color : 'var(--text-secondary)', minWidth: '70px', textAlign: 'center' }}>{data ? `${data.average}kg` : 'Log →'}</div></div></Card>); })}<Card><label style={{ display: 'block', marginBottom: '8px', fontWeight: '600' }}><i className="fa-solid fa-note-sticky" style={{ marginRight: '8px' }}></i>Workout Notes</label><textarea value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="How did this workout feel? Any knee discomfort?" style={{ width: '100%', padding: '12px', border: '1px solid var(--border)', borderRadius: '8px', background: 'var(--bg-card-light)', color: 'var(--text-primary)', fontSize: '14px', minHeight: '80px', resize: 'vertical' }} /></Card>{completedCount === dayExercises.length && <button onClick={() => completeWorkout(selectedDay)} className="haptic" style={{ width: '100%', padding: '16px', background: 'linear-gradient(135deg, var(--irish-green) 0%, var(--irish-orange) 100%)', color: 'white', border: 'none', borderRadius: '12px', fontSize: '16px', fontWeight: '600', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}><i className="fa-solid fa-flag-checkered"></i> Complete Workout</button>}</div></div>); } return (<div><Header title="Knee-Safe Training" /><div style={{ padding: '16px', paddingBottom: '100px' }}><div style={{ display: 'flex', height: '6px', borderRadius: '3px', overflow: 'hidden', marginBottom: '16px' }}><div style={{ flex: 1, background: '#169B62' }}></div><div style={{ flex: 1, background: '#FFFFFF' }}></div><div style={{ flex: 1, background: '#FF883E' }}></div></div><Card style={{ background: 'linear-gradient(135deg, var(--success)22 0%, var(--bg-card) 100%)', borderColor: 'var(--success)' }}><div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}><i className="fa-solid fa-shield-heart" style={{ fontSize: '24px', color: 'var(--success)' }}></i><div><div style={{ fontWeight: '600', marginBottom: '4px' }}>100% Knee-Safe Program</div><div style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>Zero patellofemoral compression. All hip hinge + open chain lower body work.</div></div></div></Card><Card style={{ background: `linear-gradient(135deg, ${phase.color}44 0%, var(--bg-card) 100%)`, borderColor: phase.color }}><div style={{ textAlign: 'center' }}><div style={{ fontSize: '13px', color: 'var(--text-secondary)', marginBottom: '4px' }}>Current Program</div><div style={{ fontSize: '28px', fontWeight: '700', color: phase.color }}>Phase {currentPhase}: {phase.name}</div><div style={{ fontSize: '12px', color: 'var(--text-secondary)', marginTop: '4px' }}>{phase.description}</div><div style={{ display: 'inline-block', marginTop: '12px', padding: '8px 16px', background: 'var(--bg-card-light)', borderRadius: '20px', fontSize: '14px' }}>Week {currentWeek} of 12 • {phase.reps}</div></div></Card><h3 style={{ margin: '24px 0 12px', fontSize: '14px', textTransform: 'uppercase', letterSpacing: '1px', color: 'var(--text-secondary)' }}>5-Day Split</h3>{workoutDays.map((day) => { const dayExercises = exercises[day.id]; const completed = dayExercises.filter(ex => workoutData[getWorkoutKey(day.id, ex.name)]?.completedSets > 0).length; const total = dayExercises.length; const progress = (completed / total) * 100; return (<Card key={day.id} onClick={() => setSelectedDay(day.id)}><div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}><div style={{ width: '50px', height: '50px', borderRadius: '12px', background: `linear-gradient(135deg, ${phase.color}33 0%, ${phase.color}11 100%)`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '20px', color: phase.color }}><i className={day.icon}></i></div><div style={{ flex: 1 }}><div style={{ fontWeight: '600', marginBottom: '4px' }}>Day {day.id}: {day.name}</div><div style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>{day.muscles}</div></div><ProgressRing progress={progress} size={44} strokeWidth={4} color={completed === total ? 'var(--success)' : phase.color} /></div></Card>); })}</div></div>); };
+                        <div className="card animate-fadeInUp stagger-2" style={{ padding: '20px', marginBottom: '16px' }}>
+                            <h3 style={{ margin: '0 0 16px', fontSize: '14px', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                <i className="fa-solid fa-database" style={{ color: 'var(--irish-orange)' }}></i>
+                                Data Management
+                            </h3>
 
-        const ProgressTab = ({ workoutData, workoutHistory }) => { const chartRef = useRef(null); const chartInstance = useRef(null); useEffect(() => { if (chartRef.current) { if (chartInstance.current) chartInstance.current.destroy(); const ctx = chartRef.current.getContext('2d'); const getPhaseAverages = (exerciseKeyword) => [1, 2, 3, 4].map(phase => { const phaseData = Object.keys(workoutData).filter(k => k.startsWith(`p${phase}_`) && k.includes(exerciseKeyword)).map(k => workoutData[k]?.average || 0).filter(v => v > 0); return phaseData.length > 0 ? (phaseData.reduce((a, b) => a + b, 0) / phaseData.length).toFixed(1) : null; }); chartInstance.current = new Chart(ctx, { type: 'bar', data: { labels: ['Phase 1', 'Phase 2', 'Phase 3', 'Phase 4'], datasets: [{ label: 'Hip Thrust', data: getPhaseAverages('Hip'), backgroundColor: '#169B62' }, { label: 'RDL', data: getPhaseAverages('Romanian'), backgroundColor: '#FF883E' }, { label: 'Bench', data: getPhaseAverages('Bench'), backgroundColor: '#FFFFFF' }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, padding: 15, color: '#a8c4ac' } } }, scales: { y: { beginAtZero: true, grid: { color: 'var(--border)' }, ticks: { color: '#a8c4ac' } }, x: { grid: { display: false }, ticks: { color: '#a8c4ac' } } } } }); } return () => { if (chartInstance.current) chartInstance.current.destroy(); }; }, [workoutData]); const getPR = (exerciseKeyword) => { let best = 0; Object.keys(workoutData).forEach(key => { if (key.toLowerCase().includes(exerciseKeyword.toLowerCase())) { const val = workoutData[key]?.max || 0; if (val > best) best = val; } }); return best; }; const getTotalVolume = () => Object.keys(workoutData).reduce((total, key) => total + (workoutData[key]?.totalVolume || 0), 0); const totalWorkouts = workoutHistory.length; const totalVol = getTotalVolume(); return (<div><Header title="Progress" subtitle="Track your knee-safe gains" /><div style={{ padding: '16px', paddingBottom: '100px' }}><div style={{ display: 'flex', height: '6px', borderRadius: '3px', overflow: 'hidden', marginBottom: '16px' }}><div style={{ flex: 1, background: '#169B62' }}></div><div style={{ flex: 1, background: '#FFFFFF' }}></div><div style={{ flex: 1, background: '#FF883E' }}></div></div><div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '12px', marginBottom: '16px' }}><Card style={{ textAlign: 'center', background: 'linear-gradient(135deg, var(--primary)22 0%, var(--bg-card) 100%)' }}><div style={{ fontSize: '32px', fontWeight: '700', color: 'var(--primary)' }}>{totalWorkouts}</div><div style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>Workouts Completed</div></Card><Card style={{ textAlign: 'center', background: 'linear-gradient(135deg, var(--secondary)22 0%, var(--bg-card) 100%)' }}><div style={{ fontSize: '32px', fontWeight: '700', color: 'var(--secondary)' }}>{totalVol.toLocaleString()}</div><div style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>Total Volume (kg)</div></Card></div><Card><h3 style={{ margin: '0 0 16px', fontSize: '16px' }}><i className="fa-solid fa-chart-column" style={{ marginRight: '8px', color: 'var(--primary)' }}></i>Key Lifts by Phase</h3><div style={{ height: '220px' }}><canvas ref={chartRef}></canvas></div></Card><h3 style={{ margin: '20px 0 12px', fontSize: '14px', textTransform: 'uppercase', letterSpacing: '1px', color: 'var(--text-secondary)' }}>☘️ Personal Records</h3><div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>{keyExercises.map((exercise, idx) => { const pr = getPR(exercise.name.split('/')[0]); return (<Card key={idx} style={{ textAlign: 'center', padding: '14px' }}><div style={{ fontSize: '20px', marginBottom: '4px' }}>{exercise.icon}</div><div style={{ fontSize: '11px', color: 'var(--text-secondary)', marginBottom: '4px' }}>{exercise.name}</div><div style={{ fontSize: '20px', fontWeight: '700', color: pr ? 'var(--secondary)' : 'var(--text-secondary)' }}>{pr || '—'}<span style={{ fontSize: '12px', fontWeight: '400' }}> kg</span></div></Card>); })}</div></div></div>); };
+                            <button onClick={handleExport} className="btn-haptic" style={{ width: '100%', padding: '14px', marginBottom: '10px', background: 'var(--irish-green)', color: 'white', border: 'none', borderRadius: 'var(--radius-md)', fontSize: '14px', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+                                <i className="fa-solid fa-download"></i> Export Backup
+                            </button>
 
-        const SettingsTab = ({ currentPhase, setCurrentPhase, currentWeek, setCurrentWeek, darkMode, setDarkMode }) => { const handleExport = () => { const data = { workoutData: loadData('workoutData', {}), workoutHistory: loadData('workoutHistory', []), currentPhase, currentWeek, exportDate: new Date().toISOString(), version: '5.1-knee-safe' }; const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' }); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = `strength-tracker-knee-safe-${new Date().toISOString().split('T')[0]}.json`; a.click(); }; const handleImport = (e) => { const file = e.target.files[0]; if (file) { const reader = new FileReader(); reader.onload = (event) => { try { const data = JSON.parse(event.target.result); if (data.workoutData) saveData('workoutData', migrateWorkoutData(data.workoutData)); if (data.workoutHistory) saveData('workoutHistory', data.workoutHistory); if (data.currentPhase) saveData('currentPhase', data.currentPhase); if (data.currentWeek) saveData('currentWeek', data.currentWeek); alert('Data imported! Refreshing...'); window.location.reload(); } catch { alert('Error importing data.'); } }; reader.readAsText(file); } }; return (<div><Header title="Settings" /><div style={{ padding: '16px', paddingBottom: '100px' }}><div style={{ display: 'flex', height: '6px', borderRadius: '3px', overflow: 'hidden', marginBottom: '16px' }}><div style={{ flex: 1, background: '#169B62' }}></div><div style={{ flex: 1, background: '#FFFFFF' }}></div><div style={{ flex: 1, background: '#FF883E' }}></div></div><Card style={{ background: 'linear-gradient(135deg, var(--success)22 0%, var(--bg-card) 100%)', borderColor: 'var(--success)' }}><h3 style={{ margin: '0 0 12px', display: 'flex', alignItems: 'center', gap: '8px' }}><i className="fa-solid fa-shield-heart" style={{ color: 'var(--success)' }}></i>Knee-Safe Principles</h3><ul style={{ margin: 0, paddingLeft: '20px', fontSize: '13px', color: 'var(--text-secondary)', lineHeight: '1.8' }}><li><strong>Hip hinge over knee bend</strong> - RDLs, hip thrusts are primary</li><li><strong>Open chain leg work</strong> - Leg curls, straight leg raises</li><li><strong>TKE every lower day</strong> - Strengthens VMO safely</li><li><strong>Zero deep squats</strong> - No wall sits, no leg press</li><li><strong>Stop if pain</strong> - Sharp knee pain = stop immediately</li></ul></Card><Card><h3 style={{ margin: '0 0 16px', display: 'flex', alignItems: 'center', gap: '8px' }}><i className="fa-solid fa-calendar" style={{ color: 'var(--primary)' }}></i>Current Program</h3><div style={{ marginBottom: '16px' }}><label style={{ display: 'block', marginBottom: '8px', fontWeight: '500', fontSize: '14px' }}>Phase</label><select value={currentPhase} onChange={(e) => { const val = parseInt(e.target.value); setCurrentPhase(val); saveData('currentPhase', val); }} style={{ width: '100%', padding: '12px', fontSize: '16px', borderRadius: '10px', border: '1px solid var(--border)', background: 'var(--bg-card-light)', color: 'var(--text-primary)' }}>{phases.map(p => <option key={p.id} value={p.id}>Phase {p.id}: {p.name} ({p.months})</option>)}</select></div><div><label style={{ display: 'block', marginBottom: '8px', fontWeight: '500', fontSize: '14px' }}>Week (1-12)</label><input type="number" min="1" max="12" value={currentWeek} onChange={(e) => { const val = Math.min(12, Math.max(1, parseInt(e.target.value) || 1)); setCurrentWeek(val); saveData('currentWeek', val); }} style={{ width: '100%', padding: '12px', fontSize: '16px', borderRadius: '10px', border: '1px solid var(--border)', background: 'var(--bg-card-light)', color: 'var(--text-primary)' }} /></div></Card><Card><div onClick={() => { const newMode = !darkMode; setDarkMode(newMode); saveData('darkMode', newMode); document.body.classList.toggle('light-mode', !newMode); }} className="haptic" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer' }}><span><i className="fa-solid fa-moon" style={{ marginRight: '8px' }}></i>Dark Mode</span><div style={{ width: '50px', height: '28px', background: darkMode ? 'var(--primary)' : 'var(--border)', borderRadius: '14px', position: 'relative', transition: 'background 0.3s' }}><div style={{ width: '24px', height: '24px', background: 'white', borderRadius: '50%', position: 'absolute', top: '2px', left: darkMode ? '24px' : '2px', transition: 'left 0.3s' }} /></div></div></Card><Card><h3 style={{ margin: '0 0 16px', display: 'flex', alignItems: 'center', gap: '8px' }}><i className="fa-solid fa-database" style={{ color: 'var(--success)' }}></i>Data</h3><button onClick={handleExport} className="haptic" style={{ width: '100%', padding: '14px', background: 'var(--primary)', color: 'white', border: 'none', borderRadius: '10px', fontSize: '15px', fontWeight: '600', marginBottom: '10px', cursor: 'pointer' }}><i className="fa-solid fa-download"></i> Export Backup</button><label className="haptic" style={{ display: 'flex', width: '100%', padding: '14px', background: 'var(--bg-card-light)', color: 'var(--text-primary)', border: 'none', borderRadius: '10px', fontSize: '15px', fontWeight: '600', marginBottom: '10px', cursor: 'pointer', alignItems: 'center', justifyContent: 'center', gap: '8px' }}><i className="fa-solid fa-upload"></i> Import Backup<input type="file" accept=".json" onChange={handleImport} style={{ display: 'none' }} /></label><button onClick={() => { if (confirm('Delete ALL data?')) { localStorage.clear(); window.location.reload(); }}} className="haptic" style={{ width: '100%', padding: '14px', background: 'var(--accent)', color: 'white', border: 'none', borderRadius: '10px', fontSize: '15px', fontWeight: '600', cursor: 'pointer' }}><i className="fa-solid fa-trash"></i> Clear All Data</button></Card><div style={{ textAlign: 'center', marginTop: '20px', color: 'var(--text-secondary)', fontSize: '12px' }}>☘️ Knee-Safe Strength v5.1 🇮🇪<br/>Zero patellofemoral compression</div></div></div>); };
+                            <label className="btn-haptic" style={{ display: 'flex', width: '100%', padding: '14px', marginBottom: '10px', background: 'var(--bg-elevated)', color: 'var(--text-primary)', border: 'none', borderRadius: 'var(--radius-md)', fontSize: '14px', fontWeight: 600, cursor: 'pointer', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+                                <i className="fa-solid fa-upload"></i> Import Backup
+                                <input type="file" accept=".json" onChange={handleImport} style={{ display: 'none' }} />
+                            </label>
 
-        const App = () => { const [activeTab, setActiveTab] = useState('workout'); const [currentPhase, setCurrentPhase] = useState(() => loadData('currentPhase', 1)); const [currentWeek, setCurrentWeek] = useState(() => loadData('currentWeek', 1)); const [workoutData, setWorkoutData] = useState(() => migrateWorkoutData(loadData('workoutData', {}))); const [workoutHistory, setWorkoutHistory] = useState(() => loadData('workoutHistory', [])); const [darkMode, setDarkMode] = useState(() => loadData('darkMode', true)); useEffect(() => { document.body.classList.toggle('light-mode', !darkMode); }, []); return (<div style={{ paddingBottom: '80px' }}>{activeTab === 'workout' && <WorkoutTab currentPhase={currentPhase} currentWeek={currentWeek} workoutData={workoutData} setWorkoutData={setWorkoutData} workoutHistory={workoutHistory} setWorkoutHistory={setWorkoutHistory} />}{activeTab === 'progress' && <ProgressTab workoutData={workoutData} workoutHistory={workoutHistory} />}{activeTab === 'settings' && <SettingsTab currentPhase={currentPhase} setCurrentPhase={setCurrentPhase} currentWeek={currentWeek} setCurrentWeek={setCurrentWeek} darkMode={darkMode} setDarkMode={setDarkMode} />}<TabBar activeTab={activeTab} setActiveTab={setActiveTab} /></div>); };
+                            <button onClick={() => { if (confirm('Delete ALL data? This cannot be undone.')) { localStorage.clear(); window.location.reload(); }}} className="btn-haptic" style={{ width: '100%', padding: '14px', background: 'rgba(255,77,77,0.15)', color: '#ff6b6b', border: '1px solid rgba(255,77,77,0.3)', borderRadius: 'var(--radius-md)', fontSize: '14px', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+                                <i className="fa-solid fa-trash"></i> Clear All Data
+                            </button>
+                        </div>
+
+                        <div className="card animate-fadeInUp stagger-3" style={{ padding: '20px', marginBottom: '16px' }}>
+                            <h3 style={{ margin: '0 0 12px', fontSize: '14px', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                <i className="fa-solid fa-mobile-screen" style={{ color: 'var(--text-secondary)' }}></i>
+                                Install as App
+                            </h3>
+                            <p style={{ margin: 0, fontSize: '13px', color: 'var(--text-secondary)', lineHeight: 1.6 }}>
+                                <strong style={{ color: 'var(--text-primary)' }}>iPhone:</strong> Tap <i className="fa-solid fa-arrow-up-from-bracket"></i> Share → "Add to Home Screen" → "Add"
+                            </p>
+                        </div>
+
+                        <div style={{ textAlign: 'center', padding: '20px 0', color: 'var(--text-muted)', fontSize: '12px' }}>
+                            <div style={{ marginBottom: '4px' }}>☘️ <strong>IronClad</strong> v6.0 🇮🇪</div>
+                            <div>Knee-Safe Strength Training</div>
+                        </div>
+                    </div>
+                </>
+            );
+        };
+
+        // ============ MAIN APP ============
+        const App = () => {
+            const [activeTab, setActiveTab] = useState('workout');
+            const [currentPhase, setCurrentPhase] = useState(() => loadData('currentPhase', 1));
+            const [currentWeek, setCurrentWeek] = useState(() => loadData('currentWeek', 1));
+            const [workoutData, setWorkoutData] = useState(() => migrateWorkoutData(loadData('workoutData', {})));
+            const [workoutHistory, setWorkoutHistory] = useState(() => loadData('workoutHistory', []));
+
+            const tabs = [
+                { id: 'workout', icon: 'fa-solid fa-dumbbell', label: 'Workout' },
+                { id: 'progress', icon: 'fa-solid fa-chart-line', label: 'Progress' },
+                { id: 'settings', icon: 'fa-solid fa-gear', label: 'Settings' },
+            ];
+
+            return (
+                <div style={{ paddingBottom: 'calc(70px + var(--safe-bottom))' }}>
+                    {activeTab === 'workout' && (
+                        <WorkoutTab 
+                            currentPhase={currentPhase} 
+                            currentWeek={currentWeek} 
+                            workoutData={workoutData} 
+                            setWorkoutData={setWorkoutData} 
+                            workoutHistory={workoutHistory} 
+                            setWorkoutHistory={setWorkoutHistory} 
+                        />
+                    )}
+                    {activeTab === 'progress' && (
+                        <ProgressTab workoutData={workoutData} workoutHistory={workoutHistory} />
+                    )}
+                    {activeTab === 'settings' && (
+                        <SettingsTab 
+                            currentPhase={currentPhase} 
+                            setCurrentPhase={setCurrentPhase} 
+                            currentWeek={currentWeek} 
+                            setCurrentWeek={setCurrentWeek} 
+                        />
+                    )}
+
+                    <div className="tab-bar">
+                        <div style={{ display: 'flex', justifyContent: 'space-around' }}>
+                            {tabs.map(tab => (
+                                <button 
+                                    key={tab.id} 
+                                    className={`tab-item ${activeTab === tab.id ? 'active' : ''}`} 
+                                    onClick={() => { setActiveTab(tab.id); haptic(); }}
+                                >
+                                    <i className={`tab-icon ${tab.icon}`}></i>
+                                    <span>{tab.label}</span>
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
         ReactDOM.createRoot(document.getElementById('root')).render(<App />);
     </script>
 </body>
