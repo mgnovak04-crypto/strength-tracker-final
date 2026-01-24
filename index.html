@@ -6,717 +6,337 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="IronClad">
-<meta name="theme-color" content="#0a0f0a">
-<title>IronClad v7</title>
+<meta name="theme-color" content="#000">
+<title>IronClad</title>
 <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
 <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
 <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <style>
+:root{--bg:#000;--c1:#1c1c1e;--c2:#2c2c2e;--c3:#3a3a3c;--sep:rgba(84,84,88,0.65);--t1:#fff;--t2:rgba(235,235,245,0.6);--t3:rgba(235,235,245,0.3);--grn:#30d158;--grn-d:rgba(48,209,88,0.15);--org:#ff9f0a;--org-d:rgba(255,159,10,0.15);--red:#ff453a;--blu:#0a84ff;--safe-t:env(safe-area-inset-top);--safe-b:env(safe-area-inset-bottom)}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;margin:0;padding:0}
-:root{--g:#169B62;--o:#FF883E;--bg:#0a0f0a;--c1:#1a251a;--c2:#243024;--c3:#2d3d2d;--t1:#fff;--t2:#8fa88f;--t3:#5a7a5a;--b:rgba(255,255,255,0.08);--r:#ff6b6b}
-html,body{height:100%;overflow:hidden}
-body{font-family:system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--t1)}
-#root{height:100%;display:flex;flex-direction:column}
-.page{flex:1;display:flex;flex-direction:column;overflow:hidden}
-.hdr{flex-shrink:0;padding:max(8px,env(safe-area-inset-top)) 12px 8px;background:rgba(10,15,10,0.95);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid var(--b)}
-.cnt{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:12px 12px calc(70px + env(safe-area-inset-bottom))}
-.tabs{flex-shrink:0;position:fixed;bottom:0;left:0;right:0;background:rgba(10,15,10,0.95);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-top:1px solid var(--b);padding:6px 0 calc(6px + env(safe-area-inset-bottom));display:flex;justify-content:space-around;z-index:100}
-.tab{display:flex;flex-direction:column;align-items:center;gap:2px;padding:4px 16px;border:none;background:none;color:var(--t3);font-size:9px;cursor:pointer;transition:color .2s}
-.tab.on{color:var(--g)}
-.tab i{font-size:18px}
-.crd{background:var(--c1);border-radius:12px;padding:12px;margin-bottom:8px;border:1px solid var(--b)}
-.str{height:3px;background:linear-gradient(90deg,var(--g) 33%,#fff 33% 66%,var(--o) 66%);border-radius:2px;margin-bottom:12px}
-.bdg{display:inline-flex;padding:4px 8px;border-radius:12px;font-size:10px;font-weight:600}
-.bdg.g{background:rgba(22,155,98,0.2);color:#1eb872}
-.bdg.o{background:rgba(255,136,62,0.2);color:var(--o)}
-.day{background:var(--c1);border-radius:12px;padding:14px;margin-bottom:8px;border:1px solid var(--b);display:flex;align-items:center;gap:10px;cursor:pointer;transition:transform .15s,border-color .2s}
-.day:active{transform:scale(0.98)}
-.day-i{width:40px;height:40px;border-radius:10px;background:var(--c2);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;transition:background .2s}
-.day.dn .day-i{background:var(--g)}
-.day.dn{border-color:var(--g)}
-.ex{background:var(--c1);border-radius:10px;padding:10px;margin-bottom:6px;border:1px solid var(--b);display:flex;align-items:center;gap:8px;cursor:pointer;transition:all .15s}
-.ex:active{transform:scale(0.98)}
-.ex.dn{border-color:var(--g);background:linear-gradient(135deg,rgba(22,155,98,0.08),var(--c1))}
-.ex-i{width:32px;height:32px;border-radius:8px;background:var(--c2);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
-.ex.dn .ex-i{background:var(--g)}
-.ex-b{padding:4px 8px;border-radius:6px;font-size:11px;font-weight:600;background:var(--c2);color:var(--t2);flex-shrink:0}
-.ex-b.on{background:var(--g);color:#fff}
-.sr{display:grid;grid-template-columns:28px 1fr 1fr;gap:6px;align-items:center;margin-bottom:6px}
-.sn{width:28px;height:28px;border-radius:50%;background:var(--c1);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:11px;flex-shrink:0;border:2px solid var(--b);transition:all .2s}
-.sn.dn{background:var(--g);color:#fff;border-color:var(--g)}
-.sn.act{border-color:var(--o);box-shadow:0 0 0 3px rgba(255,136,62,0.3)}
-.si{width:100%;padding:10px 4px;font-size:18px;font-weight:700;text-align:center;background:var(--c1);border:2px solid var(--b);border-radius:8px;color:var(--t1);transition:border-color .2s}
-.si:focus{outline:none;border-color:var(--g)}
-.si.has{border-color:var(--g);background:rgba(22,155,98,0.05)}
-.btn{width:100%;padding:12px;border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;transition:transform .1s,opacity .2s}
-.btn:active{transform:scale(0.97)}
-.btn-g{background:linear-gradient(135deg,var(--g),#0d7a4d);color:#fff}
+html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--t1);font-family:-apple-system,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+#root{height:100%}
+.pg{height:100%;display:flex;flex-direction:column}
+.sc{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding-bottom:calc(90px + var(--safe-b))}
+.nav{padding:max(12px,var(--safe-t)) 16px 12px;background:rgba(0,0,0,0.8);backdrop-filter:saturate(180%) blur(20px);-webkit-backdrop-filter:saturate(180%) blur(20px);position:sticky;top:0;z-index:100}
+.nav-lg{padding:max(8px,var(--safe-t)) 16px 0;background:var(--bg)}
+.nav-t{padding:0 16px 8px}
+.tabs{position:fixed;bottom:0;left:0;right:0;background:rgba(30,30,30,0.85);backdrop-filter:saturate(180%) blur(20px);-webkit-backdrop-filter:saturate(180%) blur(20px);border-top:0.5px solid var(--sep);padding:6px 0 calc(6px + var(--safe-b));display:flex;justify-content:space-around;z-index:1000}
+.tab{display:flex;flex-direction:column;align-items:center;gap:2px;padding:4px 20px;background:none;border:none;color:var(--t3);font-size:10px;font-weight:500;cursor:pointer;position:relative}
+.tab.on{color:var(--grn)}
+.tab svg{width:24px;height:24px;fill:currentColor}
+.tab-badge{position:absolute;top:0;right:12px;width:8px;height:8px;background:var(--org);border-radius:50%}
+.crd{background:var(--c1);border-radius:12px;overflow:hidden}
+.crd-p{padding:16px}
+.crd-s{padding:12px 16px}
+.crd-s+.crd-s{border-top:0.5px solid var(--sep)}
+.sec{font-size:13px;color:var(--t2);text-transform:uppercase;letter-spacing:0.02em;padding:24px 16px 8px}
+.sec:first-child{padding-top:16px}
+.btn{width:100%;padding:16px;border:none;border-radius:12px;font-size:17px;font-weight:600;cursor:pointer;transition:transform 0.1s}
+.btn:active{transform:scale(0.98)}
+.btn-p{background:var(--grn);color:#fff}
 .btn-s{background:var(--c2);color:var(--t1)}
-.btn-o{background:linear-gradient(135deg,var(--o),#e67332);color:#fff}
-.st{text-align:center;padding:8px}
-.st-v{font-size:20px;font-weight:800}
-.st-l{font-size:8px;color:var(--t3);text-transform:uppercase;margin-top:1px}
-.ov{position:fixed;inset:0;background:rgba(0,0,0,0.85);display:flex;align-items:flex-end;justify-content:center;z-index:200;padding:0}
-.ov-c{background:var(--c1);border-radius:16px 16px 0 0;padding:16px;padding-bottom:calc(16px + env(safe-area-inset-bottom));width:100%;max-height:85vh;overflow-y:auto}
-.ov-h{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid var(--b)}
-.pill{display:inline-flex;align-items:center;gap:4px;padding:6px 12px;border-radius:20px;font-size:11px;font-weight:600;border:none;cursor:pointer;transition:all .15s}
-.pill:active{transform:scale(0.95)}
-.pill.on{background:var(--g);color:#fff}
-.pill.off{background:var(--c2);color:var(--t2)}
-.qb{width:36px;height:36px;border-radius:8px;border:none;font-size:14px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .1s}
-.qb:active{transform:scale(0.9)}
-.qb.up{background:rgba(22,155,98,0.2);color:var(--g)}
-.qb.dn{background:rgba(255,107,107,0.2);color:var(--r)}
-.note-inp{width:100%;padding:10px;font-size:13px;background:var(--c2);border:1px solid var(--b);border-radius:8px;color:var(--t1);resize:none;font-family:inherit}
-.note-inp:focus{outline:none;border-color:var(--g)}
-.streak{display:flex;align-items:center;gap:6px;padding:8px 12px;background:linear-gradient(135deg,rgba(255,136,62,0.15),rgba(255,136,62,0.05));border-radius:10px;border:1px solid rgba(255,136,62,0.2)}
-.streak-num{font-size:24px;font-weight:800;color:var(--o)}
-.streak-txt{font-size:10px;color:var(--t2);line-height:1.2}
-.timer-bar{display:flex;align-items:center;gap:8px;padding:8px 12px;background:var(--c2);border-radius:10px;margin-bottom:10px}
-.timer-display{font-size:20px;font-weight:700;font-variant-numeric:tabular-nums;color:var(--t1);flex:1}
-.timer-btn{width:32px;height:32px;border-radius:8px;border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:12px}
-.swap-item{display:flex;align-items:center;gap:10px;padding:12px;background:var(--c2);border-radius:10px;margin-bottom:6px;cursor:pointer;border:2px solid transparent;transition:all .15s}
-.swap-item:active{transform:scale(0.98)}
-.swap-item.sel{border-color:var(--g);background:rgba(22,155,98,0.1)}
-.swap-i{width:36px;height:36px;border-radius:8px;background:var(--c1);display:flex;align-items:center;justify-content:center;font-size:16px}
-.rest-ov{position:fixed;inset:0;background:rgba(0,0,0,0.9);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:300;padding:20px}
-.rest-time{font-size:72px;font-weight:800;font-variant-numeric:tabular-nums;color:var(--t1)}
-.rest-label{font-size:14px;color:var(--t2);margin-top:8px}
-.rest-btns{display:flex;gap:10px;margin-top:24px}
-.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:12px}
-.cal-day{aspect-ratio:1;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;color:var(--t3)}
-.cal-day.hd{font-size:8px;color:var(--t3)}
-.cal-day.wk{background:var(--c2);color:var(--t2)}
-.cal-day.td{border:1px solid var(--g)}
-.cal-day.dn{background:var(--g);color:#fff}
+.btn-d{background:rgba(255,69,58,0.15);color:var(--red)}
+.btn-w{background:var(--org-d);color:var(--org)}
+.chip{display:inline-flex;align-items:center;gap:4px;padding:6px 12px;border-radius:100px;font-size:13px;font-weight:600}
+.chip.g{background:var(--grn-d);color:var(--grn)}
+.chip.o{background:var(--org-d);color:var(--org)}
+.inp{width:100%;padding:12px;background:var(--c2);border:2px solid transparent;border-radius:10px;color:var(--t1);font-size:20px;font-weight:600;font-variant-numeric:tabular-nums;text-align:center;transition:border-color 0.2s;-moz-appearance:textfield}
+.inp::-webkit-outer-spin-button,.inp::-webkit-inner-spin-button{-webkit-appearance:none}
+.inp:focus{outline:none;border-color:var(--grn)}
+.inp.ok{border-color:var(--grn);background:rgba(48,209,88,0.08)}
+.txt{width:100%;padding:12px;background:var(--c2);border:none;border-radius:10px;color:var(--t1);font-size:15px;font-family:inherit;resize:none}
+.txt:focus{outline:none}
+.txt::placeholder{color:var(--t3)}
+.ov{position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:2000;display:flex;align-items:flex-end}
+.sht{background:var(--c1);border-radius:12px 12px 0 0;width:100%;max-height:85vh;overflow:hidden;animation:su .3s cubic-bezier(0.32,0.72,0,1)}
+.sht-h{display:flex;justify-content:space-between;align-items:center;padding:16px;border-bottom:0.5px solid var(--sep)}
+.sht-c{overflow-y:auto;max-height:calc(85vh - 60px);padding-bottom:var(--safe-b)}
+.fov{position:fixed;inset:0;background:rgba(0,0,0,0.95);z-index:3000;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:2px}
+.cal-h{padding:8px 4px;text-align:center;font-size:11px;font-weight:600;color:var(--t3)}
+.cal-d{aspect-ratio:1;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:500;color:var(--t2);border-radius:50%}
+.cal-d.td{color:var(--grn);font-weight:700}
+.cal-d.wk{background:var(--grn);color:#fff}
+.sts{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.st-c{background:var(--c1);border-radius:12px;padding:16px 12px;text-align:center}
+.st-v{font-size:28px;font-weight:700;font-variant-numeric:tabular-nums}
+.st-l{font-size:11px;font-weight:500;color:var(--t2);text-transform:uppercase;letter-spacing:0.5px;margin-top:4px}
+.day-c{display:flex;align-items:center;gap:14px;padding:14px 16px;background:var(--c1);border-radius:12px;margin-bottom:8px;cursor:pointer;transition:transform 0.15s;position:relative}
+.day-c:active{transform:scale(0.98)}
+.day-c.dn{border:1px solid var(--grn)}
+.day-c.draft{border:1px solid var(--org)}
+.day-i{width:48px;height:48px;background:var(--c2);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px}
+.day-c.dn .day-i{background:var(--grn)}
+.day-c.draft .day-i{background:var(--org)}
+.draft-badge{position:absolute;top:-4px;right:-4px;padding:4px 8px;background:var(--org);border-radius:8px;font-size:10px;font-weight:700;color:#fff}
+.ex-r{display:flex;align-items:center;gap:12px;padding:14px 16px;background:var(--c1);cursor:pointer;transition:background 0.15s}
+.ex-r:active{background:var(--c3)}
+.ex-r+.ex-r{border-top:0.5px solid var(--sep)}
+.ex-r.dn{background:rgba(48,209,88,0.06)}
+.ex-r.draft{background:rgba(255,159,10,0.06)}
+.ex-i{width:40px;height:40px;background:var(--c2);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.ex-r.dn .ex-i{background:var(--grn)}
+.ex-r.draft .ex-i{background:var(--org)}
+.set-r{display:grid;grid-template-columns:32px 1fr 1fr;gap:10px;align-items:center;margin-bottom:10px}
+.set-n{width:32px;height:32px;background:var(--c2);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:var(--t2);border:2px solid transparent}
+.set-n.act{border-color:var(--org);color:var(--org)}
+.set-n.dn{background:var(--grn);color:#fff}
+.qa{display:flex;gap:6px;margin-top:6px}
+.qb{flex:1;padding:8px;background:var(--c2);border:none;border-radius:8px;color:var(--t2);font-size:13px;font-weight:600;cursor:pointer}
+.qb:active{background:var(--c3)}
+.qb.g{color:var(--grn)}
+.qb.r{color:var(--red)}
+.tm-d{font-size:72px;font-weight:200;font-variant-numeric:tabular-nums;letter-spacing:-2px}
+.tm-l{font-size:15px;color:var(--t2);text-transform:uppercase;letter-spacing:1px;margin-top:8px}
+.tm-p{display:flex;gap:8px;margin:24px 0}
+.tm-pb{padding:10px 20px;background:var(--c1);border:2px solid transparent;border-radius:100px;color:var(--t2);font-size:15px;font-weight:600;cursor:pointer}
+.tm-pb.on{border-color:var(--grn);color:var(--grn);background:var(--grn-d)}
+.sw-i{display:flex;align-items:center;gap:14px;padding:14px 16px;cursor:pointer}
+.sw-i:active{background:var(--c3)}
+.sw-i+.sw-i{border-top:0.5px solid var(--sep)}
+.sw-i.sel{background:var(--grn-d)}
+.sw-ic{width:44px;height:44px;background:var(--c2);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px}
+.sw-i.sel .sw-ic{background:var(--grn)}
+.wt{display:flex;align-items:center;gap:6px;padding:6px 12px;background:var(--c2);border-radius:8px}
+.wt-d{width:6px;height:6px;border-radius:50%;background:var(--grn);animation:pulse 1s infinite}
+.wt-v{font-size:15px;font-weight:600;font-variant-numeric:tabular-nums}
+.back{display:flex;align-items:center;gap:2px;background:none;border:none;color:var(--grn);font-size:17px;cursor:pointer;padding:0;margin-left:-4px}
+.nbtn{display:flex;align-items:center;gap:4px;padding:8px 12px;background:var(--c2);border:none;border-radius:8px;color:var(--grn);font-size:15px;font-weight:600;cursor:pointer}
+.hero{background:linear-gradient(135deg,rgba(48,209,88,0.15),rgba(48,209,88,0.05));border:1px solid rgba(48,209,88,0.2);border-radius:16px;padding:20px;margin-bottom:16px}
+.hero-c{display:flex;align-items:center;gap:16px}
+.hero-i{font-size:40px}
+.hero-t{font-size:17px;font-weight:700;color:var(--grn)}
+.hero-s{font-size:13px;color:var(--t2);margin-top:2px}
+.phase-c{background:var(--c1);border-radius:16px;padding:20px;text-align:center;margin-bottom:16px}
+.phase-n{font-size:13px;color:var(--t3);text-transform:uppercase;letter-spacing:1px}
+.phase-nm{font-size:28px;font-weight:700;margin:4px 0 12px}
+.str{height:3px;background:linear-gradient(90deg,#169B62 33%,#fff 33% 66%,#FF883E 66%);border-radius:2px}
+.strk{display:flex;align-items:center;gap:8px;padding:8px 14px;background:linear-gradient(135deg,rgba(255,159,10,0.2),rgba(255,69,58,0.15));border-radius:100px;border:1px solid rgba(255,159,10,0.3)}
+.strk-v{font-size:20px;font-weight:800;color:var(--org);font-variant-numeric:tabular-nums}
+.pr-g{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.pr-c{background:var(--c1);border-radius:12px;padding:14px 10px;text-align:center}
+.pr-i{font-size:24px;margin-bottom:4px}
+.pr-l{font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:0.5px}
+.pr-v{font-size:20px;font-weight:700;font-variant-numeric:tabular-nums;color:var(--org);margin-top:2px}
+.pr-v.mt{color:var(--t3)}
+.ex-hd{text-align:center;padding:8px 0 16px}
+.ex-hd-i{font-size:44px;margin-bottom:8px}
+.ex-hd-n{font-size:22px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:6px}
+.ex-hd-e{font-size:14px;color:var(--t3)}
+.ex-hd-d{font-size:15px;color:var(--t2);margin-top:4px}
+.ks-b{display:inline-flex;align-items:center;gap:4px;padding:6px 12px;background:var(--grn-d);border-radius:100px;font-size:12px;font-weight:600;color:var(--grn);margin-top:12px}
+.st-sum{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:16px;background:var(--c1);border-radius:12px}
+.st-sum-i{text-align:center}
+.st-sum-v{font-size:22px;font-weight:700;font-variant-numeric:tabular-nums}
+.st-sum-l{font-size:10px;color:var(--t3);text-transform:uppercase;margin-top:2px}
+.rw{display:flex;align-items:center;gap:12px;padding:12px 16px}
+.rw+.rw{border-top:0.5px solid var(--sep)}
+.rw-i{width:44px;height:44px;background:var(--c2);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px}
+.unsaved-bar{background:var(--org-d);border:1px solid rgba(255,159,10,0.3);border-radius:12px;padding:12px 16px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between}
+.unsaved-txt{font-size:14px;color:var(--org);font-weight:600}
+.unsaved-btn{padding:6px 12px;background:var(--org);border:none;border-radius:8px;color:#fff;font-size:13px;font-weight:600;cursor:pointer}
+select{-webkit-appearance:none;appearance:none}
+@keyframes su{from{transform:translateY(100%)}to{transform:translateY(0)}}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.02)}}
 @keyframes cf{0%{transform:translateY(-100vh) rotate(0);opacity:1}100%{transform:translateY(100vh) rotate(720deg);opacity:0}}
-.cf{position:fixed;width:10px;height:10px;top:0;z-index:9999;pointer-events:none;animation:cf 3s ease-out forwards}
-@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.05)}}
-.pulse{animation:pulse .3s ease}
-@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
-.slide-up{animation:slideUp .25s ease}
+.cf{position:fixed;width:10px;height:10px;top:0;z-index:9999;pointer-events:none;animation:cf 3s cubic-bezier(0.25,0.46,0.45,0.94) forwards}
 </style>
 </head>
 <body>
 <div id="root"></div>
 <script type="text/babel">
-const {useState,useEffect,useRef,useCallback}=React;
-
-// === DATA ===
+const {useState,useEffect,useRef}=React;
 const P=[{id:1,n:'Foundation',m:'1-3',r:'12-15',s:3,c:'g'},{id:2,n:'Build',m:'4-6',r:'10-12',s:3,c:'o'},{id:3,n:'Strengthen',m:'7-9',r:'8-10',s:4,c:'g'},{id:4,n:'Maintain',m:'10-12',r:'10-12',s:3,c:'o'}];
 const D=[{id:1,n:'Upper Push',i:'💪',m:'Chest, Shoulders, Triceps'},{id:2,n:'Lower Body',i:'🍑',m:'Glutes, Hamstrings, Calves'},{id:3,n:'Upper Pull',i:'🔙',m:'Back, Biceps, Rear Delts'},{id:4,n:'Core & Cardio',i:'🔥',m:'Core, Conditioning'},{id:5,n:'Recovery',i:'🧘',m:'Mobility, Rehab'}];
-
-const defaultEx={
-    1:[{n:'Push-ups',r:'12-15',m:'Chest',i:'💪'},{n:'DB Bench Press',r:'12-15',m:'Chest',i:'🏋️'},{n:'DB Shoulder Press',r:'12-15',m:'Shoulders',i:'🎯'},{n:'Lateral Raises',r:'12-15',m:'Shoulders',i:'🦅'},{n:'Tricep Dips',r:'12-15',m:'Triceps',i:'💪'},{n:'Tricep Pushdowns',r:'12-15',m:'Triceps',i:'⬇️'}],
-    2:[{n:'Glute Bridges',r:'15-20',m:'Glutes',i:'🍑',k:1},{n:'Romanian Deadlift',r:'12-15',m:'Hamstrings',i:'🦵',k:1},{n:'Hip Thrust',r:'12-15',m:'Glutes',i:'🍑',k:1},{n:'Lying Leg Curl',r:'12-15',m:'Hamstrings',i:'🦵',k:1},{n:'Calf Raises',r:'15-20',m:'Calves',i:'🦶'},{n:'TKE',r:'15-20',m:'VMO',i:'🦿',k:1}],
-    3:[{n:'Lat Pulldown',r:'12-15',m:'Lats',i:'🔙'},{n:'Seated Cable Row',r:'12-15',m:'Back',i:'🚣'},{n:'DB Rows',r:'12-15',m:'Back',i:'🏋️'},{n:'Face Pulls',r:'15-20',m:'Rear Delts',i:'🎯'},{n:'Bicep Curls',r:'12-15',m:'Biceps',i:'💪'},{n:'Hammer Curls',r:'12-15',m:'Biceps',i:'🔨'}],
-    4:[{n:'Plank',r:'30-45s',m:'Core',i:'🧘'},{n:'Dead Bug',r:'10-12/side',m:'Core',i:'🐛'},{n:'Pallof Press',r:'12-15/side',m:'Core',i:'🎯'},{n:'Bird Dog',r:'10-12/side',m:'Core',i:'🐕'},{n:'Rowing Machine',r:'10-15 min',m:'Cardio',i:'🚣',k:1},{n:'Battle Ropes',r:'30s x 5',m:'Cardio',i:'🌊'}],
-    5:[{n:'Prone Leg Raise',r:'12-15/leg',m:'Glutes',i:'🦵',k:1},{n:'Glute Bridge Hold',r:'30s',m:'Glutes',i:'🍑',k:1},{n:'Clamshells',r:'15-20/side',m:'Hips',i:'🐚',k:1},{n:'Straight Leg Raise',r:'12-15/leg',m:'Quads',i:'🦵',k:1},{n:'Foam Rolling',r:'5-10 min',m:'Recovery',i:'🧘'},{n:'Swimming/Walking',r:'20-30 min',m:'Cardio',i:'🏊',k:1}]
-};
-
-const altEx={
-    'Chest':[{n:'Push-ups',i:'💪'},{n:'DB Bench Press',i:'🏋️'},{n:'Incline DB Press',i:'📐'},{n:'Cable Flyes',i:'🦋'},{n:'Chest Dips',i:'⬇️'},{n:'Floor Press',i:'🛏️'}],
-    'Shoulders':[{n:'DB Shoulder Press',i:'🎯'},{n:'Lateral Raises',i:'🦅'},{n:'Front Raises',i:'⬆️'},{n:'Arnold Press',i:'💪'},{n:'Cable Lateral Raise',i:'📡'},{n:'Reverse Flyes',i:'🔙'}],
-    'Triceps':[{n:'Tricep Dips',i:'💪'},{n:'Tricep Pushdowns',i:'⬇️'},{n:'Overhead Extension',i:'🙆'},{n:'Skull Crushers',i:'💀'},{n:'Diamond Push-ups',i:'💎'},{n:'Kickbacks',i:'🦵'}],
-    'Glutes':[{n:'Hip Thrust',i:'🍑',k:1},{n:'Glute Bridges',i:'🍑',k:1},{n:'Glute Bridge Hold',i:'🍑',k:1},{n:'Cable Kickbacks',i:'🦵',k:1},{n:'Frog Pumps',i:'🐸',k:1},{n:'Fire Hydrants',i:'🔥',k:1}],
-    'Hamstrings':[{n:'Romanian Deadlift',i:'🦵',k:1},{n:'Lying Leg Curl',i:'🦵',k:1},{n:'Seated Leg Curl',i:'🪑',k:1},{n:'Good Mornings',i:'🌅',k:1},{n:'Nordic Curl',i:'❄️'},{n:'Single Leg RDL',i:'1️⃣',k:1}],
-    'Calves':[{n:'Calf Raises',i:'🦶'},{n:'Seated Calf Raise',i:'🪑'},{n:'Single Leg Calf Raise',i:'1️⃣'},{n:'Donkey Calf Raise',i:'🫏'}],
-    'VMO':[{n:'TKE',i:'🦿',k:1},{n:'Terminal Knee Extension',i:'🦵',k:1},{n:'VMO Dips',i:'⬇️',k:1}],
-    'Lats':[{n:'Lat Pulldown',i:'🔙'},{n:'Pull-ups',i:'⬆️'},{n:'Chin-ups',i:'🫴'},{n:'Straight Arm Pulldown',i:'📏'}],
-    'Back':[{n:'Seated Cable Row',i:'🚣'},{n:'DB Rows',i:'🏋️'},{n:'Barbell Row',i:'🏋️'},{n:'T-Bar Row',i:'🔧'},{n:'Chest Supported Row',i:'🛏️'},{n:'Inverted Row',i:'🔄'}],
-    'Rear Delts':[{n:'Face Pulls',i:'🎯'},{n:'Reverse Flyes',i:'🦋'},{n:'Rear Delt Cable',i:'📡'}],
-    'Biceps':[{n:'Bicep Curls',i:'💪'},{n:'Hammer Curls',i:'🔨'},{n:'Preacher Curls',i:'🙏'},{n:'Incline Curls',i:'📐'},{n:'Cable Curls',i:'📡'},{n:'Concentration Curl',i:'🧘'}],
-    'Core':[{n:'Plank',i:'🧘'},{n:'Dead Bug',i:'🐛'},{n:'Pallof Press',i:'🎯'},{n:'Bird Dog',i:'🐕'},{n:'Ab Wheel',i:'🛞'},{n:'Hanging Leg Raise',i:'🦵'},{n:'Cable Crunch',i:'📡'}],
-    'Cardio':[{n:'Rowing Machine',i:'🚣',k:1},{n:'Battle Ropes',i:'🌊'},{n:'Swimming/Walking',i:'🏊',k:1},{n:'Bike',i:'🚴',k:1},{n:'Elliptical',i:'⭕',k:1},{n:'Stair Climber',i:'🪜'}],
-    'Hips':[{n:'Clamshells',i:'🐚',k:1},{n:'Fire Hydrants',i:'🔥',k:1},{n:'Side Lying Abduction',i:'🦵',k:1},{n:'Banded Walks',i:'🦀',k:1}],
-    'Quads':[{n:'Straight Leg Raise',i:'🦵',k:1},{n:'Prone Leg Raise',i:'🦵',k:1},{n:'TKE',i:'🦿',k:1}],
-    'Recovery':[{n:'Foam Rolling',i:'🧘'},{n:'Stretching',i:'🤸'},{n:'Yoga',i:'🧘'},{n:'Walking',i:'🚶',k:1}]
-};
-
+const EX={1:[{n:'Push-ups',r:'12-15',m:'Chest',i:'💪'},{n:'DB Bench Press',r:'12-15',m:'Chest',i:'🏋️'},{n:'DB Shoulder Press',r:'12-15',m:'Shoulders',i:'🎯'},{n:'Lateral Raises',r:'12-15',m:'Shoulders',i:'🦅'},{n:'Tricep Dips',r:'12-15',m:'Triceps',i:'💪'},{n:'Tricep Pushdowns',r:'12-15',m:'Triceps',i:'⬇️'}],2:[{n:'Glute Bridges',r:'15-20',m:'Glutes',i:'🍑',k:1},{n:'Romanian Deadlift',r:'12-15',m:'Hamstrings',i:'🦵',k:1},{n:'Hip Thrust',r:'12-15',m:'Glutes',i:'🍑',k:1},{n:'Lying Leg Curl',r:'12-15',m:'Hamstrings',i:'🦵',k:1},{n:'Calf Raises',r:'15-20',m:'Calves',i:'🦶'},{n:'TKE',r:'15-20',m:'VMO',i:'🦿',k:1}],3:[{n:'Lat Pulldown',r:'12-15',m:'Lats',i:'🔙'},{n:'Seated Cable Row',r:'12-15',m:'Back',i:'🚣'},{n:'DB Rows',r:'12-15',m:'Back',i:'🏋️'},{n:'Face Pulls',r:'15-20',m:'Rear Delts',i:'🎯'},{n:'Bicep Curls',r:'12-15',m:'Biceps',i:'💪'},{n:'Hammer Curls',r:'12-15',m:'Biceps',i:'🔨'}],4:[{n:'Plank',r:'30-45s',m:'Core',i:'🧘'},{n:'Dead Bug',r:'10-12/side',m:'Core',i:'🐛'},{n:'Pallof Press',r:'12-15/side',m:'Core',i:'🎯'},{n:'Bird Dog',r:'10-12/side',m:'Core',i:'🐕'},{n:'Rowing Machine',r:'10-15 min',m:'Cardio',i:'🚣',k:1},{n:'Battle Ropes',r:'30s x 5',m:'Cardio',i:'🌊'}],5:[{n:'Prone Leg Raise',r:'12-15/leg',m:'Glutes',i:'🦵',k:1},{n:'Glute Bridge Hold',r:'30s',m:'Glutes',i:'🍑',k:1},{n:'Clamshells',r:'15-20/side',m:'Hips',i:'🐚',k:1},{n:'Straight Leg Raise',r:'12-15/leg',m:'Quads',i:'🦵',k:1},{n:'Foam Rolling',r:'5-10 min',m:'Recovery',i:'🧘'},{n:'Swimming/Walking',r:'20-30 min',m:'Cardio',i:'🏊',k:1}]};
+const ALT={Chest:[{n:'Push-ups',i:'💪'},{n:'DB Bench Press',i:'🏋️'},{n:'Incline DB Press',i:'📐'},{n:'Cable Flyes',i:'🦋'},{n:'Floor Press',i:'🛏️'}],Shoulders:[{n:'DB Shoulder Press',i:'🎯'},{n:'Lateral Raises',i:'🦅'},{n:'Front Raises',i:'⬆️'},{n:'Arnold Press',i:'💪'}],Triceps:[{n:'Tricep Dips',i:'💪'},{n:'Tricep Pushdowns',i:'⬇️'},{n:'Overhead Extension',i:'🙆'},{n:'Skull Crushers',i:'💀'}],Glutes:[{n:'Hip Thrust',i:'🍑',k:1},{n:'Glute Bridges',i:'🍑',k:1},{n:'Glute Bridge Hold',i:'🍑',k:1},{n:'Frog Pumps',i:'🐸',k:1}],Hamstrings:[{n:'Romanian Deadlift',i:'🦵',k:1},{n:'Lying Leg Curl',i:'🦵',k:1},{n:'Seated Leg Curl',i:'🪑',k:1},{n:'Good Mornings',i:'🌅',k:1}],Calves:[{n:'Calf Raises',i:'🦶'},{n:'Seated Calf Raise',i:'🪑'}],VMO:[{n:'TKE',i:'🦿',k:1}],Lats:[{n:'Lat Pulldown',i:'🔙'},{n:'Pull-ups',i:'⬆️'},{n:'Chin-ups',i:'🫴'}],Back:[{n:'Seated Cable Row',i:'🚣'},{n:'DB Rows',i:'🏋️'},{n:'Barbell Row',i:'🏋️'}],'Rear Delts':[{n:'Face Pulls',i:'🎯'},{n:'Reverse Flyes',i:'🦋'}],Biceps:[{n:'Bicep Curls',i:'💪'},{n:'Hammer Curls',i:'🔨'},{n:'Preacher Curls',i:'🙏'}],Core:[{n:'Plank',i:'🧘'},{n:'Dead Bug',i:'🐛'},{n:'Pallof Press',i:'🎯'},{n:'Bird Dog',i:'🐕'}],Cardio:[{n:'Rowing Machine',i:'🚣',k:1},{n:'Battle Ropes',i:'🌊'},{n:'Swimming/Walking',i:'🏊',k:1}],Hips:[{n:'Clamshells',i:'🐚',k:1},{n:'Fire Hydrants',i:'🔥',k:1}],Quads:[{n:'Straight Leg Raise',i:'🦵',k:1},{n:'Prone Leg Raise',i:'🦵',k:1}],Recovery:[{n:'Foam Rolling',i:'🧘'},{n:'Stretching',i:'🤸'}]};
 const sv=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch{}};
 const ld=(k,d)=>{try{const s=localStorage.getItem(k);return s?JSON.parse(s):d}catch{return d}};
-const cf=()=>{const c=['#169B62','#FF883E','#FFF','#FFD700'];for(let i=0;i<50;i++){const e=document.createElement('div');e.className='cf';e.style.left=Math.random()*100+'vw';e.style.background=c[Math.floor(Math.random()*c.length)];e.style.animationDelay=Math.random()*0.5+'s';e.style.borderRadius=Math.random()>0.5?'50%':'2px';document.body.appendChild(e);setTimeout(()=>e.remove(),3500)}if(navigator.vibrate)navigator.vibrate([10,50,10,50,10])};
-const vib=()=>{if(navigator.vibrate)navigator.vibrate(5)};
+const vb=(p=10)=>{if(navigator.vibrate)navigator.vibrate(p)};
+const cf=()=>{const c=['#30d158','#ff9f0a','#fff','#0a84ff'];for(let i=0;i<60;i++){const e=document.createElement('div');e.className='cf';e.style.left=Math.random()*100+'vw';e.style.background=c[Math.floor(Math.random()*c.length)];e.style.animationDelay=Math.random()*0.5+'s';e.style.borderRadius=Math.random()>0.5?'50%':'2px';document.body.appendChild(e);setTimeout(()=>e.remove(),3500)}vb([10,50,10,50,10])};
 
-// === COMPONENTS ===
-const Rg=({p,sz=32,sw=3,cl='var(--g)'})=>{const r=(sz-sw)/2,c=r*2*Math.PI,o=c-(p/100)*c;return<svg width={sz} height={sz} style={{transform:'rotate(-90deg)'}}><circle stroke="var(--c2)" fill="none" strokeWidth={sw} r={r} cx={sz/2} cy={sz/2}/><circle stroke={cl} fill="none" strokeWidth={sw} strokeLinecap="round" r={r} cx={sz/2} cy={sz/2} style={{strokeDasharray:c,strokeDashoffset:o,transition:'stroke-dashoffset .3s'}}/></svg>};
+const Rg=({p,sz=32,sw=3,cl='var(--grn)'})=>{const r=(sz-sw)/2,c=r*2*Math.PI,o=c-(p/100)*c;return<svg width={sz} height={sz} style={{transform:'rotate(-90deg)'}}><circle fill="none" stroke="var(--c2)" strokeWidth={sw} r={r} cx={sz/2} cy={sz/2}/><circle fill="none" stroke={cl} strokeWidth={sw} strokeLinecap="round" r={r} cx={sz/2} cy={sz/2} style={{strokeDasharray:c,strokeDashoffset:o,transition:'stroke-dashoffset .4s'}}/></svg>};
 
-const RestTimer=({show,onClose,onDone})=>{
-    const[t,sT]=useState(90);
-    const[run,sR]=useState(false);
-    const[sel,sS]=useState(90);
-    const rf=useRef();
+const Rest=({sh,cl})=>{const[t,sT]=useState(90),[ru,sR]=useState(false),[sl,sS]=useState(90);const rf=useRef();useEffect(()=>{if(ru&&t>0)rf.current=setInterval(()=>sT(x=>x-1),1000);else if(t===0){sR(false);vb([200,100,200,100,200])}return()=>clearInterval(rf.current)},[ru,t]);const rs=x=>{sS(x);sT(x);sR(false)};if(!sh)return null;const m=Math.floor(t/60),s=t%60;return<div className="fov" onClick={cl}><div onClick={e=>e.stopPropagation()} style={{textAlign:'center',padding:'0 32px'}}><div className="tm-l">Rest Time</div><div className="tm-d">{m}:{s.toString().padStart(2,'0')}</div><div className="tm-p">{[60,90,120,180].map(x=><button key={x} className={`tm-pb ${sl===x?'on':''}`} onClick={()=>rs(x)}>{x}s</button>)}</div><div style={{display:'flex',gap:12,justifyContent:'center'}}><button className={`btn ${ru?'btn-s':'btn-p'}`} style={{width:140}} onClick={()=>sR(!ru)}>{ru?'Pause':'Start'}</button><button className="btn btn-s" style={{width:60}} onClick={()=>rs(sl)}>↺</button><button className="btn btn-s" style={{width:60}} onClick={cl}>✕</button></div></div></div>};
+
+const Swap=({sh,mus,cur,onSel,cl})=>{if(!sh)return null;const opts=ALT[mus]||[];return<div className="ov" onClick={cl}><div className="sht" onClick={e=>e.stopPropagation()}><div style={{width:36,height:5,background:'var(--t3)',borderRadius:3,margin:'8px auto 0'}}/><div className="sht-h"><span style={{fontWeight:600}}>Swap Exercise</span><button className="back" onClick={cl}>Done</button></div><div className="sht-c"><div className="sec">Alternatives for {mus}</div>{opts.map((ex,i)=><div key={i} className={`sw-i ${ex.n===cur?'sel':''}`} onClick={()=>{onSel(ex);vb()}}><div className="sw-ic">{ex.i}</div><div style={{flex:1}}><div style={{fontWeight:600}}>{ex.n}</div>{ex.k&&<div style={{fontSize:12,color:'var(--grn)',marginTop:2}}>⭐ Knee-Safe</div>}</div>{ex.n===cur&&<span style={{color:'var(--grn)',fontSize:20}}>✓</span>}</div>)}</div></div></div>};
+
+const Cal=({hist})=>{const td=new Date(),ds=['S','M','T','W','T','F','S'],fd=new Date(td.getFullYear(),td.getMonth(),1).getDay(),dm=new Date(td.getFullYear(),td.getMonth()+1,0).getDate(),wd=hist.filter(h=>{const d=new Date(h.date);return d.getMonth()===td.getMonth()&&d.getFullYear()===td.getFullYear()}).map(h=>new Date(h.date).getDate());const cells=[];for(let i=0;i<fd;i++)cells.push(<div key={`e${i}`} className="cal-d"/>);for(let d=1;d<=dm;d++){const iT=d===td.getDate(),iW=wd.includes(d);cells.push(<div key={d} className={`cal-d ${iT?'td':''} ${iW?'wk':''}`}>{d}</div>)}return<div><div className="cal">{ds.map((d,i)=><div key={i} className="cal-h">{d}</div>)}</div><div className="cal">{cells}</div></div>};
+
+// Exercise Tracker with draft support
+const ST=({ex,ph,ini,onSv,cl,cex,sCex,did,draft,setDraft})=>{
+    const ns=ph.s;
+    const draftKey=`${did}_${ex.n}`;
+    const existingDraft=draft[draftKey];
     
+    const[sts,sSts]=useState(()=>existingDraft?.sets||ini?.sets||Array(ns).fill().map(()=>({w:'',r:''})));
+    const[nt,sNt]=useState(existingDraft?.note??ini?.note??'');
+    const[rst,sRst]=useState(false);
+    const[swp,sSwp]=useState(false);
+    const[act,sAct]=useState(()=>{const f=sts.findIndex(s=>!s.w);return f===-1?0:f});
+    
+    // Auto-save draft on any change
     useEffect(()=>{
-        if(run&&t>0)rf.current=setInterval(()=>sT(x=>x-1),1000);
-        else if(t===0){sR(false);if(navigator.vibrate)navigator.vibrate([200,100,200,100,200]);onDone?.();}
-        return()=>clearInterval(rf.current);
-    },[run,t]);
+        const hasData=sts.some(s=>s.w||s.r)||nt;
+        if(hasData){
+            const newDraft={...draft,[draftKey]:{sets:sts,note:nt}};
+            setDraft(newDraft);
+            sv('drafts',newDraft);
+        }
+    },[sts,nt]);
     
-    const rs=x=>{sS(x);sT(x);sR(false)};
-    if(!show)return null;
-    const m=Math.floor(t/60),s=t%60;
-    
-    return<div className="rest-ov" onClick={onClose}>
-        <div onClick={e=>e.stopPropagation()} style={{textAlign:'center'}}>
-            <div style={{fontSize:14,color:'var(--t2)',marginBottom:8}}>REST TIME</div>
-            <div className="rest-time">{m}:{s.toString().padStart(2,'0')}</div>
-            <div style={{display:'flex',gap:8,justifyContent:'center',margin:'20px 0'}}>
-                {[60,90,120,180].map(x=><button key={x} onClick={()=>rs(x)} className={`pill ${sel===x?'on':'off'}`}>{x}s</button>)}
-            </div>
-            <div className="rest-btns">
-                <button onClick={()=>sR(!run)} className={`btn ${run?'btn-o':'btn-g'}`} style={{width:120}}>{run?'⏸ Pause':'▶ Start'}</button>
-                <button onClick={()=>rs(sel)} className="btn btn-s" style={{width:60}}>↺</button>
-                <button onClick={onClose} className="btn btn-s" style={{width:60}}>✕</button>
-            </div>
-        </div>
-    </div>;
-};
-
-const SwapSheet=({show,muscle,current,onSelect,onClose})=>{
-    if(!show)return null;
-    const opts=altEx[muscle]||[];
-    return<div className="ov" onClick={onClose}>
-        <div className="ov-c slide-up" onClick={e=>e.stopPropagation()}>
-            <div className="ov-h">
-                <span style={{fontWeight:700}}>Swap Exercise</span>
-                <button onClick={onClose} style={{background:'none',border:'none',color:'var(--t2)',fontSize:18,cursor:'pointer'}}>✕</button>
-            </div>
-            <div style={{fontSize:11,color:'var(--t2)',marginBottom:10}}>Select alternative for {muscle}</div>
-            {opts.map((ex,i)=>(
-                <div key={i} className={`swap-item ${ex.n===current?'sel':''}`} onClick={()=>{onSelect(ex);vib();}}>
-                    <div className="swap-i">{ex.i}</div>
-                    <div style={{flex:1}}>
-                        <div style={{fontWeight:600,fontSize:13}}>{ex.n}</div>
-                        {ex.k&&<div style={{fontSize:10,color:'#1eb872'}}>⭐ Knee-Safe</div>}
-                    </div>
-                    {ex.n===current&&<span style={{color:'var(--g)'}}>✓</span>}
-                </div>
-            ))}
-        </div>
-    </div>;
-};
-
-const WorkoutTimer=({running,seconds})=>{
-    const m=Math.floor(seconds/60);
-    const s=seconds%60;
-    return<div style={{display:'flex',alignItems:'center',gap:6,padding:'6px 10px',background:'var(--c2)',borderRadius:8}}>
-        <span style={{color:running?'var(--g)':'var(--t3)',fontSize:10}}>{running?'●':'○'}</span>
-        <span style={{fontSize:14,fontWeight:700,fontVariantNumeric:'tabular-nums'}}>{m}:{s.toString().padStart(2,'0')}</span>
-    </div>;
-};
-
-const SetTracker=({ex,ph,ini,onSv,cl,customEx,setCustomEx,dayId})=>{
-    const st=ph.s;
-    const[dt,sD]=useState(()=>ini?.sets||Array(st).fill().map(()=>({w:'',r:''})));
-    const[note,setNote]=useState(ini?.note||'');
-    const[rest,setRest]=useState(false);
-    const[swap,setSwap]=useState(false);
-    const[activeSet,setActiveSet]=useState(()=>{
-        const first=dt.findIndex(s=>!s.w||parseFloat(s.w)===0);
-        return first===-1?0:first;
-    });
-    
-    const up=(i,f,v)=>{const d=[...dt];d[i]={...d[i],[f]:v};sD(d);vib();};
-    const adj=(i,amt)=>{
-        const cur=parseFloat(dt[i].w)||0;
-        const nv=Math.max(0,cur+amt);
-        up(i,'w',nv.toString());
-    };
+    const up=(i,f,v)=>{const d=[...sts];d[i]={...d[i],[f]:v};sSts(d);vb(5)};
+    const adj=(i,a)=>{const c=parseFloat(sts[i].w)||0;up(i,'w',Math.max(0,c+a).toString())};
     const dn=s=>s.w&&parseFloat(s.w)>0;
-    const av=()=>{const w=dt.filter(dn).map(s=>parseFloat(s.w));return w.length?(w.reduce((a,b)=>a+b,0)/w.length).toFixed(1):0};
-    const mx=()=>{const w=dt.filter(dn).map(s=>parseFloat(s.w));return w.length?Math.max(...w):0};
-    const rp=()=>dt.reduce((t,s)=>t+(parseInt(s.r)||0),0);
-    const vl=()=>dt.reduce((t,s)=>t+((parseFloat(s.w)||0)*(parseInt(s.r)||0)),0);
+    const av=()=>{const w=sts.filter(dn).map(s=>parseFloat(s.w));return w.length?(w.reduce((a,b)=>a+b,0)/w.length).toFixed(1):'0'};
+    const mx=()=>{const w=sts.filter(dn).map(s=>parseFloat(s.w));return w.length?Math.max(...w):0};
+    const rp=()=>sts.reduce((t,s)=>t+(parseInt(s.r)||0),0);
+    const vl=()=>sts.reduce((t,s)=>t+((parseFloat(s.w)||0)*(parseInt(s.r)||0)),0);
     
     const hSv=()=>{
-        onSv({sets:dt,average:parseFloat(av()),max:mx(),totalReps:rp(),totalVolume:vl(),completedSets:dt.filter(dn).length,note});
+        onSv({sets:sts,average:parseFloat(av()),max:mx(),totalReps:rp(),totalVolume:vl(),completedSets:sts.filter(dn).length,note:nt});
+        // Clear draft after save
+        const newDraft={...draft};
+        delete newDraft[draftKey];
+        setDraft(newDraft);
+        sv('drafts',newDraft);
         cl();
     };
     
-    const handleSwap=(newEx)=>{
-        const updated={...customEx};
-        if(!updated[dayId])updated[dayId]={};
-        updated[dayId][ex.n]={...newEx,r:ex.r,m:ex.m};
-        setCustomEx(updated);
-        sv('customEx',updated);
-        setSwap(false);
+    const hDiscard=()=>{
+        if(confirm('Discard unsaved changes?')){
+            const newDraft={...draft};
+            delete newDraft[draftKey];
+            setDraft(newDraft);
+            sv('drafts',newDraft);
+            cl();
+        }
     };
     
-    const curEx=customEx?.[dayId]?.[ex.n]||ex;
+    const hSwp=ne=>{const u={...cex};if(!u[did])u[did]={};u[did][ex.n]={...ne,r:ex.r,m:ex.m};sCex(u);sv('cex',u);sSwp(false)};
+    const ce=cex?.[did]?.[ex.n]||ex;
+    const hasUnsaved=sts.some(s=>s.w||s.r)||nt;
     
-    return<div className="page">
-        <div className="hdr">
-            <div style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}>
-                <button onClick={cl} style={{background:'var(--c1)',border:'none',color:'var(--t1)',padding:'6px 10px',borderRadius:6,cursor:'pointer',fontSize:12}}>←</button>
-                <div style={{textAlign:'center',flex:1}} onClick={()=>setSwap(true)}>
-                    <div style={{fontSize:20}}>{curEx.i}</div>
-                    <div style={{fontSize:13,fontWeight:700,display:'flex',alignItems:'center',justifyContent:'center',gap:4}}>{curEx.n} <span style={{fontSize:10,color:'var(--t3)'}}>✎</span></div>
-                    <div style={{fontSize:10,color:'var(--t2)'}}>{st}×{ph.r}</div>
-                </div>
-                <button onClick={()=>setRest(true)} style={{background:'var(--g)',border:'none',color:'#fff',padding:'6px 10px',borderRadius:6,cursor:'pointer',fontSize:11,fontWeight:600}}>⏱</button>
-            </div>
-        </div>
-        <div className="cnt">
-            {curEx.k&&<div style={{marginBottom:8,padding:'5px 10px',background:'rgba(22,155,98,0.12)',borderRadius:6,textAlign:'center',fontSize:10,color:'#1eb872'}}>⭐ Knee-Safe</div>}
-            
-            <div style={{display:'grid',gridTemplateColumns:'28px 36px 1fr 36px 1fr',gap:4,alignItems:'center',marginBottom:6}}>
-                <div style={{fontSize:8,color:'var(--t3)',fontWeight:600}}></div>
-                <div></div>
-                <div style={{fontSize:8,color:'var(--t3)',fontWeight:600,textAlign:'center'}}>WEIGHT (KG)</div>
-                <div></div>
-                <div style={{fontSize:8,color:'var(--t3)',fontWeight:600,textAlign:'center'}}>REPS</div>
-            </div>
-            
-            {dt.map((s,i)=>(
-                <div key={i} style={{display:'grid',gridTemplateColumns:'28px 36px 1fr 36px 1fr',gap:4,alignItems:'center',marginBottom:6}}>
-                    <div className={`sn ${dn(s)?'dn':''} ${i===activeSet&&!dn(s)?'act':''}`} onClick={()=>setActiveSet(i)}>{dn(s)?'✓':i+1}</div>
-                    <button className="qb dn" onClick={()=>adj(i,-2.5)}>−</button>
-                    <input 
-                        type="number" 
-                        inputMode="decimal" 
-                        className={`si ${s.w?'has':''}`} 
-                        value={s.w} 
-                        onChange={e=>up(i,'w',e.target.value)} 
-                        onFocus={()=>setActiveSet(i)}
-                        placeholder="0"
-                    />
-                    <button className="qb up" onClick={()=>adj(i,2.5)}>+</button>
-                    <input 
-                        type="number" 
-                        inputMode="numeric" 
-                        className={`si ${s.r?'has':''}`} 
-                        value={s.r} 
-                        onChange={e=>{up(i,'r',e.target.value);if(e.target.value&&i<st-1)setActiveSet(i+1);}}
-                        onFocus={()=>setActiveSet(i)}
-                        placeholder="0"
-                    />
-                </div>
-            ))}
-            
-            <div style={{marginTop:10,marginBottom:10}}>
-                <div style={{fontSize:9,color:'var(--t3)',marginBottom:4}}>NOTES (optional)</div>
-                <textarea 
-                    className="note-inp" 
-                    rows={2} 
-                    value={note} 
-                    onChange={e=>setNote(e.target.value)}
-                    placeholder="How did it feel? Any tweaks?"
-                />
-            </div>
-            
-            <div style={{display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:4,marginBottom:10}}>
-                <div className="crd st" style={{padding:6,marginBottom:0}}><div className="st-v" style={{color:'var(--g)',fontSize:16}}>{av()}</div><div className="st-l">AVG</div></div>
-                <div className="crd st" style={{padding:6,marginBottom:0}}><div className="st-v" style={{color:'var(--o)',fontSize:16}}>{mx()}</div><div className="st-l">MAX</div></div>
-                <div className="crd st" style={{padding:6,marginBottom:0}}><div className="st-v" style={{fontSize:16}}>{rp()}</div><div className="st-l">REPS</div></div>
-                <div className="crd st" style={{padding:6,marginBottom:0}}><div className="st-v" style={{color:'#FFD700',fontSize:16}}>{vl()}</div><div className="st-l">VOL</div></div>
-            </div>
-            
-            <button onClick={hSv} className="btn btn-g">✓ Save Exercise</button>
-        </div>
-        <RestTimer show={rest} onClose={()=>setRest(false)}/>
-        <SwapSheet show={swap} muscle={curEx.m} current={curEx.n} onSelect={handleSwap} onClose={()=>setSwap(false)}/>
-    </div>;
-};
+    return<div className="pg"><div className="nav"><div style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}><button className="back" onClick={hasUnsaved?hDiscard:cl}><span style={{fontSize:20}}>‹</span> {hasUnsaved?'Discard':'Back'}</button><button className="nbtn" onClick={()=>sRst(true)}>⏱ Rest</button></div></div><div className="sc"><div style={{padding:'0 16px'}}>
+    
+    {hasUnsaved&&<div className="unsaved-bar"><span className="unsaved-txt">⚡ Unsaved changes</span><button className="unsaved-btn" onClick={hSv}>Save Now</button></div>}
+    
+    <div className="ex-hd" onClick={()=>sSwp(true)} style={{cursor:'pointer'}}><div className="ex-hd-i">{ce.i}</div><div className="ex-hd-n">{ce.n}<span className="ex-hd-e">✎</span></div><div className="ex-hd-d">{ns} sets × {ph.r} reps</div>{ce.k&&<div className="ks-b">⭐ Knee-Safe Exercise</div>}</div><div style={{marginBottom:20}}>{sts.map((s,i)=><div key={i} className="set-r"><div className={`set-n ${dn(s)?'dn':''} ${i===act&&!dn(s)?'act':''}`}>{dn(s)?'✓':i+1}</div><div><input type="number" inputMode="decimal" className={`inp ${s.w?'ok':''}`} value={s.w} onChange={e=>up(i,'w',e.target.value)} onFocus={()=>sAct(i)} placeholder="kg"/><div className="qa"><button className="qb r" onClick={()=>adj(i,-2.5)}>−2.5</button><button className="qb g" onClick={()=>adj(i,2.5)}>+2.5</button></div></div><div><input type="number" inputMode="numeric" className={`inp ${s.r?'ok':''}`} value={s.r} onChange={e=>{up(i,'r',e.target.value);if(e.target.value&&i<ns-1)sAct(i+1)}} onFocus={()=>sAct(i)} placeholder="reps"/></div></div>)}</div><div style={{marginBottom:16}}><div style={{fontSize:13,color:'var(--t3)',marginBottom:8}}>Notes</div><textarea className="txt" rows={2} value={nt} onChange={e=>sNt(e.target.value)} placeholder="How did it feel?"/></div><div className="st-sum"><div className="st-sum-i"><div className="st-sum-v" style={{color:'var(--grn)'}}>{av()}</div><div className="st-sum-l">Avg kg</div></div><div className="st-sum-i"><div className="st-sum-v" style={{color:'var(--org)'}}>{mx()}</div><div className="st-sum-l">Max kg</div></div><div className="st-sum-i"><div className="st-sum-v">{rp()}</div><div className="st-sum-l">Reps</div></div><div className="st-sum-i"><div className="st-sum-v" style={{color:'var(--blu)'}}>{vl()}</div><div className="st-sum-l">Volume</div></div></div><div style={{marginTop:20}}><button className="btn btn-p" onClick={hSv}>Save Exercise</button></div></div></div><Rest sh={rst} cl={()=>sRst(false)}/><Swap sh={swp} mus={ce.m} cur={ce.n} onSel={hSwp} cl={()=>sSwp(false)}/></div>};
 
-const WorkoutDay=({dy,ph,dt,sD,bk,customEx,setCustomEx,streak,setStreak,workoutHistory,setWorkoutHistory})=>{
-    const[ei,sE]=useState(null);
-    const[timer,setTimer]=useState(0);
-    const[timerRun,setTimerRun]=useState(false);
-    const timerRef=useRef();
-    const startTimeRef=useRef();
+// Workout Day with draft awareness
+const WD=({dy,ph,dt,sD,bk,cex,sCex,strk,sStrk,hist,sHist,draft,setDraft,wkTimer,setWkTimer})=>{
+    const[sei,sSei]=useState(null);
+    const[tmr,sTmr]=useState(wkTimer||0);
+    const tr=useRef(),st=useRef(Date.now()-(wkTimer||0)*1000);
     
     useEffect(()=>{
-        startTimeRef.current=Date.now();
-        setTimerRun(true);
-        return()=>setTimerRun(false);
+        tr.current=setInterval(()=>{
+            const newTime=Math.floor((Date.now()-st.current)/1000);
+            sTmr(newTime);
+            setWkTimer(newTime);
+        },1000);
+        return()=>clearInterval(tr.current);
     },[]);
     
-    useEffect(()=>{
-        if(timerRun){
-            timerRef.current=setInterval(()=>{
-                setTimer(Math.floor((Date.now()-startTimeRef.current)/1000));
-            },1000);
-        }
-        return()=>clearInterval(timerRef.current);
-    },[timerRun]);
-    
-    const el=customEx?.[dy.id]?Object.keys(defaultEx[dy.id]).map((k,i)=>customEx[dy.id][defaultEx[dy.id][i].n]||defaultEx[dy.id][i]):defaultEx[dy.id];
-    const getEx=()=>defaultEx[dy.id].map(e=>customEx?.[dy.id]?.[e.n]||e);
-    const exList=getEx();
-    
+    const gEx=()=>EX[dy.id].map(e=>cex?.[dy.id]?.[e.n]||e);
+    const exs=gEx();
     const ky=n=>`p${ph.id}_d${dy.id}_${n}`;
-    const dn=exList.filter(e=>dt[ky(e.n)]?.completedSets>0).length;
-    const pc=dn/exList.length*100;
+    const dnC=exs.filter(e=>dt[ky(EX[dy.id].find(de=>de.n===e.n||cex?.[dy.id]?.[de.n]?.n===e.n)?.n||e.n)]?.completedSets>0).length;
+    const prg=(dnC/exs.length)*100;
     
-    const svE=(n,d)=>{
+    // Check for drafts in this day
+    const dayHasDrafts=Object.keys(draft).some(k=>k.startsWith(`${dy.id}_`));
+    
+    const svEx=(n,d)=>{
         const pv=Object.keys(dt).filter(k=>k.includes(n)).map(k=>dt[k]?.average||0).filter(v=>v>0);
         const bs=pv.length?Math.max(...pv):0;
         if(d.average&&bs&&d.average>bs)cf();
         const nd={...dt,[ky(n)]:d};
         sD(nd);sv('workoutData',nd);
-        sE(null);
+        sSei(null);
     };
     
-    const completeWorkout=()=>{
+    const cmpW=()=>{
         cf();
-        const today=new Date().toDateString();
-        const hist=ld('workoutHistory',[]);
-        const lastWorkout=hist[0]?.date;
-        let newStreak=streak;
-        
-        if(lastWorkout){
-            const last=new Date(lastWorkout);
-            const diff=Math.floor((new Date()-last)/(1000*60*60*24));
-            if(diff<=1)newStreak=streak+1;
-            else newStreak=1;
-        }else{
-            newStreak=1;
-        }
-        
-        const entry={date:today,day:dy.id,phase:ph.id,duration:timer,exercises:dn};
-        const newHist=[entry,...hist].slice(0,50);
-        sv('workoutHistory',newHist);
-        sv('streak',newStreak);
-        setStreak(newStreak);
-        setWorkoutHistory(newHist);
+        const td=new Date().toDateString(),lw=hist[0]?.date;
+        let ns=strk;
+        if(lw){const df=Math.floor((new Date()-new Date(lw))/(1000*60*60*24));ns=df<=1?strk+1:1}else ns=1;
+        const en={date:td,day:dy.id,phase:ph.id,duration:tmr,exercises:dnC},nh=[en,...hist].slice(0,50);
+        sv('workoutHistory',nh);sv('streak',ns);sStrk(ns);sHist(nh);
+        // Clear all drafts for this day
+        const newDraft={...draft};
+        Object.keys(newDraft).forEach(k=>{if(k.startsWith(`${dy.id}_`))delete newDraft[k]});
+        setDraft(newDraft);sv('drafts',newDraft);
+        setWkTimer(0);
         bk();
     };
     
-    if(ei!==null){
-        const ex=exList[ei];
-        const origEx=defaultEx[dy.id][ei];
-        return<SetTracker ex={origEx} ph={ph} ini={dt[ky(origEx.n)]} onSv={d=>svE(origEx.n,d)} cl={()=>sE(null)} customEx={customEx} setCustomEx={setCustomEx} dayId={dy.id}/>;
+    if(sei!==null){
+        const oe=EX[dy.id][sei];
+        return<ST ex={oe} ph={ph} ini={dt[ky(oe.n)]} onSv={d=>svEx(oe.n,d)} cl={()=>sSei(null)} cex={cex} sCex={sCex} did={dy.id} draft={draft} setDraft={setDraft}/>;
     }
     
-    return<div className="page">
-        <div className="hdr">
-            <div style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}>
-                <button onClick={bk} style={{background:'var(--c1)',border:'none',color:'var(--t1)',padding:'6px 10px',borderRadius:6,cursor:'pointer',fontSize:12}}>←</button>
-                <div style={{textAlign:'center',flex:1}}>
-                    <div style={{fontSize:11,color:'var(--t2)'}}>Day {dy.id}</div>
-                    <div style={{fontSize:14,fontWeight:700}}>{dy.n}</div>
-                </div>
-                <WorkoutTimer running={timerRun} seconds={timer}/>
-            </div>
-        </div>
-        <div className="cnt">
-            <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:10}}>
-                <div className={`bdg ${ph.c}`}>Phase {ph.id} • {ph.s}×{ph.r}</div>
-                <div style={{display:'flex',alignItems:'center',gap:4}}><Rg p={pc} sz={24} sw={2}/><span style={{fontWeight:700,fontSize:12}}>{dn}/{exList.length}</span></div>
-            </div>
-            
-            {exList.map((ex,i)=>{
-                const origEx=defaultEx[dy.id][i];
-                const d=dt[ky(origEx.n)];
-                const iD=d?.completedSets>0;
-                return<div key={i} className={`ex ${iD?'dn':''}`} onClick={()=>sE(i)}>
-                    <div className="ex-i">{ex.i}</div>
-                    <div style={{flex:1,minWidth:0}}>
-                        <div style={{fontWeight:600,fontSize:12,display:'flex',alignItems:'center',gap:4}}>
-                            {ex.n}
-                            {iD&&<span style={{color:'var(--g)'}}>✓</span>}
-                        </div>
-                        <div style={{fontSize:10,color:'var(--t2)'}}>{ex.m}{ex.k&&' ⭐'}</div>
-                        {d?.note&&<div style={{fontSize:9,color:'var(--o)',marginTop:1}}>📝 {d.note.slice(0,30)}{d.note.length>30?'...':''}</div>}
-                        {d&&!d.note&&<div style={{fontSize:9,color:'var(--g)',marginTop:1}}>{d.average}kg • {d.totalReps}r</div>}
-                    </div>
-                    <div className={`ex-b ${iD?'on':''}`}>{iD?`${d.average}kg`:'Log'}</div>
-                </div>;
-            })}
-            
-            {dn===exList.length&&<button onClick={completeWorkout} className="btn btn-g" style={{marginTop:10}}>🏁 Complete Workout</button>}
-        </div>
-    </div>;
-};
+    const tm=Math.floor(tmr/60),ts=tmr%60;
+    
+    return<div className="pg"><div className="nav"><div style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}><button className="back" onClick={bk}><span style={{fontSize:20}}>‹</span> Back</button><div className="wt"><div className="wt-d"/><div className="wt-v">{tm}:{ts.toString().padStart(2,'0')}</div></div></div></div><div className="sc"><div className="nav-t"><div style={{display:'flex',alignItems:'center',gap:12}}><span style={{fontSize:32}}>{dy.i}</span><div><h1 style={{fontSize:34,fontWeight:700}}>{dy.n}</h1><p style={{fontSize:15,color:'var(--t2)'}}>{dy.m}</p></div></div></div><div style={{padding:'0 16px'}}>
 
-const Calendar=({history})=>{
-    const today=new Date();
-    const days=['S','M','T','W','T','F','S'];
-    const firstDay=new Date(today.getFullYear(),today.getMonth(),1).getDay();
-    const daysInMonth=new Date(today.getFullYear(),today.getMonth()+1,0).getDate();
-    
-    const workoutDates=history.map(h=>new Date(h.date).getDate());
-    
-    const cells=[];
-    for(let i=0;i<firstDay;i++)cells.push(<div key={`e${i}`} className="cal-day"/>);
-    for(let d=1;d<=daysInMonth;d++){
-        const isToday=d===today.getDate();
-        const isWorkout=workoutDates.includes(d);
-        cells.push(<div key={d} className={`cal-day wk ${isToday?'td':''} ${isWorkout?'dn':''}`}>{d}</div>);
-    }
-    
-    return<div>
-        <div className="cal-grid">{days.map(d=><div key={d} className="cal-day hd">{d}</div>)}</div>
-        <div className="cal-grid">{cells}</div>
-    </div>;
-};
+    {dayHasDrafts&&<div className="unsaved-bar"><span className="unsaved-txt">⚡ You have unsaved exercises</span></div>}
 
-const WorkoutTab=({ph,dt,sD,customEx,setCustomEx,streak,setStreak,workoutHistory,setWorkoutHistory})=>{
-    const[di,sDi]=useState(null);
+    <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:16}}><div className={`chip ${ph.c}`}>Phase {ph.id} · {ph.s}×{ph.r}</div><div style={{display:'flex',alignItems:'center',gap:8}}><Rg p={prg} sz={28} sw={3}/><span style={{fontWeight:600}}>{dnC}/{exs.length}</span></div></div><div className="crd">{exs.map((ex,i)=>{const oe=EX[dy.id][i],ed=dt[ky(oe.n)],isDn=ed?.completedSets>0,hasDraft=draft[`${dy.id}_${oe.n}`];return<div key={i} className={`ex-r ${isDn?'dn':''} ${hasDraft&&!isDn?'draft':''}`} onClick={()=>sSei(i)}><div className="ex-i">{ex.i}</div><div style={{flex:1,minWidth:0}}><div style={{fontWeight:600,display:'flex',alignItems:'center',gap:6}}>{ex.n}{isDn&&<span style={{color:'var(--grn)'}}>✓</span>}{hasDraft&&!isDn&&<span style={{color:'var(--org)'}}>●</span>}</div><div style={{fontSize:13,color:'var(--t2)'}}>{ex.m}{ex.k&&' · ⭐ Knee-Safe'}</div>{hasDraft&&!isDn&&<div style={{fontSize:12,color:'var(--org)',marginTop:2}}>Unsaved draft</div>}{ed?.note&&<div style={{fontSize:12,color:'var(--org)',marginTop:2}}>📝 {ed.note.slice(0,40)}{ed.note.length>40?'...':''}</div>}{ed&&!ed.note&&!hasDraft&&<div style={{fontSize:12,color:'var(--grn)',marginTop:2}}>{ed.average}kg avg · {ed.totalReps} reps</div>}</div><div style={{color:isDn?'var(--grn)':hasDraft?'var(--org)':'var(--t3)',fontSize:13,fontWeight:600}}>{isDn?`${ed.average}kg`:hasDraft?'Draft':'›'}</div></div>})}</div>{dnC===exs.length&&<div style={{marginTop:20}}><button className="btn btn-p" onClick={cmpW}>🏁 Complete Workout</button></div>}</div></div></div>};
+
+// Workout Tab with session persistence
+const WT=({ph,dt,sD,cex,sCex,strk,sStrk,hist,sHist,draft,setDraft,activeDay,setActiveDay,wkTimer,setWkTimer})=>{
     const ky=(d,n)=>`p${ph.id}_d${d}_${n}`;
     
-    if(di){
-        const dy=D.find(d=>d.id===di);
-        return<WorkoutDay dy={dy} ph={ph} dt={dt} sD={sD} bk={()=>sDi(null)} customEx={customEx} setCustomEx={setCustomEx} streak={streak} setStreak={setStreak} workoutHistory={workoutHistory} setWorkoutHistory={setWorkoutHistory}/>;
+    if(activeDay){
+        const dy=D.find(d=>d.id===activeDay);
+        return<WD dy={dy} ph={ph} dt={dt} sD={sD} bk={()=>setActiveDay(null)} cex={cex} sCex={sCex} strk={strk} sStrk={sStrk} hist={hist} sHist={sHist} draft={draft} setDraft={setDraft} wkTimer={wkTimer} setWkTimer={setWkTimer}/>;
     }
     
-    const thisMonth=workoutHistory.filter(h=>{
-        const d=new Date(h.date);
-        const now=new Date();
-        return d.getMonth()===now.getMonth()&&d.getFullYear()===now.getFullYear();
-    });
+    const tmw=hist.filter(h=>{const d=new Date(h.date),nw=new Date();return d.getMonth()===nw.getMonth()&&d.getFullYear()===nw.getFullYear()});
+    const hasDrafts=Object.keys(draft).length>0;
     
-    return<div className="page">
-        <div className="hdr">
-            <div style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}>
-                <div>
-                    <div style={{fontSize:9,color:'var(--t3)',textTransform:'uppercase',letterSpacing:1}}>IronClad</div>
-                    <h1 style={{margin:0,fontSize:16,fontWeight:800,background:'linear-gradient(90deg,var(--g),var(--o))',WebkitBackgroundClip:'text',WebkitTextFillColor:'transparent'}}>Knee-Safe Training</h1>
-                </div>
-                {streak>0&&<div className="streak">
-                    <div className="streak-num">🔥{streak}</div>
-                    <div className="streak-txt">day{streak>1?'s':''}<br/>streak</div>
-                </div>}
-            </div>
-        </div>
-        <div className="cnt">
-            <div className="str"/>
-            
-            <div className="crd" style={{padding:10}}>
-                <div style={{fontSize:11,fontWeight:700,marginBottom:8,display:'flex',alignItems:'center',justifyContent:'space-between'}}>
-                    <span>📅 {new Date().toLocaleString('default',{month:'long'})}</span>
-                    <span style={{color:'var(--t2)',fontWeight:400}}>{thisMonth.length} workouts</span>
-                </div>
-                <Calendar history={thisMonth}/>
-            </div>
-            
-            <div className="crd" style={{background:'linear-gradient(135deg,rgba(22,155,98,0.12),var(--c1))',borderColor:'var(--g)',padding:10}}>
-                <div style={{display:'flex',alignItems:'center',gap:8}}>
-                    <span style={{fontSize:20}}>🛡️</span>
-                    <div>
-                        <div style={{fontWeight:700,fontSize:12,color:'#1eb872'}}>100% Knee-Safe</div>
-                        <div style={{fontSize:10,color:'var(--t2)'}}>Hip hinge + open chain only</div>
-                    </div>
-                </div>
-            </div>
-            
-            <div className="crd" style={{background:`linear-gradient(135deg,${ph.c==='g'?'rgba(22,155,98,0.12)':'rgba(255,136,62,0.12)'},var(--c1))`,padding:10}}>
-                <div style={{textAlign:'center'}}>
-                    <div style={{fontSize:9,color:'var(--t3)',textTransform:'uppercase'}}>Phase {ph.id}</div>
-                    <div style={{fontSize:18,fontWeight:800,margin:'2px 0'}}>{ph.n}</div>
-                    <div className={`bdg ${ph.c}`}>{ph.s}×{ph.r} • Months {ph.m}</div>
-                </div>
-            </div>
-            
-            <div style={{fontSize:9,color:'var(--t3)',textTransform:'uppercase',letterSpacing:1,margin:'12px 0 8px'}}>5-Day Split</div>
-            
-            {D.map(dy=>{
-                const exList=defaultEx[dy.id];
-                const dn=exList.filter(e=>dt[ky(dy.id,e.n)]?.completedSets>0).length;
-                const pc=dn/exList.length*100;
-                const cp=dn===exList.length;
-                return<div key={dy.id} className={`day ${cp?'dn':''}`} onClick={()=>sDi(dy.id)}>
-                    <div className="day-i">{cp?'✓':dy.i}</div>
-                    <div style={{flex:1}}>
-                        <div style={{fontWeight:700,fontSize:13}}>Day {dy.id}: {dy.n}</div>
-                        <div style={{fontSize:10,color:'var(--t2)'}}>{dy.m}</div>
-                    </div>
-                    <Rg p={pc} cl={cp?'#1eb872':'var(--g)'}/>
-                </div>;
-            })}
-        </div>
-    </div>;
-};
+    return<div className="pg"><div className="nav-lg"><div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start'}}><div style={{fontSize:12,color:'var(--t3)',textTransform:'uppercase',letterSpacing:1}}>IronClad</div>{strk>0&&<div className="strk"><span style={{fontSize:16}}>🔥</span><span className="strk-v">{strk}</span></div>}</div></div><div className="sc"><div className="nav-t"><h1 style={{fontSize:34,fontWeight:700}}>Workout</h1></div><div style={{padding:'0 16px'}}><div className="str" style={{marginBottom:16}}/>
 
-const ProgressTab=({dt,workoutHistory})=>{
-    const cr=useRef();const ci=useRef();
-    useEffect(()=>{
-        if(!cr.current)return;
-        if(ci.current)ci.current.destroy();
-        const cx=cr.current.getContext('2d');
-        const ga=kw=>[1,2,3,4].map(p=>{
-            const vs=Object.keys(dt).filter(k=>k.startsWith(`p${p}_`)&&k.includes(kw)).map(k=>dt[k]?.average||0).filter(v=>v>0);
-            return vs.length?(vs.reduce((a,b)=>a+b,0)/vs.length).toFixed(1):null;
-        });
-        ci.current=new Chart(cx,{type:'bar',data:{labels:['P1','P2','P3','P4'],datasets:[
-            {label:'Hip Thrust',data:ga('Hip'),backgroundColor:'#169B62',borderRadius:3},
-            {label:'RDL',data:ga('Romanian'),backgroundColor:'#FF883E',borderRadius:3},
-            {label:'Bench',data:ga('Bench'),backgroundColor:'#8fa88f',borderRadius:3}
-        ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{boxWidth:8,padding:8,color:'#8fa88f',font:{size:9}}}},scales:{y:{beginAtZero:true,grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#5a7a5a',font:{size:8}}},x:{grid:{display:false},ticks:{color:'#5a7a5a',font:{size:8}}}}}});
-        return()=>{if(ci.current)ci.current.destroy()};
-    },[dt]);
-    
-    const gP=kw=>{let b=0;Object.keys(dt).forEach(k=>{if(k.toLowerCase().includes(kw.toLowerCase())){const v=dt[k]?.max||0;if(v>b)b=v}});return b};
-    const tv=Object.keys(dt).reduce((t,k)=>t+(dt[k]?.totalVolume||0),0);
-    const totalTime=workoutHistory.reduce((t,h)=>t+(h.duration||0),0);
-    const avgTime=workoutHistory.length?Math.round(totalTime/workoutHistory.length/60):0;
-    
-    return<div className="page">
-        <div className="hdr">
-            <div style={{fontSize:9,color:'var(--t3)',textTransform:'uppercase',letterSpacing:1}}>IronClad</div>
-            <h1 style={{margin:0,fontSize:16,fontWeight:800,background:'linear-gradient(90deg,var(--g),var(--o))',WebkitBackgroundClip:'text',WebkitTextFillColor:'transparent'}}>Progress</h1>
-        </div>
-        <div className="cnt">
-            <div className="str"/>
-            
-            <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:6,marginBottom:10}}>
-                <div className="crd st" style={{padding:8,marginBottom:0}}>
-                    <div className="st-v" style={{color:'var(--g)',fontSize:18}}>{workoutHistory.length}</div>
-                    <div className="st-l">Workouts</div>
-                </div>
-                <div className="crd st" style={{padding:8,marginBottom:0}}>
-                    <div className="st-v" style={{color:'var(--o)',fontSize:18}}>{(tv/1000).toFixed(1)}k</div>
-                    <div className="st-l">Volume kg</div>
-                </div>
-                <div className="crd st" style={{padding:8,marginBottom:0}}>
-                    <div className="st-v" style={{fontSize:18}}>{avgTime}m</div>
-                    <div className="st-l">Avg Time</div>
-                </div>
-            </div>
-            
-            <div className="crd">
-                <div style={{fontSize:11,fontWeight:700,marginBottom:8}}>📊 Key Lifts by Phase</div>
-                <div style={{height:140}}><canvas ref={cr}/></div>
-            </div>
-            
-            <div style={{fontSize:9,color:'var(--t3)',textTransform:'uppercase',letterSpacing:1,margin:'12px 0 8px'}}>☘️ Personal Records</div>
-            
-            <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:6,marginBottom:10}}>
-                {[{n:'Hip',k:'Hip',i:'🍑'},{n:'RDL',k:'Romanian',i:'🦵'},{n:'TKE',k:'TKE',i:'🦿'},{n:'Bench',k:'Bench',i:'💪'},{n:'Row',k:'Row',i:'🔙'},{n:'Press',k:'Press',i:'⬆️'}].map(e=>{
-                    const pr=gP(e.k);
-                    return<div key={e.k} className="crd" style={{padding:8,textAlign:'center',marginBottom:0}}>
-                        <div style={{fontSize:16}}>{e.i}</div>
-                        <div style={{fontSize:7,color:'var(--t3)',textTransform:'uppercase'}}>{e.n}</div>
-                        <div style={{fontSize:14,fontWeight:800,color:pr?'var(--o)':'var(--t3)'}}>{pr||'—'}</div>
-                    </div>;
-                })}
-            </div>
-            
-            {workoutHistory.length>0&&<>
-                <div style={{fontSize:9,color:'var(--t3)',textTransform:'uppercase',letterSpacing:1,margin:'12px 0 8px'}}>Recent Workouts</div>
-                {workoutHistory.slice(0,5).map((h,i)=>(
-                    <div key={i} className="crd" style={{padding:10,marginBottom:6,display:'flex',alignItems:'center',gap:10}}>
-                        <div style={{fontSize:20}}>{D[h.day-1]?.i}</div>
-                        <div style={{flex:1}}>
-                            <div style={{fontWeight:600,fontSize:12}}>Day {h.day}: {D[h.day-1]?.n}</div>
-                            <div style={{fontSize:10,color:'var(--t2)'}}>{new Date(h.date).toLocaleDateString()} • {Math.round((h.duration||0)/60)}m</div>
-                        </div>
-                        <div style={{fontSize:11,color:'var(--g)',fontWeight:600}}>P{h.phase}</div>
-                    </div>
-                ))}
-            </>}
-        </div>
-    </div>;
-};
+    {hasDrafts&&<div className="unsaved-bar" style={{marginBottom:16}}><span className="unsaved-txt">⚡ You have unsaved workout data</span><button className="unsaved-btn" onClick={()=>{if(confirm('Discard all unsaved data?')){setDraft({});sv('drafts',{})}}}>Discard All</button></div>}
 
-const SettingsTab=({ph,sPh,wk,sWk,customEx,setCustomEx})=>{
-    const ex=()=>{
-        const d={workoutData:ld('workoutData',{}),customEx,phase:ph.id,week:wk,streak:ld('streak',0),workoutHistory:ld('workoutHistory',[]),v:'7.0'};
-        const b=new Blob([JSON.stringify(d,null,2)],{type:'application/json'});
-        const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='ironclad-backup.json';a.click();
-    };
-    const im=e=>{
-        const f=e.target.files[0];if(!f)return;
-        const r=new FileReader();
-        r.onload=ev=>{try{
-            const d=JSON.parse(ev.target.result);
-            if(d.workoutData)sv('workoutData',d.workoutData);
-            if(d.customEx)sv('customEx',d.customEx);
-            if(d.phase)sv('phase',d.phase);
-            if(d.week)sv('week',d.week);
-            if(d.streak)sv('streak',d.streak);
-            if(d.workoutHistory)sv('workoutHistory',d.workoutHistory);
-            alert('Imported!');location.reload();
-        }catch{alert('Error')}};
-        r.readAsText(f);
-    };
-    const resetEx=()=>{
-        if(confirm('Reset all exercise swaps to defaults?')){
-            sv('customEx',{});
-            setCustomEx({});
-        }
-    };
-    
-    return<div className="page">
-        <div className="hdr">
-            <div style={{fontSize:9,color:'var(--t3)',textTransform:'uppercase',letterSpacing:1}}>IronClad</div>
-            <h1 style={{margin:0,fontSize:16,fontWeight:800,background:'linear-gradient(90deg,var(--g),var(--o))',WebkitBackgroundClip:'text',WebkitTextFillColor:'transparent'}}>Settings</h1>
-        </div>
-        <div className="cnt">
-            <div className="str"/>
-            
-            <div className="crd" style={{background:'linear-gradient(135deg,rgba(22,155,98,0.08),var(--c1))',padding:10}}>
-                <div style={{fontWeight:700,marginBottom:6,fontSize:12}}>🛡️ Knee-Safe Rules</div>
-                <ul style={{margin:0,paddingLeft:14,fontSize:11,color:'var(--t2)',lineHeight:1.6}}>
-                    <li>Hip hinge over knee bend</li>
-                    <li>Open chain leg work</li>
-                    <li>TKE every lower day</li>
-                    <li>Zero deep squats</li>
-                    <li style={{color:'var(--o)'}}>Stop if pain</li>
-                </ul>
-            </div>
-            
-            <div className="crd" style={{padding:10}}>
-                <div style={{fontWeight:700,marginBottom:10,fontSize:12}}>📅 Program</div>
-                <div style={{marginBottom:10}}>
-                    <div style={{fontSize:9,color:'var(--t3)',textTransform:'uppercase',marginBottom:4}}>Phase</div>
-                    <select value={ph.id} onChange={e=>{const p=P.find(x=>x.id===+e.target.value);sPh(p);sv('phase',p.id)}} style={{width:'100%',padding:10,fontSize:13,borderRadius:6,border:'1px solid var(--b)',background:'var(--c2)',color:'var(--t1)'}}>
-                        {P.map(p=><option key={p.id} value={p.id}>P{p.id}: {p.n} ({p.m})</option>)}
-                    </select>
-                </div>
-                <div>
-                    <div style={{fontSize:9,color:'var(--t3)',textTransform:'uppercase',marginBottom:4}}>Week</div>
-                    <input type="number" min={1} max={12} value={wk} onChange={e=>{const v=Math.min(12,Math.max(1,+e.target.value||1));sWk(v);sv('week',v)}} style={{width:'100%',padding:10,fontSize:13,textAlign:'center',borderRadius:6,border:'1px solid var(--b)',background:'var(--c2)',color:'var(--t1)'}}/>
-                </div>
-            </div>
-            
-            <div className="crd" style={{padding:10}}>
-                <div style={{fontWeight:700,marginBottom:10,fontSize:12}}>🔄 Exercise Customization</div>
-                <button onClick={resetEx} className="btn btn-s" style={{padding:10}}>Reset All Swaps to Default</button>
-            </div>
-            
-            <div className="crd" style={{padding:10}}>
-                <div style={{fontWeight:700,marginBottom:10,fontSize:12}}>💾 Data</div>
-                <button onClick={ex} className="btn btn-g" style={{marginBottom:6,padding:10}}>⬇ Export Backup</button>
-                <label className="btn btn-s" style={{marginBottom:6,cursor:'pointer',padding:10}}>⬆ Import Backup<input type="file" accept=".json" onChange={im} style={{display:'none'}}/></label>
-                <button onClick={()=>{if(confirm('Delete ALL data? This cannot be undone.')){localStorage.clear();location.reload()}}} className="btn" style={{background:'rgba(255,77,77,0.12)',color:'#ff6b6b',border:'1px solid rgba(255,77,77,0.2)',padding:10}}>🗑 Clear All Data</button>
-            </div>
-            
-            <div style={{textAlign:'center',padding:12,color:'var(--t3)',fontSize:10}}>
-                ☘️ <b>IronClad</b> v7.0 🇮🇪<br/>
-                <span style={{fontSize:9}}>iPhone: ⬆ → Add to Home Screen</span>
-            </div>
-        </div>
-    </div>;
-};
+    <div className="crd" style={{marginBottom:16}}><div className="crd-s"><div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:12}}><span style={{fontWeight:600}}>{new Date().toLocaleString('default',{month:'long'})}</span><span style={{fontSize:13,color:'var(--t2)'}}>{tmw.length} workouts</span></div><Cal hist={tmw}/></div></div><div className="hero"><div className="hero-c"><div className="hero-i">🛡️</div><div><div className="hero-t">100% Knee-Safe</div><div className="hero-s">Hip hinge + open chain exercises only</div></div></div></div><div className="phase-c"><div className="phase-n">Phase {ph.id}</div><div className="phase-nm">{ph.n}</div><div className={`chip ${ph.c}`}>{ph.s} sets × {ph.r} reps · Months {ph.m}</div></div><div className="sec">5-Day Split</div>{D.map(dy=>{const exs=EX[dy.id],cmp=exs.filter(e=>dt[ky(dy.id,e.n)]?.completedSets>0).length,prg=(cmp/exs.length)*100,isCmp=cmp===exs.length,dayDrafts=Object.keys(draft).filter(k=>k.startsWith(`${dy.id}_`)).length;return<div key={dy.id} className={`day-c ${isCmp?'dn':''} ${dayDrafts>0&&!isCmp?'draft':''}`} onClick={()=>setActiveDay(dy.id)}>{dayDrafts>0&&!isCmp&&<div className="draft-badge">{dayDrafts} unsaved</div>}<div className="day-i">{isCmp?'✓':dy.i}</div><div style={{flex:1}}><div style={{fontWeight:600}}>Day {dy.id}: {dy.n}</div><div style={{fontSize:13,color:'var(--t2)'}}>{dy.m}</div></div><Rg p={prg} sz={36} sw={3}/></div>})}</div></div></div>};
+
+const PT=({dt,hist})=>{const cr=useRef(),ci=useRef();useEffect(()=>{if(!cr.current)return;if(ci.current)ci.current.destroy();const cx=cr.current.getContext('2d'),gA=kw=>[1,2,3,4].map(p=>{const vs=Object.keys(dt).filter(k=>k.startsWith(`p${p}_`)&&k.includes(kw)).map(k=>dt[k]?.average||0).filter(v=>v>0);return vs.length?(vs.reduce((a,b)=>a+b,0)/vs.length).toFixed(1):null});ci.current=new Chart(cx,{type:'bar',data:{labels:['P1','P2','P3','P4'],datasets:[{label:'Hip Thrust',data:gA('Hip'),backgroundColor:'#30d158',borderRadius:4},{label:'RDL',data:gA('Romanian'),backgroundColor:'#ff9f0a',borderRadius:4},{label:'Bench',data:gA('Bench'),backgroundColor:'#0a84ff',borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{boxWidth:10,padding:16,color:'rgba(235,235,245,0.6)',font:{size:11}}}},scales:{y:{beginAtZero:true,grid:{color:'rgba(84,84,88,0.3)'},ticks:{color:'rgba(235,235,245,0.3)',font:{size:10}}},x:{grid:{display:false},ticks:{color:'rgba(235,235,245,0.3)',font:{size:10}}}}}});return()=>{if(ci.current)ci.current.destroy()}},[dt]);const gPR=kw=>{let b=0;Object.keys(dt).forEach(k=>{if(k.toLowerCase().includes(kw.toLowerCase())){const v=dt[k]?.max||0;if(v>b)b=v}});return b};const tv=Object.keys(dt).reduce((t,k)=>t+(dt[k]?.totalVolume||0),0),tt=hist.reduce((t,h)=>t+(h.duration||0),0),at=hist.length?Math.round(tt/hist.length/60):0;return<div className="pg"><div className="nav-lg"/><div className="sc"><div className="nav-t"><h1 style={{fontSize:34,fontWeight:700}}>Progress</h1></div><div style={{padding:'0 16px'}}><div className="str" style={{marginBottom:16}}/><div className="sts" style={{marginBottom:16}}><div className="st-c"><div className="st-v" style={{color:'var(--grn)'}}>{hist.length}</div><div className="st-l">Workouts</div></div><div className="st-c"><div className="st-v" style={{color:'var(--org)'}}>{(tv/1000).toFixed(1)}k</div><div className="st-l">Volume</div></div><div className="st-c"><div className="st-v">{at}m</div><div className="st-l">Avg Time</div></div></div><div className="crd" style={{marginBottom:16}}><div className="crd-p"><div style={{fontWeight:600,marginBottom:12}}>Key Lifts by Phase</div><div style={{height:160}}><canvas ref={cr}/></div></div></div><div className="sec">Personal Records</div><div className="pr-g" style={{marginBottom:16}}>{[{n:'Hip',k:'Hip',i:'🍑'},{n:'RDL',k:'Romanian',i:'🦵'},{n:'TKE',k:'TKE',i:'🦿'},{n:'Bench',k:'Bench',i:'💪'},{n:'Row',k:'Row',i:'🔙'},{n:'Press',k:'Press',i:'⬆️'}].map(ex=>{const pr=gPR(ex.k);return<div key={ex.k} className="pr-c"><div className="pr-i">{ex.i}</div><div className="pr-l">{ex.n}</div><div className={`pr-v ${!pr?'mt':''}`}>{pr||'—'}</div></div>})}</div>{hist.length>0&&<><div className="sec">Recent Workouts</div><div className="crd">{hist.slice(0,5).map((h,i)=><div key={i} className="rw"><div className="rw-i">{D[h.day-1]?.i}</div><div style={{flex:1}}><div style={{fontWeight:600}}>Day {h.day}: {D[h.day-1]?.n}</div><div style={{fontSize:13,color:'var(--t2)'}}>{new Date(h.date).toLocaleDateString()} · {Math.round((h.duration||0)/60)}m</div></div><div className="chip g">P{h.phase}</div></div>)}</div></>}</div></div></div>};
+
+const SetT=({ph,sPh,wk,sWk,cex,sCex,draft,setDraft})=>{const hEx=()=>{const d={workoutData:ld('workoutData',{}),cex,phase:ph.id,week:wk,streak:ld('streak',0),workoutHistory:ld('workoutHistory',[]),drafts:draft,v:'8.1'};const b=new Blob([JSON.stringify(d,null,2)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=`ironclad-${new Date().toISOString().split('T')[0]}.json`;a.click()};const hIm=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=ev=>{try{const d=JSON.parse(ev.target.result);if(d.workoutData)sv('workoutData',d.workoutData);if(d.cex)sv('cex',d.cex);if(d.phase)sv('phase',d.phase);if(d.week)sv('week',d.week);if(d.streak)sv('streak',d.streak);if(d.workoutHistory)sv('workoutHistory',d.workoutHistory);if(d.drafts)sv('drafts',d.drafts);alert('Imported!');location.reload()}catch{alert('Error')}};r.readAsText(f)};const rSwp=()=>{if(confirm('Reset all exercise swaps?')){sv('cex',{});sCex({})}};const rDrf=()=>{if(confirm('Discard all unsaved drafts?')){sv('drafts',{});setDraft({})}};return<div className="pg"><div className="nav-lg"/><div className="sc"><div className="nav-t"><h1 style={{fontSize:34,fontWeight:700}}>Settings</h1></div><div style={{padding:'0 16px'}}><div className="str" style={{marginBottom:16}}/><div className="sec">Knee-Safe Principles</div><div className="crd" style={{marginBottom:16}}><div className="crd-p"><ul style={{margin:0,paddingLeft:20,fontSize:15,color:'var(--t2)',lineHeight:1.8}}><li><span style={{color:'var(--t1)'}}>Hip hinge over knee bend</span></li><li><span style={{color:'var(--t1)'}}>Open chain leg work</span></li><li><span style={{color:'var(--t1)'}}>TKE every lower day</span></li><li><span style={{color:'var(--t1)'}}>Zero deep squats</span></li><li><span style={{color:'var(--red)'}}>Stop if pain</span></li></ul></div></div><div className="sec">Program</div><div className="crd" style={{marginBottom:16}}><div className="crd-s"><div style={{fontSize:13,color:'var(--t2)',marginBottom:8}}>Phase</div><select value={ph.id} onChange={e=>{const p=P.find(x=>x.id===+e.target.value);sPh(p);sv('phase',p.id)}} style={{width:'100%',padding:14,fontSize:17,borderRadius:10,border:'none',background:'var(--c2)',color:'var(--t1)'}}>{P.map(p=><option key={p.id} value={p.id}>Phase {p.id}: {p.n} ({p.m})</option>)}</select></div><div className="crd-s"><div style={{fontSize:13,color:'var(--t2)',marginBottom:8}}>Week (1-12)</div><input type="number" min={1} max={12} value={wk} onChange={e=>{const v=Math.min(12,Math.max(1,+e.target.value||1));sWk(v);sv('week',v)}} style={{width:'100%',padding:14,fontSize:17,textAlign:'center',borderRadius:10,border:'none',background:'var(--c2)',color:'var(--t1)',fontVariantNumeric:'tabular-nums'}}/></div></div><div className="sec">Customization</div><div className="crd" style={{marginBottom:16}}><div className="crd-p" style={{display:'flex',flexDirection:'column',gap:10}}><button className="btn btn-s" onClick={rSwp}>Reset Exercise Swaps</button>{Object.keys(draft).length>0&&<button className="btn btn-w" onClick={rDrf}>Discard All Drafts ({Object.keys(draft).length})</button>}</div></div><div className="sec">Data</div><div className="crd" style={{marginBottom:16}}><div className="crd-p" style={{display:'flex',flexDirection:'column',gap:10}}><button className="btn btn-p" onClick={hEx}>Export Backup</button><label className="btn btn-s" style={{cursor:'pointer',textAlign:'center'}}>Import Backup<input type="file" accept=".json" onChange={hIm} style={{display:'none'}}/></label><button className="btn btn-d" onClick={()=>{if(confirm('Delete ALL data?')){localStorage.clear();location.reload()}}}>Clear All Data</button></div></div><div style={{textAlign:'center',padding:'24px 0 40px',color:'var(--t3)'}}><div style={{fontSize:13}}>☘️ <strong>IronClad</strong> v8.1 🇮🇪</div><div style={{fontSize:11,marginTop:4}}>Tap ⬆️ Share → Add to Home Screen</div></div></div></div></div>};
 
 const App=()=>{
-    const[tb,sTb]=useState('workout');
+    const[tab,sTab]=useState('workout');
     const[ph,sPh]=useState(()=>P.find(p=>p.id===ld('phase',1))||P[0]);
     const[wk,sWk]=useState(()=>ld('week',1));
     const[dt,sD]=useState(()=>ld('workoutData',{}));
-    const[customEx,setCustomEx]=useState(()=>ld('customEx',{}));
-    const[streak,setStreak]=useState(()=>ld('streak',0));
-    const[workoutHistory,setWorkoutHistory]=useState(()=>ld('workoutHistory',[]));
+    const[cex,sCex]=useState(()=>ld('cex',{}));
+    const[strk,sStrk]=useState(()=>ld('streak',0));
+    const[hist,sHist]=useState(()=>ld('workoutHistory',[]));
+    const[draft,setDraft]=useState(()=>ld('drafts',{}));
+    const[activeDay,setActiveDay]=useState(null);
+    const[wkTimer,setWkTimer]=useState(0);
     
-    return<div style={{height:'100%',display:'flex',flexDirection:'column'}}>
-        {tb==='workout'&&<WorkoutTab ph={ph} dt={dt} sD={sD} customEx={customEx} setCustomEx={setCustomEx} streak={streak} setStreak={setStreak} workoutHistory={workoutHistory} setWorkoutHistory={setWorkoutHistory}/>}
-        {tb==='progress'&&<ProgressTab dt={dt} workoutHistory={workoutHistory}/>}
-        {tb==='settings'&&<SettingsTab ph={ph} sPh={sPh} wk={wk} sWk={sWk} customEx={customEx} setCustomEx={setCustomEx}/>}
+    const hasDrafts=Object.keys(draft).length>0;
+    
+    return<>
+        {tab==='workout'&&<WT ph={ph} dt={dt} sD={sD} cex={cex} sCex={sCex} strk={strk} sStrk={sStrk} hist={hist} sHist={sHist} draft={draft} setDraft={setDraft} activeDay={activeDay} setActiveDay={setActiveDay} wkTimer={wkTimer} setWkTimer={setWkTimer}/>}
+        {tab==='progress'&&<PT dt={dt} hist={hist}/>}
+        {tab==='settings'&&<SetT ph={ph} sPh={sPh} wk={wk} sWk={sWk} cex={cex} sCex={sCex} draft={draft} setDraft={setDraft}/>}
         <div className="tabs">
-            {[{id:'workout',i:'fa-dumbbell',l:'Workout'},{id:'progress',i:'fa-chart-line',l:'Progress'},{id:'settings',i:'fa-gear',l:'Settings'}].map(t=>
-                <button key={t.id} className={`tab ${tb===t.id?'on':''}`} onClick={()=>{sTb(t.id);vib();}}>
-                    <i className={`fa-solid ${t.i}`}/>
+            {[{id:'workout',l:'Workout',ic:<svg viewBox="0 0 24 24"><path d="M20.57 14.86L22 13.43 20.57 12 17 15.57 8.43 7 12 3.43 10.57 2 9.14 3.43 7.71 2 5.57 4.14 4.14 2.71 2.71 4.14l1.43 1.43L2 7.71l1.43 1.43L2 10.57 3.43 12 7 8.43 15.57 17 12 20.57 13.43 22l1.43-1.43L16.29 22l2.14-2.14 1.43 1.43 1.43-1.43-1.43-1.43L22 16.29z"/></svg>},{id:'progress',l:'Progress',ic:<svg viewBox="0 0 24 24"><path d="M3.5 18.49l6-6.01 4 4L22 6.92l-1.41-1.41-7.09 7.97-4-4L2 16.99z"/></svg>},{id:'settings',l:'Settings',ic:<svg viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.31.06-.63.06-.94 0-.31-.02-.63-.06-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.04.31-.06.63-.06.94s.02.63.06.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>}].map(t=>
+                <button key={t.id} className={`tab ${tab===t.id?'on':''}`} onClick={()=>{sTab(t.id);vb()}}>
+                    {t.id==='workout'&&hasDrafts&&<div className="tab-badge"/>}
+                    {t.ic}
                     <span>{t.l}</span>
                 </button>
             )}
         </div>
-    </div>;
+    </>;
 };
-
 ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
 </script>
 </body>
