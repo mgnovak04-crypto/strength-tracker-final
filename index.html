@@ -355,3 +355,247 @@ ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
 </script>
 </body>
 </html>
+-l">This Month</div></div>
+  </div>
+
+  <div className="crd" style={{marginBottom:16}}><div className="crd-s"><div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:10}}><span style={{fontWeight:600}}>{new Date().toLocaleString('default',{month:'long',year:'numeric'})}</span><span style={{fontSize:12,color:'var(--t2)'}}>{tmw.length} workouts</span></div><Cal hist={hist}/></div></div>
+  
+  <div className="hero"><div className="hero-c"><div className="hero-i">🛡️</div><div><div className="hero-t">100% Knee-Safe Program</div><div className="hero-s">Hip hinge + open chain exercises only</div></div></div></div>
+  
+  <div className="phase-c"><div className="phase-n">Phase {ph.id}</div><div className="phase-nm">{ph.n}</div><div className={`chip ${ph.c}`}>{ph.s} sets × {ph.r} reps</div><div style={{fontSize:12,color:'var(--t3)',marginTop:6}}>Months {ph.m}</div></div>
+  
+  <div className="sec" style={{paddingTop:8}}>Training Days</div>
+  {DAYS.map(dy=>{
+    const exList=dayExercises[dy.id]||DEF_EX[dy.id];
+    const cmp=exList.filter(n=>dt[ky(dy.id,n)]?.completedSets>0).length;
+    const prg=(cmp/exList.length)*100;
+    const isCmp=cmp===exList.length;
+    const dayDrafts=Object.keys(draft).filter(k=>k.startsWith(`${dy.id}_`)).length;
+    
+    return<div key={dy.id} className={`day-c ${isCmp?'dn':''} ${dayDrafts>0&&!isCmp?'draft':''}`} onClick={()=>setActiveDay(dy.id)}>
+      {dayDrafts>0&&!isCmp&&<div className="draft-bdg">{dayDrafts}</div>}
+      <div className="day-i">{isCmp?'✓':dy.i}</div>
+      <div style={{flex:1}}><div style={{fontWeight:600}}>Day {dy.id}: {dy.n}</div><div style={{fontSize:12,color:'var(--t2)'}}>{exList.length} exercises</div></div>
+      <Rg p={prg} sz={34} sw={3}/>
+    </div>;
+  })}
+  </div></div></div>;
+};
+
+// === PROGRESS TAB ===
+const PT=({dt,hist})=>{
+  const cr=useRef(),ci=useRef();
+  
+  useEffect(()=>{
+    if(!cr.current)return;
+    if(ci.current)ci.current.destroy();
+    const cx=cr.current.getContext('2d');
+    const gA=kw=>[1,2,3,4].map(p=>{
+      const vs=Object.keys(dt).filter(k=>k.startsWith(`p${p}_`)&&k.toLowerCase().includes(kw.toLowerCase())).map(k=>dt[k]?.average||0).filter(v=>v>0);
+      return vs.length?(vs.reduce((a,b)=>a+b,0)/vs.length).toFixed(1):null;
+    });
+    ci.current=new Chart(cx,{type:'bar',data:{labels:['Phase 1','Phase 2','Phase 3','Phase 4'],datasets:[{label:'Hip Thrust',data:gA('hip'),backgroundColor:'#30d158',borderRadius:6},{label:'RDL',data:gA('romanian'),backgroundColor:'#ff9f0a',borderRadius:6},{label:'Row',data:gA('row'),backgroundColor:'#0a84ff',borderRadius:6}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{boxWidth:12,padding:12,color:'rgba(235,235,245,0.6)',font:{size:11}}}},scales:{y:{beginAtZero:true,grid:{color:'rgba(84,84,88,0.2)'},ticks:{color:'rgba(235,235,245,0.3)',font:{size:10}}},x:{grid:{display:false},ticks:{color:'rgba(235,235,245,0.3)',font:{size:10}}}}}});
+    return()=>{if(ci.current)ci.current.destroy()};
+  },[dt]);
+  
+  const gPR=kw=>{let b=0;Object.keys(dt).forEach(k=>{if(k.toLowerCase().includes(kw.toLowerCase())){const v=dt[k]?.max||dt[k]?.est1RM||0;if(v>b)b=v}});return b};
+  const tv=Object.keys(dt).reduce((t,k)=>t+(dt[k]?.totalVolume||0),0);
+  const tr=Object.keys(dt).reduce((t,k)=>t+(dt[k]?.totalReps||0),0);
+  const tt=hist.reduce((t,h)=>t+(h.duration||0),0);
+  const at=hist.length?Math.round(tt/hist.length/60):0;
+  
+  return<div className="pg"><div className="nav-lg"/><div className="sc"><div className="nav-t"><h1 style={{fontSize:32,fontWeight:700}}>Progress</h1></div><div style={{padding:'0 16px'}}><div className="str" style={{marginBottom:16}}/>
+  
+  <div className="sts" style={{marginBottom:16}}>
+    <div className="st-c"><div className="st-v" style={{color:'var(--grn)'}}>{hist.length}</div><div className="st-l">Workouts</div></div>
+    <div className="st-c"><div className="st-v" style={{color:'var(--org)'}}>{(tv/1000).toFixed(1)}k</div><div className="st-l">Volume kg</div></div>
+    <div className="st-c"><div className="st-v" style={{color:'var(--blu)'}}>{at}m</div><div className="st-l">Avg Time</div></div>
+  </div>
+  
+  <div className="crd" style={{marginBottom:16}}><div className="crd-p"><div style={{fontWeight:600,marginBottom:10}}>Key Lifts by Phase</div><div style={{height:180}}><canvas ref={cr}/></div></div></div>
+  
+  <div className="sec" style={{paddingTop:8}}>Personal Records 🏆</div>
+  <div className="pr-g" style={{marginBottom:16}}>
+    {[{n:'Hip Thrust',k:'hip',i:'🍑'},{n:'RDL',k:'romanian',i:'🦵'},{n:'TKE',k:'tke',i:'🦿'},{n:'Bench',k:'bench',i:'💪'},{n:'Row',k:'row',i:'🔙'},{n:'Pulldown',k:'pulldown',i:'⬇️'},{n:'Curl',k:'curl',i:'💪'},{n:'Press',k:'press',i:'🎯'},{n:'Thrust',k:'thrust',i:'🍑'}].map(ex=>{
+      const pr=gPR(ex.k);
+      return<div key={ex.k} className="pr-c"><div className="pr-i">{ex.i}</div><div className="pr-l">{ex.n}</div><div className={`pr-v ${!pr?'mt':''}`}>{pr?`${pr}kg`:'—'}</div></div>;
+    })}
+  </div>
+  
+  <div className="sts" style={{marginBottom:16}}>
+    <div className="st-c"><div className="st-v">{tr.toLocaleString()}</div><div className="st-l">Total Reps</div></div>
+    <div className="st-c"><div className="st-v">{Math.round(tt/60)}m</div><div className="st-l">Total Time</div></div>
+    <div className="st-c"><div className="st-v">{Object.keys(dt).length}</div><div className="st-l">Exercises</div></div>
+  </div>
+  
+  {hist.length>0&&<><div className="sec" style={{paddingTop:8}}>Recent Workouts</div><div className="crd">{hist.slice(0,8).map((h,i)=><div key={i} className="rw"><div className="rw-i">{DAYS[h.day-1]?.i}</div><div style={{flex:1}}><div style={{fontWeight:600}}>{DAYS[h.day-1]?.n}</div><div style={{fontSize:12,color:'var(--t2)'}}>{new Date(h.date).toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'})} • {Math.round((h.duration||0)/60)}m</div></div><div className="chip g">P{h.phase}</div></div>)}</div></>}
+  </div></div></div>;
+};
+
+// === LIBRARY TAB ===
+const LT=({dayExercises,setDayExercises})=>{
+  const[srch,setSrch]=useState('');
+  const[fltM,setFltM]=useState('All');
+  const[kneeSafe,setKneeSafe]=useState(false);
+  
+  const filtered=useMemo(()=>EXDB.filter(e=>{
+    const matchSrch=e.n.toLowerCase().includes(srch.toLowerCase())||e.m.toLowerCase().includes(srch.toLowerCase());
+    const matchM=fltM==='All'||e.m===fltM;
+    const matchK=!kneeSafe||e.k;
+    return matchSrch&&matchM&&matchK;
+  }),[srch,fltM,kneeSafe]);
+  
+  const grouped=useMemo(()=>{
+    const g={};
+    filtered.forEach(e=>{if(!g[e.m])g[e.m]=[];g[e.m].push(e)});
+    return g;
+  },[filtered]);
+  
+  return<div className="pg"><div className="nav-lg"/><div className="sc"><div className="nav-t"><h1 style={{fontSize:32,fontWeight:700}}>Library</h1></div><div style={{padding:'0 16px'}}><div className="str" style={{marginBottom:16}}/>
+  
+  <input className="srch" placeholder="Search exercises..." value={srch} onChange={e=>setSrch(e.target.value)} style={{marginBottom:8}}/>
+  
+  <div className="flt" style={{marginBottom:8}}>
+    {['All',...MUSCLES].map(m=><button key={m} className={`flt-b ${fltM===m?'on':''}`} onClick={()=>setFltM(m)}>{m}</button>)}
+  </div>
+  
+  <div style={{display:'flex',gap:8,marginBottom:16}}>
+    <button className={`flt-b ${kneeSafe?'on':''}`} onClick={()=>setKneeSafe(!kneeSafe)}>⭐ Knee-Safe Only</button>
+    <div style={{flex:1,textAlign:'right',fontSize:12,color:'var(--t3)',alignSelf:'center'}}>{filtered.length} exercises</div>
+  </div>
+  
+  {Object.keys(grouped).map(muscle=>(
+    <div key={muscle}>
+      <div className="sec" style={{paddingTop:12}}>{muscle} ({grouped[muscle].length})</div>
+      <div className="crd" style={{marginBottom:8}}>
+        {grouped[muscle].map((ex,i)=>(
+          <div key={i} className="ex-r" style={{cursor:'default'}}>
+            <div className="ex-i">{ex.i}</div>
+            <div style={{flex:1}}>
+              <div style={{fontWeight:600,display:'flex',alignItems:'center',gap:6,flexWrap:'wrap'}}>
+                {ex.n}
+                <span className={`chip ${TYPES[ex.t].c}`} style={{fontSize:9,padding:'2px 6px'}}>{TYPES[ex.t].n}</span>
+              </div>
+              <div style={{fontSize:11,color:'var(--t2)',display:'flex',gap:8,marginTop:2}}>
+                <span>{ex.eq}</span>
+                {ex.k&&<span style={{color:'var(--grn)'}}>⭐ Knee-Safe</span>}
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  ))}
+  
+  </div></div></div>;
+};
+
+// === SETTINGS TAB ===
+const SetT=({ph,sPh,wk,sWk,draft,setDraft,dayExercises,setDayExercises,bodyWeight,setBodyWeight})=>{
+  const hEx=()=>{const d={workoutData:ld('workoutData',{}),phase:ph.id,week:wk,streak:ld('streak',0),workoutHistory:ld('workoutHistory',[]),drafts:draft,dayExercises,bodyWeight,v:'10.0'};const b=new Blob([JSON.stringify(d,null,2)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=`ironclad-pro-${new Date().toISOString().split('T')[0]}.json`;a.click()};
+  const hIm=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=ev=>{try{const d=JSON.parse(ev.target.result);if(d.workoutData)sv('workoutData',d.workoutData);if(d.phase)sv('phase',d.phase);if(d.week)sv('week',d.week);if(d.streak)sv('streak',d.streak);if(d.workoutHistory)sv('workoutHistory',d.workoutHistory);if(d.drafts)sv('drafts',d.drafts);if(d.dayExercises)sv('dayExercises',d.dayExercises);if(d.bodyWeight)sv('bodyWeight',d.bodyWeight);alert('Data imported successfully!');location.reload()}catch{alert('Import failed')}};r.readAsText(f)};
+  const rEx=()=>{if(confirm('Reset all exercises to default?')){sv('dayExercises',{});setDayExercises({})}};
+  
+  return<div className="pg"><div className="nav-lg"/><div className="sc"><div className="nav-t"><h1 style={{fontSize:32,fontWeight:700}}>Settings</h1></div><div style={{padding:'0 16px'}}><div className="str" style={{marginBottom:16}}/>
+  
+  <div className="sec" style={{paddingTop:8}}>Program</div>
+  <div className="crd" style={{marginBottom:16}}>
+    <div className="crd-s">
+      <div style={{fontSize:12,color:'var(--t2)',marginBottom:6}}>Current Phase</div>
+      <select value={ph.id} onChange={e=>{const p=PHASES.find(x=>x.id===+e.target.value);sPh(p);sv('phase',p.id)}}>
+        {PHASES.map(p=><option key={p.id} value={p.id}>Phase {p.id}: {p.n} (Months {p.m})</option>)}
+      </select>
+    </div>
+    <div className="crd-s">
+      <div style={{fontSize:12,color:'var(--t2)',marginBottom:6}}>Week (1-12)</div>
+      <input type="number" min={1} max={12} value={wk} onChange={e=>{const v=Math.min(12,Math.max(1,+e.target.value||1));sWk(v);sv('week',v)}} className="inp"/>
+    </div>
+  </div>
+  
+  <div className="sec" style={{paddingTop:8}}>Body Stats</div>
+  <div className="crd" style={{marginBottom:16}}>
+    <div className="crd-s">
+      <div style={{fontSize:12,color:'var(--t2)',marginBottom:6}}>Body Weight (kg)</div>
+      <input type="number" inputMode="decimal" value={bodyWeight} onChange={e=>{setBodyWeight(e.target.value);sv('bodyWeight',e.target.value)}} className="inp" placeholder="e.g. 85"/>
+    </div>
+  </div>
+  
+  <div className="sec" style={{paddingTop:8}}>Knee-Safe Principles</div>
+  <div className="crd" style={{marginBottom:16}}><div className="crd-p">
+    <ul style={{margin:0,paddingLeft:18,fontSize:14,color:'var(--t2)',lineHeight:1.9}}>
+      <li><span style={{color:'var(--t1)'}}>Hip hinge over knee bend</span></li>
+      <li><span style={{color:'var(--t1)'}}>Open chain leg work</span></li>
+      <li><span style={{color:'var(--t1)'}}>TKE for VMO rehab every lower day</span></li>
+      <li><span style={{color:'var(--t1)'}}>Zero deep squats or lunges</span></li>
+      <li><span style={{color:'var(--red)'}}>Stop immediately if pain</span></li>
+    </ul>
+  </div></div>
+  
+  <div className="sec" style={{paddingTop:8}}>Customization</div>
+  <div className="crd" style={{marginBottom:16}}><div className="crd-p" style={{display:'flex',flexDirection:'column',gap:10}}>
+    <button className="btn btn-s" onClick={rEx}>Reset Exercises to Default</button>
+    {Object.keys(draft).length>0&&<button className="btn btn-o" onClick={()=>{if(confirm('Discard all drafts?')){sv('drafts',{});setDraft({})}}}>Discard All Drafts ({Object.keys(draft).length})</button>}
+  </div></div>
+  
+  <div className="sec" style={{paddingTop:8}}>Data Management</div>
+  <div className="crd" style={{marginBottom:16}}><div className="crd-p" style={{display:'flex',flexDirection:'column',gap:10}}>
+    <button className="btn btn-p" onClick={hEx}>📤 Export Backup</button>
+    <label className="btn btn-s" style={{cursor:'pointer',textAlign:'center'}}>📥 Import Backup<input type="file" accept=".json" onChange={hIm} style={{display:'none'}}/></label>
+    <button className="btn btn-d" onClick={()=>{if(confirm('Delete ALL data? This cannot be undone.')){localStorage.clear();location.reload()}}}>🗑️ Clear All Data</button>
+  </div></div>
+  
+  <div className="crd" style={{marginBottom:16}}><div className="crd-p">
+    <div style={{fontSize:13,color:'var(--t2)',marginBottom:6}}>Exercise Library</div>
+    <div style={{display:'flex',flexWrap:'wrap',gap:4}}>
+      {MUSCLES.map(m=><span key={m} className="chip b" style={{fontSize:10}}>{m}: {EXDB.filter(e=>e.m===m).length}</span>)}
+    </div>
+    <div style={{fontSize:12,color:'var(--t3)',marginTop:8}}>{EXDB.length} total exercises • {EXDB.filter(e=>e.k).length} knee-safe</div>
+  </div></div>
+  
+  <div style={{textAlign:'center',padding:'20px 0 40px',color:'var(--t3)'}}>
+    <div style={{fontSize:14,fontWeight:600}}>☘️ IronClad Pro v10.0 🇮🇪</div>
+    <div style={{fontSize:11,marginTop:4}}>Built for your knee recovery</div>
+    <div style={{fontSize:10,marginTop:8,color:'var(--t3)'}}>Tap Share → Add to Home Screen</div>
+  </div>
+  </div></div></div>;
+};
+
+// === MAIN APP ===
+const App=()=>{
+  const[tab,sTab]=useState('workout');
+  const[ph,sPh]=useState(()=>PHASES.find(p=>p.id===ld('phase',1))||PHASES[0]);
+  const[wk,sWk]=useState(()=>ld('week',1));
+  const[dt,sD]=useState(()=>ld('workoutData',{}));
+  const[strk,sStrk]=useState(()=>ld('streak',0));
+  const[hist,sHist]=useState(()=>ld('workoutHistory',[]));
+  const[draft,setDraft]=useState(()=>ld('drafts',{}));
+  const[activeDay,setActiveDay]=useState(null);
+  const[wkTimer,setWkTimer]=useState(0);
+  const[dayExercises,setDayExercises]=useState(()=>ld('dayExercises',{}));
+  const[bodyWeight,setBodyWeight]=useState(()=>ld('bodyWeight',''));
+  
+  const hasDrafts=Object.keys(draft).length>0;
+  
+  return<>
+    {tab==='workout'&&<WT ph={ph} dt={dt} sD={sD} strk={strk} sStrk={sStrk} hist={hist} sHist={sHist} draft={draft} setDraft={setDraft} activeDay={activeDay} setActiveDay={setActiveDay} wkTimer={wkTimer} setWkTimer={setWkTimer} dayExercises={dayExercises} setDayExercises={setDayExercises}/>}
+    {tab==='progress'&&<PT dt={dt} hist={hist}/>}
+    {tab==='library'&&<LT dayExercises={dayExercises} setDayExercises={setDayExercises}/>}
+    {tab==='settings'&&<SetT ph={ph} sPh={sPh} wk={wk} sWk={sWk} draft={draft} setDraft={setDraft} dayExercises={dayExercises} setDayExercises={setDayExercises} bodyWeight={bodyWeight} setBodyWeight={setBodyWeight}/>}
+    <div className="tabs">
+      {[
+        {id:'workout',l:'Workout',ic:<svg viewBox="0 0 24 24"><path d="M20.57 14.86L22 13.43 20.57 12 17 15.57 8.43 7 12 3.43 10.57 2 9.14 3.43 7.71 2 5.57 4.14 4.14 2.71 2.71 4.14l1.43 1.43L2 7.71l1.43 1.43L2 10.57 3.43 12 7 8.43 15.57 17 12 20.57 13.43 22l1.43-1.43L16.29 22l2.14-2.14 1.43 1.43 1.43-1.43-1.43-1.43L22 16.29z"/></svg>},
+        {id:'progress',l:'Progress',ic:<svg viewBox="0 0 24 24"><path d="M3.5 18.49l6-6.01 4 4L22 6.92l-1.41-1.41-7.09 7.97-4-4L2 16.99z"/></svg>},
+        {id:'library',l:'Library',ic:<svg viewBox="0 0 24 24"><path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-1 9h-4v4h-2v-4H9V9h4V5h2v4h4v2z"/></svg>},
+        {id:'settings',l:'Settings',ic:<svg viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.31.06-.63.06-.94 0-.31-.02-.63-.06-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.04.31-.06.63-.06.94s.02.63.06.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>}
+      ].map(t=><button key={t.id} className={`tab ${tab===t.id?'on':''}`} onClick={()=>{sTab(t.id);vb()}}>
+        {t.id==='workout'&&hasDrafts&&<div className="tab-bdg"/>}
+        {t.ic}<span>{t.l}</span>
+      </button>)}
+    </div>
+  </>;
+};
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+</script>
+</body>
+</html>
