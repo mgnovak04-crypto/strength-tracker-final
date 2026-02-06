@@ -171,7 +171,7 @@ const EXDB=[
   {id:'vup',n:'V-Ups',m:'Core',t:'r',eq:'Bodyweight',k:true},
   {id:'mountainclimb',n:'Mountain Climbers',m:'Core',t:'d',eq:'Bodyweight',k:true},
   // CARDIO
-  {id:'row',n:'Rowing',m:'Cardio',t:'c',eq:'Machine',k:true},
+  {id:'rowing',n:'Rowing',m:'Cardio',t:'c',eq:'Machine',k:true},
   {id:'bike',n:'Stationary Bike',m:'Cardio',t:'c',eq:'Machine',k:true},
   {id:'swim',n:'Swimming',m:'Cardio',t:'c',eq:'None',k:true},
   {id:'elliptical',n:'Elliptical',m:'Cardio',t:'c',eq:'Machine',k:true},
@@ -819,7 +819,7 @@ const LibraryTab=()=>{
   return <div className="pg">
     <div className="nav-lg">
       <div style={{fontSize:28,fontWeight:700}}>Exercise Library</div>
-      <div style={{fontSize:13,color:'var(--t2)}}>{EXDB.length} exercises</div>
+      <div style={{fontSize:13,color:'var(--t2)'}}>{EXDB.length} exercises</div>
     </div>
     <div className="sc">
       <div style={{padding:'12px 16px',position:'sticky',top:0,background:'var(--bg)',zIndex:10}}>
