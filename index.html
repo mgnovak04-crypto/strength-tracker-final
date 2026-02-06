@@ -51,8 +51,8 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--t1);font-
 .inp::placeholder{color:var(--t3)}
 .sht{position:fixed;inset:0;z-index:2000;display:flex;flex-direction:column;justify-content:flex-end;animation:fadeIn .2s}
 @keyframes fadeIn{from{opacity:0}}
-.sht-bg{position:absolute;inset:0;background:rgba(0,0,0,0.6);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
-.sht-c{background:var(--c1);border-radius:20px 20px 0 0;max-height:90vh;display:flex;flex-direction:column;padding-bottom:var(--safe-b);animation:slideUp .3s cubic-bezier(0.32,0.72,0,1)}
+.sht-bg{position:absolute;inset:0;background:rgba(0,0,0,0.7);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+.sht-c{background:#1c1c1e;border-radius:20px 20px 0 0;max-height:90vh;display:flex;flex-direction:column;padding-bottom:var(--safe-b);animation:slideUp .3s cubic-bezier(0.32,0.72,0,1);position:relative;z-index:1}
 @keyframes slideUp{from{transform:translateY(100%)}}
 .sht-h{padding:16px 20px;border-bottom:0.5px solid var(--sep);display:flex;align-items:center;justify-content:space-between}
 .sht-bar{width:40px;height:5px;background:var(--c3);border-radius:3px;margin:10px auto 6px}
@@ -319,7 +319,7 @@ const getEx=eid=>EXDB.find(e=>e.id===eid)||{id:eid,n:'Unknown',m:'Other',t:'w',e
 const flattenSS=ss=>{const f=[];ss.forEach((s,si)=>s.exercises.forEach((e,ei)=>f.push({...e,ssIdx:si,ssName:s.name,pos:ei,rounds:s.rounds,rest:s.rest})));return f};
 
 // Version check - ALWAYS clear old dayEx data to ensure proper superset structure
-const APP_VERSION = 'v12.2-supersets-fix';
+const APP_VERSION = 'v12.3-fixes';
 const storedVersion = ld('appVersion','');
 if(storedVersion !== APP_VERSION) {
   console.log('Clearing old workout data for new superset structure...');
@@ -402,8 +402,8 @@ const SwapSheet=({muscle,onSwap,onClose})=>{
 };
 
 const ExLogger=({day,exIdx,dayEx,onSave,onBack,draft,setDraft})=>{
-  const exDef=dayEx[exIdx];const ex=getEx(exDef.eid);const key=`${day.id}-${exIdx}`;
-  const[sets,setSets]=useState(()=>draft[key]||Array.from({length:exDef.s},()=>({w:'',r:'',rpe:'',tag:''})));
+  const exDef=dayEx[exIdx]||{eid:'unknown',s:3,r:'8-12'};const ex=getEx(exDef.eid);const key=`${day.id}-${exIdx}`;
+  const[sets,setSets]=useState(()=>draft[key]||Array.from({length:exDef.s||3},()=>({w:'',r:'',rpe:'',tag:''})));
   const[notes,setNotes]=useState(draft[key+'_n']||'');const[showTimer,setShowTimer]=useState(false);const[showSwap,setShowSwap]=useState(false);const[toast,setToast]=useState(null);const[confetti,setConfetti]=useState(false);
   
   useEffect(()=>{setDraft(d=>({...d,[key]:sets,[key+'_n']:notes}))},[sets,notes,key,setDraft]);
@@ -489,7 +489,7 @@ const ExLogger=({day,exIdx,dayEx,onSave,onBack,draft,setDraft})=>{
   <button className="btn btn-p" onClick={handleSave} style={{fontSize:17}}>✓ Save Exercise</button>
   </div>
   {showTimer&&<RestTimer onClose={()=>setShowTimer(false)} def={exDef.rest||60}/>}
-  {showSwap&&<SwapSheet muscle={ex.m} onSwap={handleSwap} onClose={()=>setShowSwap(false)}/>}
+  {showSwap&&<SwapSheet muscle={ex.m||''} onSwap={handleSwap} onClose={()=>setShowSwap(false)}/>}
   {toast&&<Toast msg={toast} onClose={()=>setToast(null)}/>}
   <Confetti show={confetti}/>
   </div>;
@@ -747,7 +747,7 @@ const SettingsTab=({ph,sPh,wk,sWk,draft,setDraft})=>{
   </div></div>
   
   <div style={{textAlign:'center',padding:'30px 16px 50px',color:'var(--t3)'}}>
-  <div style={{fontSize:18,fontWeight:700}}>☘️ IronClad Pro v12.2 🇮🇪</div>
+  <div style={{fontSize:18,fontWeight:700}}>☘️ IronClad Pro v12.3 🇮🇪</div>
   <div style={{fontSize:13,marginTop:6}}>163 Exercises · Gym & Bodyweight</div>
   <div style={{fontSize:12,marginTop:12,color:'var(--t3)'}}>Tap Share → Add to Home Screen</div>
   </div></div></div>};
