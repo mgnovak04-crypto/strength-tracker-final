@@ -318,9 +318,11 @@ const DAYS=[
 const getEx=eid=>EXDB.find(e=>e.id===eid)||{id:eid,n:'Unknown',m:'Other',t:'w',eq:'BW',k:false};
 const flattenSS=ss=>{const f=[];ss.forEach((s,si)=>s.exercises.forEach((e,ei)=>f.push({...e,ssIdx:si,ssName:s.name,pos:ei,rounds:s.rounds,rest:s.rest})));return f};
 
-// Version check - clear old dayEx data if version mismatch
-const APP_VERSION = 'v12.1-supersets';
-if(ld('appVersion','') !== APP_VERSION) {
+// Version check - ALWAYS clear old dayEx data to ensure proper superset structure
+const APP_VERSION = 'v12.2-supersets-fix';
+const storedVersion = ld('appVersion','');
+if(storedVersion !== APP_VERSION) {
+  console.log('Clearing old workout data for new superset structure...');
   Object.keys(localStorage).filter(k=>k.startsWith('dayEx_')).forEach(k=>localStorage.removeItem(k));
   sv('appVersion', APP_VERSION);
 }
@@ -549,17 +551,17 @@ const DayWorkout=({day,ph,dt,sD,draft,setDraft,onBack,hist,sHist,strk,sStrk})=>{
   
   <div className="sec" style={{paddingTop:8}}>Supersets ({groups.filter(g=>g.exs[0].ssIdx!==-1).length})</div>
   
-  {groups.map((g,gi)=>{const info=g.exs[0];const isAdded=info.ssIdx===-1;
+  {groups.map((g,gi)=>{const info=g.exs[0];const isAdded=info.ssIdx===-1||info.ssIdx===undefined;
   return<div key={gi} className={isAdded?'crd':'superset'} style={isAdded?{margin:'0 16px 14px'}:{}}>
   {!isAdded&&<div className="superset-hdr">
-  <div className="superset-title"><span>🔄</span>{info.ssName}<span className="superset-count">{g.exs.length} exercises</span></div>
+  <div className="superset-title"><span>🔄</span>{info.ssName||'Superset'}<span className="superset-count">{g.exs.length} exercises</span></div>
   <div style={{display:'flex',alignItems:'center',gap:10}}>
-  <span style={{fontSize:12,color:'var(--t2)',fontWeight:500}}>{info.rounds}x</span>
-  <button onClick={()=>{setRestDef(info.rest||60);setShowRest(true);vb()}} style={{background:'var(--c2)',border:'none',borderRadius:8,padding:'6px 12px',color:'var(--t1)',fontSize:13,fontWeight:600,cursor:'pointer'}}>⏱ {info.rest}s</button>
+  <span style={{fontSize:12,color:'var(--t2)',fontWeight:500}}>{info.rounds||3}x</span>
+  <button onClick={()=>{setRestDef(info.rest||60);setShowRest(true);vb()}} style={{background:'var(--c2)',border:'none',borderRadius:8,padding:'6px 12px',color:'var(--t1)',fontSize:13,fontWeight:600,cursor:'pointer'}}>⏱ {info.rest||60}s</button>
   </div></div>}
   {g.exs.map((exDef,ei)=>{const ex=getEx(exDef.eid);const dk=`${day.id}-${exDef.gi}`;const hasDraft=!!draft[dk];const isDone=Object.keys(dt).some(k=>k.includes(`_${exDef.eid}`));
   return<div key={ei} className="crd-r" style={{borderLeft:hasDraft?'4px solid var(--org)':isDone?'4px solid var(--grn)':'4px solid transparent',paddingLeft:12}} onClick={()=>{setExIdx(exDef.gi);vb()}}>
-  <div style={{width:28,height:28,borderRadius:8,background:'var(--pur)',color:'#000',display:'flex',alignItems:'center',justifyContent:'center',fontWeight:700,fontSize:13,marginRight:14}}>{exDef.pos+1}</div>
+  <div style={{width:28,height:28,borderRadius:8,background:'var(--pur)',color:'#000',display:'flex',alignItems:'center',justifyContent:'center',fontWeight:700,fontSize:13,marginRight:14}}>{(exDef.pos!==undefined?exDef.pos:ei)+1}</div>
   <div style={{flex:1}}>
   <div style={{fontWeight:600,fontSize:15,display:'flex',alignItems:'center',gap:6}}>{ex.k&&<span style={{color:'var(--grn)'}}>⭐</span>}{ex.n}{hasDraft&&<span style={{color:'var(--org)',fontSize:10}}>●</span>}{isDone&&!hasDraft&&<span style={{color:'var(--grn)'}}>✓</span>}</div>
   <div style={{fontSize:12,color:'var(--t2)',marginTop:3,display:'flex',gap:8,alignItems:'center'}}><span className="badge-eq">{EQUIP_NAMES[ex.eq]||ex.eq}</span><span>{exDef.s}×{exDef.r}</span></div>
@@ -745,7 +747,7 @@ const SettingsTab=({ph,sPh,wk,sWk,draft,setDraft})=>{
   </div></div>
   
   <div style={{textAlign:'center',padding:'30px 16px 50px',color:'var(--t3)'}}>
-  <div style={{fontSize:18,fontWeight:700}}>☘️ IronClad Pro v12.1 🇮🇪</div>
+  <div style={{fontSize:18,fontWeight:700}}>☘️ IronClad Pro v12.2 🇮🇪</div>
   <div style={{fontSize:13,marginTop:6}}>163 Exercises · Gym & Bodyweight</div>
   <div style={{fontSize:12,marginTop:12,color:'var(--t3)'}}>Tap Share → Add to Home Screen</div>
   </div></div></div>};
