@@ -62,9 +62,10 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--t1);font-
 .toast{position:fixed;top:max(70px,calc(var(--safe-t) + 60px));left:16px;right:16px;background:var(--c1);border:1px solid var(--grn);border-radius:14px;padding:14px 20px;display:flex;align-items:center;gap:12px;z-index:3000;animation:toastIn .4s cubic-bezier(0.32,0.72,0,1)}
 @keyframes toastIn{from{opacity:0;transform:translateY(-20px) scale(0.95)}}
 .confetti{position:fixed;inset:0;pointer-events:none;z-index:4000}
-.superset{background:var(--c1);border-radius:16px;margin:0 16px 14px;overflow:hidden;border:2px solid var(--pur);box-shadow:0 4px 20px rgba(191,90,242,0.15)}
-.superset-hdr{background:linear-gradient(135deg,rgba(191,90,242,0.2),rgba(100,210,255,0.1));padding:12px 16px;display:flex;align-items:center;justify-content:space-between}
-.superset-title{font-size:15px;font-weight:700;color:var(--pur);display:flex;align-items:center;gap:8px}
+.superset{background:var(--c1);border-radius:16px;margin:0 16px 18px;overflow:hidden;border:2px solid var(--pur);box-shadow:0 4px 24px rgba(191,90,242,0.2)}
+.superset-hdr{background:linear-gradient(135deg,rgba(191,90,242,0.25),rgba(100,210,255,0.15));padding:14px 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(191,90,242,0.3)}
+.superset-title{font-size:16px;font-weight:700;color:var(--pur);display:flex;align-items:center;gap:8px}
+.superset-count{font-size:11px;background:var(--pur);color:#000;padding:3px 8px;border-radius:10px;font-weight:700}
 .badge-eq{font-size:9px;padding:2px 6px;border-radius:4px;background:var(--c3);color:var(--t2);font-weight:600;text-transform:uppercase}
 .stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
 .stat-card{background:var(--c1);border-radius:12px;padding:14px 10px;text-align:center;border:1px solid var(--sep)}
@@ -539,12 +540,14 @@ const DayWorkout=({day,ph,dt,sD,draft,setDraft,onBack,hist,sHist,strk,sStrk})=>{
   <div className="prg"><div className="prg-f" style={{width:`${(compCnt/dayEx.length)*100}%`}}/></div>
   </div>
   
+  <div className="sec" style={{paddingTop:8}}>Supersets ({groups.filter(g=>g.exs[0].ssIdx!==-1).length})</div>
+  
   {groups.map((g,gi)=>{const info=g.exs[0];const isAdded=info.ssIdx===-1;
   return<div key={gi} className={isAdded?'crd':'superset'} style={isAdded?{margin:'0 16px 14px'}:{}}>
   {!isAdded&&<div className="superset-hdr">
-  <div className="superset-title"><span>🔄</span>{info.ssName}</div>
+  <div className="superset-title"><span>🔄</span>{info.ssName}<span className="superset-count">{g.exs.length} exercises</span></div>
   <div style={{display:'flex',alignItems:'center',gap:10}}>
-  <span style={{fontSize:13,color:'var(--t2)',fontWeight:500}}>{info.rounds} rounds</span>
+  <span style={{fontSize:12,color:'var(--t2)',fontWeight:500}}>{info.rounds}x</span>
   <button onClick={()=>{setRestDef(info.rest||60);setShowRest(true);vb()}} style={{background:'var(--c2)',border:'none',borderRadius:8,padding:'6px 12px',color:'var(--t1)',fontSize:13,fontWeight:600,cursor:'pointer'}}>⏱ {info.rest}s</button>
   </div></div>}
   {g.exs.map((exDef,ei)=>{const ex=getEx(exDef.eid);const dk=`${day.id}-${exDef.gi}`;const hasDraft=!!draft[dk];const isDone=Object.keys(dt).some(k=>k.includes(`_${exDef.eid}`));
