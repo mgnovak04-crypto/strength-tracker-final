@@ -318,6 +318,13 @@ const DAYS=[
 const getEx=eid=>EXDB.find(e=>e.id===eid)||{id:eid,n:'Unknown',m:'Other',t:'w',eq:'BW',k:false};
 const flattenSS=ss=>{const f=[];ss.forEach((s,si)=>s.exercises.forEach((e,ei)=>f.push({...e,ssIdx:si,ssName:s.name,pos:ei,rounds:s.rounds,rest:s.rest})));return f};
 
+// Version check - clear old dayEx data if version mismatch
+const APP_VERSION = 'v12.1-supersets';
+if(ld('appVersion','') !== APP_VERSION) {
+  Object.keys(localStorage).filter(k=>k.startsWith('dayEx_')).forEach(k=>localStorage.removeItem(k));
+  sv('appVersion', APP_VERSION);
+}
+
 // === UI COMPONENTS ===
 const Toast=({msg,onClose})=>{
   useEffect(()=>{const t=setTimeout(onClose,3000);return()=>clearTimeout(t)},[onClose]);
