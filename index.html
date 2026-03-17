@@ -7,7 +7,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="IronClad">
 <meta name="theme-color" content="#000">
-<meta name="version" content="13.2.0">
+<meta name="version" content="14.0.0">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
@@ -170,54 +170,171 @@ const EXDB=[
   // CARDIO
   {id:'rowing',n:'Rowing Machine',m:'Cardio',t:'c',eq:'Machine',tags:['k'],note:'500m intervals or steady state'},
   {id:'assault',n:'Assault Bike',m:'Cardio',t:'c',eq:'Machine',tags:['k'],note:'30s on / 30s off'},
-  {id:'battlerope',n:'Battle Ropes',m:'Cardio',t:'d',eq:'Equipment',tags:['k','p'],note:'Alternate arms, 30s bursts'}
+  {id:'battlerope',n:'Battle Ropes',m:'Cardio',t:'d',eq:'Equipment',tags:['k','p'],note:'Alternate arms, 30s bursts'},
+
+  // PHASE 2+ PROGRESSIONS
+  {id:'bbench',n:'Barbell Bench Press',m:'Chest',t:'w',eq:'Barbell',tags:['k'],note:'Progression from DB bench'},
+  {id:'wtpullup',n:'Weighted Pull-up',m:'Back',t:'w',eq:'Bodyweight',tags:['k'],note:'Add plate via belt or DB between feet'},
+  {id:'bbohp',n:'Barbell Overhead Press',m:'Shoulders',t:'w',eq:'Barbell',tags:['k'],note:'Standing, strict press'},
+  {id:'hipthrusthvy',n:'Heavy Hip Thrust',m:'Glutes',t:'w',eq:'Barbell',tags:['k'],note:'Progressive overload — 3s pause at top'},
+  {id:'lowboxjump',n:'Low Box Jump',m:'Legs',t:'r',eq:'Box',tags:['k','p'],note:'Soft landing, step down — do NOT jump down'},
+  {id:'gobsquat',n:'Goblet Squat',m:'Quads',t:'w',eq:'Dumbbell',tags:['k'],note:'Only when physio clears deeper flexion. Controlled depth.'},
+  {id:'skierswing',n:'KB Skier Swing',m:'Glutes',t:'w',eq:'Kettlebell',tags:['k','p'],note:'Double arm ski-pole motion, explosive hips'},
+  {id:'sledpush',n:'Sled Push',m:'Legs',t:'d',eq:'Sled',tags:['k','p'],note:'Low handle, drive through toes — great knee-safe conditioning'},
+  {id:'tbarrow',n:'T-Bar Row',m:'Back',t:'w',eq:'Barbell',tags:['k'],note:'Chest-supported if available'},
+  {id:'dblunge',n:'Walking DB Lunge',m:'Quads',t:'w',eq:'Dumbbell',tags:['k','b'],note:'Only Phase 3+ — controlled stride, upright torso'},
+  {id:'hanglegraise',n:'Hanging Leg Raise',m:'Core',t:'r',eq:'Bar',tags:['k'],note:'Full leg raise — progression from knee raise'},
+  {id:'slhop',n:'Single-Leg Forward Hop',m:'Legs',t:'r',eq:'Bodyweight',tags:['k','p','b'],note:'Stick the landing, 2s hold — sport-specific power'},
+  {id:'suitcasecarry',n:'Suitcase Carry',m:'Core',t:'d',eq:'Dumbbell',tags:['k','b'],note:'Heavy DB one side, walk — anti-lateral flexion'}
 ];
 
 const getEx=(eid)=>EXDB.find(e=>e.id===eid)||{id:eid,n:'Unknown',m:'Other',t:'w',eq:'None',tags:[],note:''};
 
-// === PROGRAM STRUCTURE ===
-// 3-Day Full Body: Legs/Core, Upper+Core, Power/Balance+Core
-const PROGRAM={
-  name:'Trail Runner Recovery',
-  goal:'Knee recovery, running power, balance, weight loss',
-  days:[
-    {
-      id:1,n:'Legs & Core',icon:'🦵',
+// === PHASE-AWARE PROGRAM ===
+const PHASES_META=[
+  {id:1,n:'Foundation',wks:'Weeks 1-4',d:'Build base strength, learn movements, begin knee rehab. Lighter loads, higher reps, emphasis on form.',icon:'🌱'},
+  {id:2,n:'Build',wks:'Weeks 5-8',d:'Progressive overload. Add sets & load on compounds. Introduce barbell work. Deepen eccentric capacity.',icon:'🔨'},
+  {id:3,n:'Strength & Power',wks:'Weeks 9-12',d:'Peak intensity. Heavier loads, explosive movements, sport-specific trail running prep.',icon:'🔥'},
+  {id:4,n:'Maintain & Perform',wks:'Weeks 13+',d:'Sustain strength while running volume increases. Metabolic conditioning. Injury-proof your body.',icon:'🏔'}
+];
+
+const getProgramDays=(phase)=>{
+  // Day 1 always: Legs & Core (trainer exercises constant, progression layered on)
+  // Day 2 always: Upper Body & Core (push/pull, progressive overload)
+  // Day 3 always: Power, Balance & Core (explosive, stability, conditioning)
+
+  if(phase===1) return [
+    {id:1,n:'Legs & Core',icon:'🦵',
       focus:['Knee Recovery','Eccentric Strength','Core Stability','Trainer Rx'],
       supersets:[
         {label:'Strength & Mobility',type:'Circuit',color:'var(--grn)',
-         ex:[{eid:'trapbar',s:4,r:'6-8'},{eid:'foamquad',s:1,r:'90s/side'},{eid:'johnsoncalf',s:3,r:'12-15'}]},
+         ex:[{eid:'trapbar',s:3,r:'8-10'},{eid:'foamquad',s:1,r:'90s/side'},{eid:'johnsoncalf',s:3,r:'12-15'}]},
         {label:'Stability & Anti-Rotation',type:'Superset',color:'var(--blu)',
          ex:[{eid:'copenadduct',s:3,r:'20-30s/side'},{eid:'starplank',s:3,r:'8ea'},{eid:'staggerpallof',s:3,r:'10ea'}]},
         {label:'Power & Eccentric',type:'Circuit',color:'var(--org)',
          ex:[{eid:'anklejump',s:3,r:'15+15'},{eid:'eccstepdown',s:3,r:'10ea'},{eid:'bulgsplit',s:3,r:'8-10ea'}]}
-      ]
-    },
-    {
-      id:2,n:'Upper Body & Core',icon:'💪',
+      ]},
+    {id:2,n:'Upper Body & Core',icon:'💪',
       focus:['Push/Pull Balance','Core Strength','Calorie Burn','Posture'],
       supersets:[
         {label:'Push & Pull',type:'Superset',color:'var(--pur)',
-         ex:[{eid:'dbbench',s:4,r:'8-12'},{eid:'cablerow',s:4,r:'8-12'},{eid:'deadbug',s:3,r:'10ea'}]},
+         ex:[{eid:'dbbench',s:3,r:'10-12'},{eid:'cablerow',s:3,r:'10-12'},{eid:'deadbug',s:3,r:'10ea'}]},
         {label:'Shoulders & Back',type:'Superset',color:'var(--cyn)',
-         ex:[{eid:'dbohp',s:3,r:'8-12'},{eid:'latpd',s:3,r:'10-12'},{eid:'pallof',s:3,r:'12ea'}]},
+         ex:[{eid:'dbohp',s:3,r:'10-12'},{eid:'latpd',s:3,r:'10-12'},{eid:'pallof',s:3,r:'12ea'}]},
         {label:'Arms & Core Finisher',type:'Circuit',color:'var(--yel)',
          ex:[{eid:'cablefly',s:3,r:'12-15'},{eid:'facepull',s:3,r:'15-20'},{eid:'hangknee',s:3,r:'10-15'}]}
-      ]
-    },
-    {
-      id:3,n:'Power, Balance & Core',icon:'⚡',
+      ]},
+    {id:3,n:'Power, Balance & Core',icon:'⚡',
       focus:['Explosive Power','Balance Training','Landing Mechanics','Fat Burn'],
       supersets:[
         {label:'Power & Hinge',type:'Circuit',color:'var(--red)',
-         ex:[{eid:'kbswing',s:4,r:'12-15'},{eid:'slrdl',s:3,r:'10ea'},{eid:'birddog',s:3,r:'10ea'}]},
+         ex:[{eid:'kbswing',s:3,r:'12-15'},{eid:'slrdl',s:3,r:'10ea'},{eid:'birddog',s:3,r:'10ea'}]},
         {label:'Upper Strength & Stability',type:'Superset',color:'var(--grn)',
          ex:[{eid:'pushup',s:3,r:'12-20'},{eid:'invrow',s:3,r:'8-12'},{eid:'sideplank',s:3,r:'30-45s/side'}]},
         {label:'Lower Leg Resilience',type:'Circuit',color:'var(--org)',
          ex:[{eid:'boxstep',s:3,r:'10ea'},{eid:'eccheeldrop',s:3,r:'12ea'},{eid:'seatedcalf',s:3,r:'15'}]}
-      ]
-    }
-  ]
+      ]}
+  ];
+
+  if(phase===2) return [
+    {id:1,n:'Legs & Core',icon:'🦵',
+      focus:['Progressive Overload','Eccentric Depth','Hip Strength','Trainer Rx'],
+      supersets:[
+        {label:'Heavy Hinge & Calf',type:'Circuit',color:'var(--grn)',
+         ex:[{eid:'trapbar',s:4,r:'6-8'},{eid:'foamquad',s:1,r:'90s/side'},{eid:'johnsoncalf',s:4,r:'10-12'}]},
+        {label:'Stability & Anti-Rotation',type:'Superset',color:'var(--blu)',
+         ex:[{eid:'copenadduct',s:3,r:'30-40s/side'},{eid:'starplank',s:3,r:'10ea'},{eid:'staggerpallof',s:3,r:'12ea'}]},
+        {label:'Power, Eccentric & Glute',type:'Circuit',color:'var(--org)',
+         ex:[{eid:'anklejump',s:3,r:'20+20'},{eid:'bulgsplit',s:4,r:'8ea'},{eid:'hipthrust',s:4,r:'8-10'}]}
+      ]},
+    {id:2,n:'Upper Body & Core',icon:'💪',
+      focus:['Barbell Intro','Volume Increase','Core Strength','Posture'],
+      supersets:[
+        {label:'Heavy Push & Pull',type:'Superset',color:'var(--pur)',
+         ex:[{eid:'bbench',s:4,r:'8-10'},{eid:'cablerow',s:4,r:'8-10'},{eid:'deadbug',s:3,r:'12ea'}]},
+        {label:'Vertical Push & Pull',type:'Superset',color:'var(--cyn)',
+         ex:[{eid:'dbohp',s:4,r:'8-10'},{eid:'latpd',s:4,r:'8-10'},{eid:'pallof',s:3,r:'12ea'}]},
+        {label:'Accessory & Core',type:'Circuit',color:'var(--yel)',
+         ex:[{eid:'dbincbench',s:3,r:'10-12'},{eid:'facepull',s:3,r:'15-20'},{eid:'hangknee',s:3,r:'12-15'}]}
+      ]},
+    {id:3,n:'Power, Balance & Core',icon:'⚡',
+      focus:['Explosive Hinge','Weighted Balance','Achilles Build','Conditioning'],
+      supersets:[
+        {label:'Power & Single-Leg',type:'Circuit',color:'var(--red)',
+         ex:[{eid:'kbswing',s:4,r:'12-15'},{eid:'slrdl',s:3,r:'10ea'},{eid:'lowboxjump',s:3,r:'6-8'}]},
+        {label:'Upper Strength',type:'Superset',color:'var(--grn)',
+         ex:[{eid:'pushup',s:3,r:'15-25'},{eid:'pullup',s:3,r:'6-10'},{eid:'suitcasecarry',s:3,r:'30s/side'}]},
+        {label:'Lower Leg Resilience',type:'Circuit',color:'var(--org)',
+         ex:[{eid:'boxstep',s:3,r:'12ea'},{eid:'eccheeldrop',s:3,r:'15ea'},{eid:'seatedcalf',s:4,r:'12-15'}]}
+      ]}
+  ];
+
+  if(phase===3) return [
+    {id:1,n:'Legs & Core',icon:'🦵',
+      focus:['Peak Strength','Explosive Power','Deep Eccentric','Trainer Rx'],
+      supersets:[
+        {label:'Heavy Strength',type:'Circuit',color:'var(--grn)',
+         ex:[{eid:'trapbar',s:4,r:'5-6'},{eid:'foamquad',s:1,r:'90s/side'},{eid:'johnsoncalf',s:4,r:'8-10'}]},
+        {label:'Stability & Power',type:'Superset',color:'var(--blu)',
+         ex:[{eid:'copenadduct',s:3,r:'30-40s/side'},{eid:'starplank',s:3,r:'12ea'},{eid:'staggerpallof',s:4,r:'12ea'}]},
+        {label:'Explosive & Eccentric',type:'Circuit',color:'var(--org)',
+         ex:[{eid:'anklejump',s:4,r:'20+20'},{eid:'bulgsplit',s:4,r:'6-8ea'},{eid:'hipthrusthvy',s:4,r:'6-8'}]}
+      ]},
+    {id:2,n:'Upper Body & Core',icon:'💪',
+      focus:['Heavy Compounds','Upper Power','Core Anti-Rotation','Volume'],
+      supersets:[
+        {label:'Heavy Compounds',type:'Superset',color:'var(--pur)',
+         ex:[{eid:'bbench',s:4,r:'6-8'},{eid:'wtpullup',s:4,r:'5-8'},{eid:'hanglegraise',s:3,r:'10-12'}]},
+        {label:'Vertical Power',type:'Superset',color:'var(--cyn)',
+         ex:[{eid:'bbohp',s:4,r:'6-8'},{eid:'tbarrow',s:4,r:'8-10'},{eid:'staggerpallof',s:3,r:'12ea'}]},
+        {label:'Volume & Finisher',type:'Circuit',color:'var(--yel)',
+         ex:[{eid:'dip',s:3,r:'10-15'},{eid:'dbrow',s:3,r:'10-12'},{eid:'battlerope',s:3,r:'30s'}]}
+      ]},
+    {id:3,n:'Power, Balance & Core',icon:'⚡',
+      focus:['Sport-Specific Power','Single-Leg Strength','Trail Conditioning','Achilles'],
+      supersets:[
+        {label:'Explosive & Hinge',type:'Circuit',color:'var(--red)',
+         ex:[{eid:'skierswing',s:4,r:'10-12'},{eid:'lowboxjump',s:4,r:'6-8'},{eid:'slhop',s:3,r:'6ea'}]},
+        {label:'Single-Leg & Upper',type:'Superset',color:'var(--grn)',
+         ex:[{eid:'dblunge',s:3,r:'8ea'},{eid:'pullup',s:4,r:'8-12'},{eid:'sideplank',s:3,r:'40-60s/side'}]},
+        {label:'Calf, Achilles & Conditioning',type:'Circuit',color:'var(--org)',
+         ex:[{eid:'eccheeldrop',s:3,r:'15ea'},{eid:'seatedcalf',s:4,r:'12'},{eid:'sledpush',s:3,r:'30-40s'}]}
+      ]}
+  ];
+
+  // Phase 4: Maintain & Perform
+  return [
+    {id:1,n:'Legs & Core',icon:'🦵',
+      focus:['Strength Maintenance','Knee Protection','Running Support','Trainer Rx'],
+      supersets:[
+        {label:'Maintain Strength',type:'Circuit',color:'var(--grn)',
+         ex:[{eid:'trapbar',s:3,r:'6-8'},{eid:'foamquad',s:1,r:'90s/side'},{eid:'johnsoncalf',s:3,r:'10-12'}]},
+        {label:'Stability (Constant)',type:'Superset',color:'var(--blu)',
+         ex:[{eid:'copenadduct',s:3,r:'30s/side'},{eid:'starplank',s:3,r:'10ea'},{eid:'staggerpallof',s:3,r:'10ea'}]},
+        {label:'Maintain & Protect',type:'Circuit',color:'var(--org)',
+         ex:[{eid:'bulgsplit',s:3,r:'8ea'},{eid:'hipthrust',s:3,r:'8-10'},{eid:'tke',s:3,r:'15-20'}]}
+      ]},
+    {id:2,n:'Upper Body & Core',icon:'💪',
+      focus:['Maintain Upper Strength','Posture','Core Endurance','Efficient Volume'],
+      supersets:[
+        {label:'Push & Pull Maintain',type:'Superset',color:'var(--pur)',
+         ex:[{eid:'bbench',s:3,r:'8-10'},{eid:'cablerow',s:3,r:'8-10'},{eid:'deadbug',s:3,r:'12ea'}]},
+        {label:'Vertical & Accessory',type:'Superset',color:'var(--cyn)',
+         ex:[{eid:'dbohp',s:3,r:'10-12'},{eid:'pullup',s:3,r:'8-12'},{eid:'pallof',s:3,r:'12ea'}]},
+        {label:'Prehab & Posture',type:'Circuit',color:'var(--yel)',
+         ex:[{eid:'facepull',s:3,r:'15-20'},{eid:'latraise',s:3,r:'12-15'},{eid:'suitcasecarry',s:3,r:'30s/side'}]}
+      ]},
+    {id:3,n:'Conditioning & Balance',icon:'⚡',
+      focus:['Running-Integrated','Metabolic Conditioning','Achilles Maintenance','Balance'],
+      supersets:[
+        {label:'Running Power Maintenance',type:'Circuit',color:'var(--red)',
+         ex:[{eid:'kbswing',s:3,r:'15-20'},{eid:'slrdl',s:3,r:'10ea'},{eid:'anklejump',s:3,r:'15+15'}]},
+        {label:'Metabolic Conditioning',type:'Circuit',color:'var(--grn)',
+         ex:[{eid:'assault',s:3,r:'30s on/off'},{eid:'bearcrwl',s:3,r:'30s'},{eid:'mtclimb',s:3,r:'30s'}]},
+        {label:'Lower Leg & Balance',type:'Circuit',color:'var(--org)',
+         ex:[{eid:'eccheeldrop',s:3,r:'12ea'},{eid:'seatedcalf',s:3,r:'15'},{eid:'slstand',s:3,r:'45s/side'}]}
+      ]}
+  ];
 };
 
 // === TAG DISPLAY ===
@@ -230,13 +347,14 @@ const Toast=({msg,onClose})=>{
 };
 
 // === SET LOGGER ===
-const SetLogger=({exDef,exData,dayId,ssIdx,exIdx,onLog})=>{
+const SetLogger=({exDef,exData,dayId,ssIdx,exIdx,onLog,phase})=>{
   const ex=getEx(exDef.eid);
   const sets=exDef.s||3;
   const isWeight=ex.t==='w';
   const isDuration=ex.t==='d';
+  const logKey=`log_p${phase||1}_${dayId}_${ssIdx}_${exIdx}`;
   const [vals,setVals]=useState(()=>{
-    const saved=ld(`log_${dayId}_${ssIdx}_${exIdx}`,[]);
+    const saved=ld(logKey,[]);
     return Array.from({length:sets},(_,i)=>saved[i]||{w:'',r:'',done:false});
   });
 
@@ -244,14 +362,14 @@ const SetLogger=({exDef,exData,dayId,ssIdx,exIdx,onLog})=>{
     const nv=[...vals];
     nv[si]={...nv[si],[field]:val};
     setVals(nv);
-    sv(`log_${dayId}_${ssIdx}_${exIdx}`,nv);
+    sv(logKey,nv);
   };
 
   const markDone=(si)=>{
     const nv=[...vals];
     nv[si]={...nv[si],done:!nv[si].done};
     setVals(nv);
-    sv(`log_${dayId}_${ssIdx}_${exIdx}`,nv);
+    sv(logKey,nv);
     vb();
   };
 
@@ -276,7 +394,7 @@ const SetLogger=({exDef,exData,dayId,ssIdx,exIdx,onLog})=>{
 };
 
 // === EXERCISE CARD ===
-const ExCard=({exDef,dayId,ssIdx,exIdx})=>{
+const ExCard=({exDef,dayId,ssIdx,exIdx,phase})=>{
   const[open,setOpen]=useState(false);
   const ex=getEx(exDef.eid);
   return(
@@ -291,19 +409,20 @@ const ExCard=({exDef,dayId,ssIdx,exIdx})=>{
           <span style={{color:'var(--t3)',fontSize:16,marginLeft:4}}>{open?'▼':'▶'}</span>
         </div>
       </div>
-      {open && <SetLogger exDef={exDef} dayId={dayId} ssIdx={ssIdx} exIdx={exIdx}/>}
+      {open && <SetLogger exDef={exDef} dayId={dayId} ssIdx={ssIdx} exIdx={exIdx} phase={phase}/>}
     </div>
   );
 };
 
 // === DAY VIEW ===
-const DayView=({day,onBack})=>{
+const DayView=({day,phase,onBack})=>{
   const totalEx=day.supersets.reduce((a,ss)=>a+ss.ex.length,0);
   const completed=day.supersets.reduce((a,ss,si)=>a+ss.ex.reduce((b,ex,ei)=>{
-    const saved=ld(`log_${day.id}_${si}_${ei}`,[]);
+    const saved=ld(`log_p${phase}_${day.id}_${si}_${ei}`,[]);
     return b+(saved.filter(s=>s.done).length>0?1:0);
   },0),0);
   const pct=Math.round((completed/totalEx)*100);
+  const pMeta=PHASES_META.find(p=>p.id===phase);
 
   return(
     <div className="app">
@@ -312,7 +431,7 @@ const DayView=({day,onBack})=>{
           <button onClick={onBack} style={{background:'none',border:'none',color:'var(--grn)',fontSize:16,fontWeight:600,fontFamily:'inherit',cursor:'pointer'}}>← Back</button>
           <div>
             <h1>{day.icon} {day.n}</h1>
-            <p>{pct}% complete · {completed}/{totalEx} exercises logged</p>
+            <p>{pMeta?.icon} {pMeta?.n} · {pct}% complete · {completed}/{totalEx} exercises</p>
           </div>
         </div>
         <div className="prg" style={{marginTop:8}}><div className="prg-f" style={{width:`${pct}%`}}/></div>
@@ -331,7 +450,7 @@ const DayView=({day,onBack})=>{
               <div style={{fontSize:15,fontWeight:600}}>{ss.label}</div>
             </div>
             {ss.ex.map((exDef,ei)=>(
-              <ExCard key={ei} exDef={exDef} dayId={day.id} ssIdx={si} exIdx={ei}/>
+              <ExCard key={ei} exDef={exDef} dayId={day.id} ssIdx={si} exIdx={ei} phase={phase}/>
             ))}
           </div>
         ))}
@@ -353,32 +472,36 @@ const DayView=({day,onBack})=>{
 const WorkoutTab=()=>{
   const[activeDay,setActiveDay]=useState(null);
   const[phase,setPhase]=useState(ld('phase',1));
-  const phases=[{id:1,n:'Foundation',d:'Build base, learn movements'},{id:2,n:'Strength',d:'Progressive overload'},{id:3,n:'Power',d:'Explosive + eccentric'},{id:4,n:'Maintain',d:'Sustain & prevent injury'}];
+  const days=getProgramDays(phase);
+  const pMeta=PHASES_META.find(p=>p.id===phase);
 
-  if(activeDay) return <DayView day={activeDay} onBack={()=>setActiveDay(null)}/>;
+  if(activeDay) return <DayView day={activeDay} phase={phase} onBack={()=>setActiveDay(null)}/>;
 
   return(
     <>
       <div className="hdr">
         <h1>IronClad Pro</h1>
-        <p>v13.2 · Trail Runner Recovery · 3-Day Program</p>
+        <p>v14.0 · Trail Runner Recovery · 3-Day Program</p>
       </div>
       <div className="scroll">
         <div className="section-t">Phase</div>
         <div className="phase-sel">
-          {phases.map(p=>(
+          {PHASES_META.map(p=>(
             <button key={p.id} className={`phase-btn${phase===p.id?' on':''}`} onClick={()=>{setPhase(p.id);sv('phase',p.id);vb()}}>
-              {p.n}
+              {p.icon} {p.n}
             </button>
           ))}
         </div>
-        <div style={{fontSize:13,color:'var(--t2)',marginBottom:16}}>{phases.find(p=>p.id===phase)?.d}</div>
+        {pMeta && <div className="card" style={{padding:14,marginBottom:16}}>
+          <div style={{fontWeight:700,fontSize:15,marginBottom:4}}>{pMeta.icon} {pMeta.n} <span style={{fontWeight:400,color:'var(--t2)',fontSize:13}}>— {pMeta.wks}</span></div>
+          <div style={{fontSize:13,color:'var(--t2)',lineHeight:1.5}}>{pMeta.d}</div>
+        </div>}
 
         <div className="section-t">Workouts</div>
-        {PROGRAM.days.map(day=>{
+        {days.map(day=>{
           const totalEx=day.supersets.reduce((a,ss)=>a+ss.ex.length,0);
           const completed=day.supersets.reduce((a,ss,si)=>a+ss.ex.reduce((b,ex,ei)=>{
-            const saved=ld(`log_${day.id}_${si}_${ei}`,[]);
+            const saved=ld(`log_p${phase}_${day.id}_${si}_${ei}`,[]);
             return b+(saved.filter(s=>s.done).length>0?1:0);
           },0),0);
           const pct=Math.round((completed/totalEx)*100);
@@ -511,7 +634,7 @@ const SettingsTab=()=>{
 
   return(
     <>
-      <div className="hdr"><h1>Settings</h1><p>IronClad Pro v13.2</p></div>
+      <div className="hdr"><h1>Settings</h1><p>IronClad Pro v14.0</p></div>
       <div className="scroll">
         <div className="section-t">Body Stats</div>
         <div className="card" style={{padding:16}}>
@@ -526,7 +649,7 @@ const SettingsTab=()=>{
         <div className="card" style={{padding:16}}>
           <div style={{fontWeight:600,fontSize:16,marginBottom:8}}>Trail Runner Recovery Program</div>
           <div style={{fontSize:13,color:'var(--t2)',lineHeight:1.5}}>
-            3-day full body split designed for knee injury recovery, building explosive trail running power, improving balance and landing mechanics, and supporting weight loss. Incorporates your trainer's prescribed exercises on Leg Day with eccentric knee rehab progressions.
+            3-day full body split with 4 progressive phases. Foundation builds base strength and begins knee rehab. Build adds progressive overload and barbell work. Strength & Power peaks with heavy loads and explosive movements. Maintain & Perform sustains your gains while running volume increases. Your trainer's prescribed exercises stay constant throughout all phases. Each phase tracks progress independently.
           </div>
         </div>
 
@@ -537,7 +660,7 @@ const SettingsTab=()=>{
         </div>
 
         <div style={{textAlign:'center',padding:'32px 0',color:'var(--t3)',fontSize:12}}>
-          IronClad Pro v13.2 · Trail Runner Recovery Edition<br/>
+          IronClad Pro v14.0 · Trail Runner Recovery Edition<br/>
           Built for Matt · Knee-safe · All exercises vetted
         </div>
       </div>
