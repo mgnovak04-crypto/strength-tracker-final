@@ -7,16 +7,16 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="IronClad">
 <meta name="theme-color" content="#000">
-<meta name="version" content="14.0.0">
+<meta name="version" content="15.0.0">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <title>IronClad Pro</title>
-<script src="https://unpkg.com/react@18/umd/react.production.min.js?v=13"></script>
-<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js?v=13"></script>
-<script src="https://unpkg.com/@babel/standalone/babel.min.js?v=13"></script>
+<script src="https://unpkg.com/react@18/umd/react.production.min.js?v=15"></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js?v=15"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js?v=15"></script>
 <style>
-:root{--bg:#000;--c1:#1c1c1e;--c2:#2c2c2e;--c3:#3a3a3c;--sep:rgba(84,84,88,0.65);--t1:#fff;--t2:rgba(235,235,245,0.6);--t3:rgba(235,235,245,0.3);--grn:#30d158;--grn-d:rgba(48,209,88,0.15);--org:#ff9f0a;--org-d:rgba(255,159,10,0.15);--red:#ff453a;--blu:#0a84ff;--pur:#bf5af2;--cyn:#64d2ff;--yel:#ffd60a;--safe-t:env(safe-area-inset-top);--safe-b:env(safe-area-inset-bottom)}
+:root{--bg:#000;--c1:#1c1c1e;--c2:#2c2c2e;--c3:#3a3a3c;--sep:rgba(84,84,88,0.65);--t1:#fff;--t2:rgba(235,235,245,0.6);--t3:rgba(235,235,245,0.3);--grn:#30d158;--grn-d:rgba(48,209,88,0.15);--org:#ff9f0a;--org-d:rgba(255,159,10,0.15);--red:#ff453a;--red-d:rgba(255,69,58,0.15);--blu:#0a84ff;--pur:#bf5af2;--cyn:#64d2ff;--yel:#ffd60a;--safe-t:env(safe-area-inset-top);--safe-b:env(safe-area-inset-bottom)}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;margin:0;padding:0}
 html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--t1);font-family:-apple-system,system-ui,'SF Pro Display',sans-serif;-webkit-font-smoothing:antialiased}
 #root{height:100%}
@@ -53,6 +53,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--t1);font-
 .tag-p{background:rgba(255,69,58,0.15);color:var(--red)}
 .tag-b{background:rgba(255,214,10,0.15);color:var(--yel)}
 .tag-t{background:rgba(191,90,242,0.15);color:var(--pur)}
+.tag-f{background:var(--org-d);color:var(--org)}
 .log-area{padding:12px 16px;border-top:0.5px solid var(--sep)}
 .set-row{display:flex;align-items:center;gap:8px;margin-bottom:8px}
 .set-num{width:28px;height:28px;border-radius:8px;background:var(--c2);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;color:var(--t2);flex-shrink:0}
@@ -86,6 +87,21 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--t1);font-
 .phase-btn.on{border-color:var(--grn);background:var(--grn-d);color:var(--grn)}
 .section-t{font-size:20px;font-weight:700;margin:20px 0 12px;letter-spacing:-0.3px}
 .focus-tag{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:8px;font-size:12px;font-weight:600;margin-right:6px;margin-bottom:6px}
+/* REST TIMER */
+.rest-overlay{position:fixed;inset:0;z-index:2500;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.85);backdrop-filter:blur(12px)}
+.rest-ring{position:relative;width:200px;height:200px}
+.rest-ring svg{transform:rotate(-90deg)}
+.rest-ring .time{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.rest-ring .time .big{font-size:56px;font-weight:700;font-variant-numeric:tabular-nums;letter-spacing:-2px}
+.rest-ring .time .small{font-size:14px;color:var(--t2);margin-top:4px}
+.rest-btns{display:flex;gap:12px;margin-top:32px}
+.rest-btn{padding:12px 24px;border-radius:12px;border:none;font-size:15px;font-weight:600;font-family:inherit;cursor:pointer}
+/* WEIGHT CHART */
+.wt-chart{background:var(--c1);border-radius:12px;padding:16px;margin-bottom:12px}
+.wt-spark{display:flex;align-items:flex-end;gap:3px;height:60px}
+.wt-bar{flex:1;border-radius:3px 3px 0 0;min-width:6px;transition:height .3s}
+/* SESSION TIMER */
+.session-timer{display:flex;align-items:center;gap:6px;font-variant-numeric:tabular-nums;font-size:14px;font-weight:600;color:var(--org)}
 </style>
 </head>
 <body>
@@ -94,16 +110,30 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--t1);font-
 const{useState,useEffect,useRef,useCallback}=React;
 
 // === UTILITIES ===
-const ld=(k,d)=>{try{const v=localStorage.getItem('ic13_'+k);return v?JSON.parse(v):d}catch{return d}};
-const sv=(k,v)=>localStorage.setItem('ic13_'+k,JSON.stringify(v));
+const ld=(k,d)=>{try{const v=localStorage.getItem('ic15_'+k);return v?JSON.parse(v):d}catch{return d}};
+const sv=(k,v)=>localStorage.setItem('ic15_'+k,JSON.stringify(v));
 const vb=()=>{try{navigator.vibrate?.(10)}catch{}};
 const fmtDate=(d)=>new Date(d).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});
+const fmtTime=(s)=>{const m=Math.floor(s/60);const sec=s%60;return `${m}:${sec.toString().padStart(2,'0')}`};
+
+// === MIGRATE DATA from v14 ===
+(()=>{
+  try{
+    const migrated=localStorage.getItem('ic15_migrated');
+    if(!migrated){
+      const keys=Object.keys(localStorage).filter(k=>k.startsWith('ic13_'));
+      keys.forEach(k=>{
+        const newKey='ic15_'+k.replace('ic13_','');
+        if(!localStorage.getItem(newKey)){localStorage.setItem(newKey,localStorage.getItem(k))}
+      });
+      localStorage.setItem('ic15_migrated','1');
+    }
+  }catch(e){}
+})();
 
 // === EXERCISE DATABASE ===
-// t: w=weight, r=reps, d=duration, c=cardio, m=mobility
-// tags: k=knee-safe, e=eccentric, p=power/explosive, b=balance, t=trainer-prescribed
 const EXDB=[
-  // TRAINER PRESCRIBED - LEG DAY
+  // TRAINER PRESCRIBED
   {id:'trapbar',n:'Trapbar Deadlift',m:'Legs',t:'w',eq:'Barbell',tags:['k','t'],note:'Hip hinge focus, keep back neutral'},
   {id:'foamquad',n:'Foam Rolling Quads',m:'Recovery',t:'d',eq:'Foam Roller',tags:['k','t'],note:'90s per quad, focus on tight spots'},
   {id:'johnsoncalf',n:'BB Johnson Calf Raise',m:'Calves',t:'w',eq:'Barbell',tags:['k','t'],note:'Full ROM, 2s pause at top'},
@@ -127,8 +157,8 @@ const EXDB=[
   {id:'clamshell',n:'Clamshell',m:'Glutes',t:'r',eq:'Band',tags:['k'],note:'Band above knees, control motion'},
   {id:'tke',n:'Terminal Knee Extension',m:'VMO',t:'r',eq:'Band',tags:['k','e'],note:'Band behind knee, squeeze to full extension'},
   {id:'calfstand',n:'Standing Calf Raise',m:'Calves',t:'w',eq:'Machine',tags:['k'],note:'Full ROM, slow eccentric'},
-  {id:'eccheeldrop',n:'Eccentric Heel Drop',m:'Calves',t:'r',eq:'Step',tags:['k','e'],note:'Stand on step edge, rise on both feet, lower slowly on one — 4s eccentric. Key for achilles health'},
-  {id:'seatedcalf',n:'Seated Calf Raise',m:'Calves',t:'w',eq:'Machine',tags:['k'],note:'Targets soleus — the deep calf muscle that loads the achilles most during running'},
+  {id:'eccheeldrop',n:'Eccentric Heel Drop',m:'Calves',t:'r',eq:'Step',tags:['k','e'],note:'Rise on both feet, lower slowly on one — 4s eccentric'},
+  {id:'seatedcalf',n:'Seated Calf Raise',m:'Calves',t:'w',eq:'Machine',tags:['k'],note:'Targets soleus — deep calf loading for achilles'},
   {id:'kbswing',n:'Kettlebell Swing',m:'Glutes',t:'w',eq:'Kettlebell',tags:['k','p'],note:'Power from hips, not arms'},
 
   // UPPER PUSH
@@ -167,10 +197,11 @@ const EXDB=[
   {id:'slstand',n:'Single-Leg Balance Hold',m:'Balance',t:'d',eq:'Bodyweight',tags:['k','b'],note:'30-60s, eyes closed to progress'},
   {id:'boxstep',n:'Low Box Step-Up',m:'Quads',t:'r',eq:'Step',tags:['k','b'],note:'Low step, controlled, no push-off'},
 
-  // CARDIO
-  {id:'rowing',n:'Rowing Machine',m:'Cardio',t:'c',eq:'Machine',tags:['k'],note:'500m intervals or steady state'},
-  {id:'assault',n:'Assault Bike',m:'Cardio',t:'c',eq:'Machine',tags:['k'],note:'30s on / 30s off'},
-  {id:'battlerope',n:'Battle Ropes',m:'Cardio',t:'d',eq:'Equipment',tags:['k','p'],note:'Alternate arms, 30s bursts'},
+  // CARDIO / CONDITIONING
+  {id:'rowing',n:'Rowing Machine',m:'Cardio',t:'c',eq:'Machine',tags:['k','f'],note:'500m intervals or steady state'},
+  {id:'skierg',n:'SkiErg',m:'Cardio',t:'c',eq:'Machine',tags:['k','f'],note:'Full-body pull, 30s on / 30s off intervals'},
+  {id:'jumpingjack',n:'Jumping Jacks',m:'Cardio',t:'d',eq:'Bodyweight',tags:['k','f'],note:'Low-impact option: step-out jacks'},
+  {id:'rowinterval',n:'Row Intervals (500m)',m:'Cardio',t:'c',eq:'Machine',tags:['k','f'],note:'Max effort 500m, rest 90s, repeat'},
 
   // PHASE 2+ PROGRESSIONS
   {id:'bbench',n:'Barbell Bench Press',m:'Chest',t:'w',eq:'Barbell',tags:['k'],note:'Progression from DB bench'},
@@ -178,61 +209,70 @@ const EXDB=[
   {id:'bbohp',n:'Barbell Overhead Press',m:'Shoulders',t:'w',eq:'Barbell',tags:['k'],note:'Standing, strict press'},
   {id:'hipthrusthvy',n:'Heavy Hip Thrust',m:'Glutes',t:'w',eq:'Barbell',tags:['k'],note:'Progressive overload — 3s pause at top'},
   {id:'lowboxjump',n:'Low Box Jump',m:'Legs',t:'r',eq:'Box',tags:['k','p'],note:'Soft landing, step down — do NOT jump down'},
-  {id:'gobsquat',n:'Goblet Squat',m:'Quads',t:'w',eq:'Dumbbell',tags:['k'],note:'Only when physio clears deeper flexion. Controlled depth.'},
+  {id:'gobsquat',n:'Goblet Squat',m:'Quads',t:'w',eq:'Dumbbell',tags:['k'],note:'Only when physio clears deeper flexion'},
   {id:'skierswing',n:'KB Skier Swing',m:'Glutes',t:'w',eq:'Kettlebell',tags:['k','p'],note:'Double arm ski-pole motion, explosive hips'},
-  {id:'sledpush',n:'Sled Push',m:'Legs',t:'d',eq:'Sled',tags:['k','p'],note:'Low handle, drive through toes — great knee-safe conditioning'},
+  {id:'sledpush',n:'Sled Push',m:'Legs',t:'d',eq:'Sled',tags:['k','p','f'],note:'Low handle, drive through toes — great knee-safe conditioning'},
   {id:'tbarrow',n:'T-Bar Row',m:'Back',t:'w',eq:'Barbell',tags:['k'],note:'Chest-supported if available'},
   {id:'dblunge',n:'Walking DB Lunge',m:'Quads',t:'w',eq:'Dumbbell',tags:['k','b'],note:'Only Phase 3+ — controlled stride, upright torso'},
   {id:'hanglegraise',n:'Hanging Leg Raise',m:'Core',t:'r',eq:'Bar',tags:['k'],note:'Full leg raise — progression from knee raise'},
   {id:'slhop',n:'Single-Leg Forward Hop',m:'Legs',t:'r',eq:'Bodyweight',tags:['k','p','b'],note:'Stick the landing, 2s hold — sport-specific power'},
-  {id:'suitcasecarry',n:'Suitcase Carry',m:'Core',t:'d',eq:'Dumbbell',tags:['k','b'],note:'Heavy DB one side, walk — anti-lateral flexion'}
+  {id:'suitcasecarry',n:'Suitcase Carry',m:'Core',t:'d',eq:'Dumbbell',tags:['k','b'],note:'Heavy DB one side, walk — anti-lateral flexion'},
+  {id:'farmerwalk',n:'Farmer Walk',m:'Full Body',t:'d',eq:'Dumbbell',tags:['k','f'],note:'Heavy DBs both hands, walk 40m — metabolic + grip'}
 ];
 
 const getEx=(eid)=>EXDB.find(e=>e.id===eid)||{id:eid,n:'Unknown',m:'Other',t:'w',eq:'None',tags:[],note:''};
 
+// === TAG DISPLAY ===
+const tagMap={k:{l:'Knee-Safe',c:'tag-k'},e:{l:'Eccentric',c:'tag-e'},p:{l:'Power',c:'tag-p'},b:{l:'Balance',c:'tag-b'},t:{l:'Trainer Rx',c:'tag-t'},f:{l:'Fat Burn',c:'tag-f'}};
+
+// === REST TIMER CONFIG ===
+const REST_OPTIONS=[30,45,60,90];
+
 // === PHASE-AWARE PROGRAM ===
 const PHASES_META=[
-  {id:1,n:'Foundation',wks:'Weeks 1-4',d:'Build base strength, learn movements, begin knee rehab. Lighter loads, higher reps, emphasis on form.',icon:'🌱'},
-  {id:2,n:'Build',wks:'Weeks 5-8',d:'Progressive overload. Add sets & load on compounds. Introduce barbell work. Deepen eccentric capacity.',icon:'🔨'},
-  {id:3,n:'Strength & Power',wks:'Weeks 9-12',d:'Peak intensity. Heavier loads, explosive movements, sport-specific trail running prep.',icon:'🔥'},
-  {id:4,n:'Maintain & Perform',wks:'Weeks 13+',d:'Sustain strength while running volume increases. Metabolic conditioning. Injury-proof your body.',icon:'🏔'}
+  {id:1,n:'Foundation',wks:'Weeks 1-4',d:'Build base strength, learn movements, begin knee rehab. Lighter loads, higher reps for calorie burn. Short rests between supersets.',icon:'🌱',restDefault:45},
+  {id:2,n:'Build',wks:'Weeks 5-8',d:'Progressive overload. Add sets & load. Introduce barbell work. Metabolic finishers increase in intensity for fat loss.',icon:'🔨',restDefault:60},
+  {id:3,n:'Strength & Power',wks:'Weeks 9-12',d:'Peak intensity. Heavier loads, explosive movements. Conditioning finishers maximize calorie burn.',icon:'🔥',restDefault:60},
+  {id:4,n:'Maintain & Perform',wks:'Weeks 13+',d:'Sustain strength while running volume increases. High-intensity conditioning circuits for continued fat loss.',icon:'🏔',restDefault:45}
 ];
 
 const getProgramDays=(phase)=>{
-  // Day 1 always: Legs & Core (trainer exercises constant, progression layered on)
-  // Day 2 always: Upper Body & Core (push/pull, progressive overload)
-  // Day 3 always: Power, Balance & Core (explosive, stability, conditioning)
-
   if(phase===1) return [
     {id:1,n:'Legs & Core',icon:'🦵',
       focus:['Knee Recovery','Eccentric Strength','Core Stability','Trainer Rx'],
       supersets:[
-        {label:'Strength & Mobility',type:'Circuit',color:'var(--grn)',
+        {label:'Strength & Mobility',type:'Circuit',color:'var(--grn)',rest:60,
          ex:[{eid:'trapbar',s:3,r:'8-10'},{eid:'foamquad',s:1,r:'90s/side'},{eid:'johnsoncalf',s:3,r:'12-15'}]},
-        {label:'Stability & Anti-Rotation',type:'Superset',color:'var(--blu)',
+        {label:'Stability & Anti-Rotation',type:'Superset',color:'var(--blu)',rest:45,
          ex:[{eid:'copenadduct',s:3,r:'20-30s/side'},{eid:'starplank',s:3,r:'8ea'},{eid:'staggerpallof',s:3,r:'10ea'}]},
-        {label:'Power & Eccentric',type:'Circuit',color:'var(--org)',
-         ex:[{eid:'anklejump',s:3,r:'15+15'},{eid:'eccstepdown',s:3,r:'10ea'},{eid:'bulgsplit',s:3,r:'8-10ea'}]}
+        {label:'Power & Eccentric',type:'Circuit',color:'var(--org)',rest:45,
+         ex:[{eid:'anklejump',s:3,r:'15+15'},{eid:'eccstepdown',s:3,r:'10ea'},{eid:'bulgsplit',s:3,r:'8-10ea'}]},
+        {label:'Metabolic Finisher',type:'AMRAP 8min',color:'var(--red)',rest:0,
+         ex:[{eid:'kbswing',s:3,r:'15'},{eid:'bearcrwl',s:3,r:'20s'},{eid:'glutebridge',s:3,r:'15'}]}
       ]},
     {id:2,n:'Upper Body & Core',icon:'💪',
       focus:['Push/Pull Balance','Core Strength','Calorie Burn','Posture'],
       supersets:[
-        {label:'Push & Pull',type:'Superset',color:'var(--pur)',
+        {label:'Push & Pull',type:'Superset',color:'var(--pur)',rest:60,
          ex:[{eid:'dbbench',s:3,r:'10-12'},{eid:'cablerow',s:3,r:'10-12'},{eid:'deadbug',s:3,r:'10ea'}]},
-        {label:'Shoulders & Back',type:'Superset',color:'var(--cyn)',
+        {label:'Shoulders & Back',type:'Superset',color:'var(--cyn)',rest:60,
          ex:[{eid:'dbohp',s:3,r:'10-12'},{eid:'latpd',s:3,r:'10-12'},{eid:'pallof',s:3,r:'12ea'}]},
-        {label:'Arms & Core Finisher',type:'Circuit',color:'var(--yel)',
-         ex:[{eid:'cablefly',s:3,r:'12-15'},{eid:'facepull',s:3,r:'15-20'},{eid:'hangknee',s:3,r:'10-15'}]}
+        {label:'Arms & Core Finisher',type:'Circuit',color:'var(--yel)',rest:45,
+         ex:[{eid:'cablefly',s:3,r:'12-15'},{eid:'facepull',s:3,r:'15-20'},{eid:'hangknee',s:3,r:'10-15'}]},
+        {label:'Metabolic Finisher',type:'EMOM 6min',color:'var(--red)',rest:0,
+         ex:[{eid:'skierg',s:3,r:'20s'},{eid:'mtclimb',s:3,r:'20s'},{eid:'jumpingjack',s:3,r:'30s'}]}
       ]},
     {id:3,n:'Power, Balance & Core',icon:'⚡',
       focus:['Explosive Power','Balance Training','Landing Mechanics','Fat Burn'],
       supersets:[
-        {label:'Power & Hinge',type:'Circuit',color:'var(--red)',
+        {label:'Power & Hinge',type:'Circuit',color:'var(--red)',rest:60,
          ex:[{eid:'kbswing',s:3,r:'12-15'},{eid:'slrdl',s:3,r:'10ea'},{eid:'birddog',s:3,r:'10ea'}]},
-        {label:'Upper Strength & Stability',type:'Superset',color:'var(--grn)',
+        {label:'Upper Strength & Stability',type:'Superset',color:'var(--grn)',rest:45,
          ex:[{eid:'pushup',s:3,r:'12-20'},{eid:'invrow',s:3,r:'8-12'},{eid:'sideplank',s:3,r:'30-45s/side'}]},
-        {label:'Lower Leg Resilience',type:'Circuit',color:'var(--org)',
-         ex:[{eid:'boxstep',s:3,r:'10ea'},{eid:'eccheeldrop',s:3,r:'12ea'},{eid:'seatedcalf',s:3,r:'15'}]}
+        {label:'Lower Leg Resilience',type:'Circuit',color:'var(--org)',rest:45,
+         ex:[{eid:'boxstep',s:3,r:'10ea'},{eid:'eccheeldrop',s:3,r:'12ea'},{eid:'seatedcalf',s:3,r:'15'}]},
+        {label:'Metabolic Finisher',type:'Intervals',color:'var(--red)',rest:0,
+         ex:[{eid:'rowing',s:4,r:'250m max'},{eid:'farmerwalk',s:3,r:'40s'}]}
       ]}
   ];
 
@@ -240,32 +280,38 @@ const getProgramDays=(phase)=>{
     {id:1,n:'Legs & Core',icon:'🦵',
       focus:['Progressive Overload','Eccentric Depth','Hip Strength','Trainer Rx'],
       supersets:[
-        {label:'Heavy Hinge & Calf',type:'Circuit',color:'var(--grn)',
+        {label:'Heavy Hinge & Calf',type:'Circuit',color:'var(--grn)',rest:75,
          ex:[{eid:'trapbar',s:4,r:'6-8'},{eid:'foamquad',s:1,r:'90s/side'},{eid:'johnsoncalf',s:4,r:'10-12'}]},
-        {label:'Stability & Anti-Rotation',type:'Superset',color:'var(--blu)',
+        {label:'Stability & Anti-Rotation',type:'Superset',color:'var(--blu)',rest:45,
          ex:[{eid:'copenadduct',s:3,r:'30-40s/side'},{eid:'starplank',s:3,r:'10ea'},{eid:'staggerpallof',s:3,r:'12ea'}]},
-        {label:'Power, Eccentric & Glute',type:'Circuit',color:'var(--org)',
-         ex:[{eid:'anklejump',s:3,r:'20+20'},{eid:'bulgsplit',s:4,r:'8ea'},{eid:'hipthrust',s:4,r:'8-10'}]}
+        {label:'Power, Eccentric & Glute',type:'Circuit',color:'var(--org)',rest:60,
+         ex:[{eid:'anklejump',s:3,r:'20+20'},{eid:'bulgsplit',s:4,r:'8ea'},{eid:'hipthrust',s:4,r:'8-10'}]},
+        {label:'Metabolic Finisher',type:'AMRAP 10min',color:'var(--red)',rest:0,
+         ex:[{eid:'kbswing',s:4,r:'15'},{eid:'bearcrwl',s:3,r:'25s'},{eid:'mtclimb',s:3,r:'25s'}]}
       ]},
     {id:2,n:'Upper Body & Core',icon:'💪',
-      focus:['Barbell Intro','Volume Increase','Core Strength','Posture'],
+      focus:['Barbell Intro','Volume Increase','Core Strength','Fat Burn'],
       supersets:[
-        {label:'Heavy Push & Pull',type:'Superset',color:'var(--pur)',
+        {label:'Heavy Push & Pull',type:'Superset',color:'var(--pur)',rest:75,
          ex:[{eid:'bbench',s:4,r:'8-10'},{eid:'cablerow',s:4,r:'8-10'},{eid:'deadbug',s:3,r:'12ea'}]},
-        {label:'Vertical Push & Pull',type:'Superset',color:'var(--cyn)',
+        {label:'Vertical Push & Pull',type:'Superset',color:'var(--cyn)',rest:60,
          ex:[{eid:'dbohp',s:4,r:'8-10'},{eid:'latpd',s:4,r:'8-10'},{eid:'pallof',s:3,r:'12ea'}]},
-        {label:'Accessory & Core',type:'Circuit',color:'var(--yel)',
-         ex:[{eid:'dbincbench',s:3,r:'10-12'},{eid:'facepull',s:3,r:'15-20'},{eid:'hangknee',s:3,r:'12-15'}]}
+        {label:'Accessory & Core',type:'Circuit',color:'var(--yel)',rest:45,
+         ex:[{eid:'dbincbench',s:3,r:'10-12'},{eid:'facepull',s:3,r:'15-20'},{eid:'hangknee',s:3,r:'12-15'}]},
+        {label:'Metabolic Finisher',type:'EMOM 8min',color:'var(--red)',rest:0,
+         ex:[{eid:'skierg',s:4,r:'25s'},{eid:'farmerwalk',s:3,r:'40s'},{eid:'jumpingjack',s:3,r:'30s'}]}
       ]},
     {id:3,n:'Power, Balance & Core',icon:'⚡',
       focus:['Explosive Hinge','Weighted Balance','Achilles Build','Conditioning'],
       supersets:[
-        {label:'Power & Single-Leg',type:'Circuit',color:'var(--red)',
+        {label:'Power & Single-Leg',type:'Circuit',color:'var(--red)',rest:60,
          ex:[{eid:'kbswing',s:4,r:'12-15'},{eid:'slrdl',s:3,r:'10ea'},{eid:'lowboxjump',s:3,r:'6-8'}]},
-        {label:'Upper Strength',type:'Superset',color:'var(--grn)',
+        {label:'Upper Strength',type:'Superset',color:'var(--grn)',rest:60,
          ex:[{eid:'pushup',s:3,r:'15-25'},{eid:'pullup',s:3,r:'6-10'},{eid:'suitcasecarry',s:3,r:'30s/side'}]},
-        {label:'Lower Leg Resilience',type:'Circuit',color:'var(--org)',
-         ex:[{eid:'boxstep',s:3,r:'12ea'},{eid:'eccheeldrop',s:3,r:'15ea'},{eid:'seatedcalf',s:4,r:'12-15'}]}
+        {label:'Lower Leg Resilience',type:'Circuit',color:'var(--org)',rest:45,
+         ex:[{eid:'boxstep',s:3,r:'12ea'},{eid:'eccheeldrop',s:3,r:'15ea'},{eid:'seatedcalf',s:4,r:'12-15'}]},
+        {label:'Metabolic Finisher',type:'Intervals',color:'var(--red)',rest:0,
+         ex:[{eid:'rowinterval',s:4,r:'500m max'},{eid:'skierg',s:3,r:'30s on/30s off'}]}
       ]}
   ];
 
@@ -273,32 +319,38 @@ const getProgramDays=(phase)=>{
     {id:1,n:'Legs & Core',icon:'🦵',
       focus:['Peak Strength','Explosive Power','Deep Eccentric','Trainer Rx'],
       supersets:[
-        {label:'Heavy Strength',type:'Circuit',color:'var(--grn)',
+        {label:'Heavy Strength',type:'Circuit',color:'var(--grn)',rest:90,
          ex:[{eid:'trapbar',s:4,r:'5-6'},{eid:'foamquad',s:1,r:'90s/side'},{eid:'johnsoncalf',s:4,r:'8-10'}]},
-        {label:'Stability & Power',type:'Superset',color:'var(--blu)',
+        {label:'Stability & Power',type:'Superset',color:'var(--blu)',rest:45,
          ex:[{eid:'copenadduct',s:3,r:'30-40s/side'},{eid:'starplank',s:3,r:'12ea'},{eid:'staggerpallof',s:4,r:'12ea'}]},
-        {label:'Explosive & Eccentric',type:'Circuit',color:'var(--org)',
-         ex:[{eid:'anklejump',s:4,r:'20+20'},{eid:'bulgsplit',s:4,r:'6-8ea'},{eid:'hipthrusthvy',s:4,r:'6-8'}]}
+        {label:'Explosive & Eccentric',type:'Circuit',color:'var(--org)',rest:60,
+         ex:[{eid:'anklejump',s:4,r:'20+20'},{eid:'bulgsplit',s:4,r:'6-8ea'},{eid:'hipthrusthvy',s:4,r:'6-8'}]},
+        {label:'Metabolic Finisher',type:'AMRAP 12min',color:'var(--red)',rest:0,
+         ex:[{eid:'sledpush',s:4,r:'30s'},{eid:'kbswing',s:4,r:'20'},{eid:'bearcrwl',s:3,r:'30s'}]}
       ]},
     {id:2,n:'Upper Body & Core',icon:'💪',
-      focus:['Heavy Compounds','Upper Power','Core Anti-Rotation','Volume'],
+      focus:['Heavy Compounds','Upper Power','Core Anti-Rotation','Fat Burn'],
       supersets:[
-        {label:'Heavy Compounds',type:'Superset',color:'var(--pur)',
+        {label:'Heavy Compounds',type:'Superset',color:'var(--pur)',rest:90,
          ex:[{eid:'bbench',s:4,r:'6-8'},{eid:'wtpullup',s:4,r:'5-8'},{eid:'hanglegraise',s:3,r:'10-12'}]},
-        {label:'Vertical Power',type:'Superset',color:'var(--cyn)',
+        {label:'Vertical Power',type:'Superset',color:'var(--cyn)',rest:75,
          ex:[{eid:'bbohp',s:4,r:'6-8'},{eid:'tbarrow',s:4,r:'8-10'},{eid:'staggerpallof',s:3,r:'12ea'}]},
-        {label:'Volume & Finisher',type:'Circuit',color:'var(--yel)',
-         ex:[{eid:'dip',s:3,r:'10-15'},{eid:'dbrow',s:3,r:'10-12'},{eid:'battlerope',s:3,r:'30s'}]}
+        {label:'Volume & Core',type:'Circuit',color:'var(--yel)',rest:45,
+         ex:[{eid:'dip',s:3,r:'10-15'},{eid:'dbrow',s:3,r:'10-12'},{eid:'skierg',s:3,r:'30s'}]},
+        {label:'Metabolic Finisher',type:'EMOM 10min',color:'var(--red)',rest:0,
+         ex:[{eid:'skierg',s:4,r:'30s max'},{eid:'farmerwalk',s:3,r:'40s'},{eid:'mtclimb',s:3,r:'30s'}]}
       ]},
     {id:3,n:'Power, Balance & Core',icon:'⚡',
       focus:['Sport-Specific Power','Single-Leg Strength','Trail Conditioning','Achilles'],
       supersets:[
-        {label:'Explosive & Hinge',type:'Circuit',color:'var(--red)',
+        {label:'Explosive & Hinge',type:'Circuit',color:'var(--red)',rest:60,
          ex:[{eid:'skierswing',s:4,r:'10-12'},{eid:'lowboxjump',s:4,r:'6-8'},{eid:'slhop',s:3,r:'6ea'}]},
-        {label:'Single-Leg & Upper',type:'Superset',color:'var(--grn)',
+        {label:'Single-Leg & Upper',type:'Superset',color:'var(--grn)',rest:60,
          ex:[{eid:'dblunge',s:3,r:'8ea'},{eid:'pullup',s:4,r:'8-12'},{eid:'sideplank',s:3,r:'40-60s/side'}]},
-        {label:'Calf, Achilles & Conditioning',type:'Circuit',color:'var(--org)',
-         ex:[{eid:'eccheeldrop',s:3,r:'15ea'},{eid:'seatedcalf',s:4,r:'12'},{eid:'sledpush',s:3,r:'30-40s'}]}
+        {label:'Calf, Achilles & Conditioning',type:'Circuit',color:'var(--org)',rest:45,
+         ex:[{eid:'eccheeldrop',s:3,r:'15ea'},{eid:'seatedcalf',s:4,r:'12'},{eid:'sledpush',s:3,r:'30-40s'}]},
+        {label:'Metabolic Finisher',type:'Intervals',color:'var(--red)',rest:0,
+         ex:[{eid:'rowinterval',s:5,r:'500m max'},{eid:'skierg',s:4,r:'30s'}]}
       ]}
   ];
 
@@ -307,53 +359,123 @@ const getProgramDays=(phase)=>{
     {id:1,n:'Legs & Core',icon:'🦵',
       focus:['Strength Maintenance','Knee Protection','Running Support','Trainer Rx'],
       supersets:[
-        {label:'Maintain Strength',type:'Circuit',color:'var(--grn)',
+        {label:'Maintain Strength',type:'Circuit',color:'var(--grn)',rest:60,
          ex:[{eid:'trapbar',s:3,r:'6-8'},{eid:'foamquad',s:1,r:'90s/side'},{eid:'johnsoncalf',s:3,r:'10-12'}]},
-        {label:'Stability (Constant)',type:'Superset',color:'var(--blu)',
+        {label:'Stability (Constant)',type:'Superset',color:'var(--blu)',rest:45,
          ex:[{eid:'copenadduct',s:3,r:'30s/side'},{eid:'starplank',s:3,r:'10ea'},{eid:'staggerpallof',s:3,r:'10ea'}]},
-        {label:'Maintain & Protect',type:'Circuit',color:'var(--org)',
-         ex:[{eid:'bulgsplit',s:3,r:'8ea'},{eid:'hipthrust',s:3,r:'8-10'},{eid:'tke',s:3,r:'15-20'}]}
+        {label:'Maintain & Protect',type:'Circuit',color:'var(--org)',rest:45,
+         ex:[{eid:'bulgsplit',s:3,r:'8ea'},{eid:'hipthrust',s:3,r:'8-10'},{eid:'tke',s:3,r:'15-20'}]},
+        {label:'Metabolic Finisher',type:'AMRAP 10min',color:'var(--red)',rest:0,
+         ex:[{eid:'kbswing',s:3,r:'20'},{eid:'mtclimb',s:3,r:'30s'},{eid:'farmerwalk',s:3,r:'40s'}]}
       ]},
     {id:2,n:'Upper Body & Core',icon:'💪',
-      focus:['Maintain Upper Strength','Posture','Core Endurance','Efficient Volume'],
+      focus:['Maintain Upper','Posture','Core Endurance','Fat Burn'],
       supersets:[
-        {label:'Push & Pull Maintain',type:'Superset',color:'var(--pur)',
+        {label:'Push & Pull Maintain',type:'Superset',color:'var(--pur)',rest:60,
          ex:[{eid:'bbench',s:3,r:'8-10'},{eid:'cablerow',s:3,r:'8-10'},{eid:'deadbug',s:3,r:'12ea'}]},
-        {label:'Vertical & Accessory',type:'Superset',color:'var(--cyn)',
+        {label:'Vertical & Accessory',type:'Superset',color:'var(--cyn)',rest:60,
          ex:[{eid:'dbohp',s:3,r:'10-12'},{eid:'pullup',s:3,r:'8-12'},{eid:'pallof',s:3,r:'12ea'}]},
-        {label:'Prehab & Posture',type:'Circuit',color:'var(--yel)',
-         ex:[{eid:'facepull',s:3,r:'15-20'},{eid:'latraise',s:3,r:'12-15'},{eid:'suitcasecarry',s:3,r:'30s/side'}]}
+        {label:'Prehab & Posture',type:'Circuit',color:'var(--yel)',rest:45,
+         ex:[{eid:'facepull',s:3,r:'15-20'},{eid:'latraise',s:3,r:'12-15'},{eid:'suitcasecarry',s:3,r:'30s/side'}]},
+        {label:'Metabolic Finisher',type:'EMOM 8min',color:'var(--red)',rest:0,
+         ex:[{eid:'skierg',s:4,r:'30s on/30s off'},{eid:'rowing',s:3,r:'500m'},{eid:'bearcrwl',s:3,r:'25s'}]}
       ]},
     {id:3,n:'Conditioning & Balance',icon:'⚡',
       focus:['Running-Integrated','Metabolic Conditioning','Achilles Maintenance','Balance'],
       supersets:[
-        {label:'Running Power Maintenance',type:'Circuit',color:'var(--red)',
+        {label:'Running Power Maintenance',type:'Circuit',color:'var(--red)',rest:45,
          ex:[{eid:'kbswing',s:3,r:'15-20'},{eid:'slrdl',s:3,r:'10ea'},{eid:'anklejump',s:3,r:'15+15'}]},
-        {label:'Metabolic Conditioning',type:'Circuit',color:'var(--grn)',
-         ex:[{eid:'assault',s:3,r:'30s on/off'},{eid:'bearcrwl',s:3,r:'30s'},{eid:'mtclimb',s:3,r:'30s'}]},
-        {label:'Lower Leg & Balance',type:'Circuit',color:'var(--org)',
-         ex:[{eid:'eccheeldrop',s:3,r:'12ea'},{eid:'seatedcalf',s:3,r:'15'},{eid:'slstand',s:3,r:'45s/side'}]}
+        {label:'Metabolic Conditioning',type:'Circuit',color:'var(--grn)',rest:30,
+         ex:[{eid:'skierg',s:3,r:'30s on/off'},{eid:'bearcrwl',s:3,r:'30s'},{eid:'mtclimb',s:3,r:'30s'}]},
+        {label:'Lower Leg & Balance',type:'Circuit',color:'var(--org)',rest:45,
+         ex:[{eid:'eccheeldrop',s:3,r:'12ea'},{eid:'seatedcalf',s:3,r:'15'},{eid:'slstand',s:3,r:'45s/side'}]},
+        {label:'Metabolic Finisher',type:'Intervals',color:'var(--red)',rest:0,
+         ex:[{eid:'rowinterval',s:5,r:'500m max'},{eid:'jumpingjack',s:3,r:'60s'}]}
       ]}
   ];
 };
 
-// === TAG DISPLAY ===
-const tagMap={k:{l:'Knee-Safe',c:'tag-k'},e:{l:'Eccentric',c:'tag-e'},p:{l:'Power',c:'tag-p'},b:{l:'Balance',c:'tag-b'},t:{l:'Trainer Rx',c:'tag-t'}};
-
 // === TOAST ===
 const Toast=({msg,onClose})=>{
   useEffect(()=>{const t=setTimeout(onClose,2500);return()=>clearTimeout(t)},[onClose]);
-  return <div className="toast">✅ {msg}</div>;
+  return <div className="toast">{msg}</div>;
+};
+
+// === REST TIMER ===
+const RestTimer=({seconds,onDone,onSkip})=>{
+  const[left,setLeft]=useState(seconds);
+  const total=seconds;
+  useEffect(()=>{
+    if(left<=0){vb();vb();onDone();return}
+    const t=setTimeout(()=>setLeft(l=>l-1),1000);
+    return()=>clearTimeout(t);
+  },[left,onDone]);
+
+  const pct=(left/total)*100;
+  const r=90;const circ=2*Math.PI*r;const offset=circ*(1-left/total);
+  const color=left<=5?'var(--red)':left<=15?'var(--org)':'var(--grn)';
+
+  return(
+    <div className="rest-overlay" onClick={e=>e.target===e.currentTarget&&onSkip()}>
+      <div style={{display:'flex',flexDirection:'column',alignItems:'center'}}>
+        <div style={{fontSize:14,color:'var(--t2)',marginBottom:16,fontWeight:600,textTransform:'uppercase',letterSpacing:1}}>Rest</div>
+        <div className="rest-ring">
+          <svg width="200" height="200" viewBox="0 0 200 200">
+            <circle cx="100" cy="100" r={r} fill="none" stroke="var(--c2)" strokeWidth="8"/>
+            <circle cx="100" cy="100" r={r} fill="none" stroke={color} strokeWidth="8"
+              strokeLinecap="round" strokeDasharray={circ} strokeDashoffset={offset}
+              style={{transition:'stroke-dashoffset 1s linear, stroke 0.3s'}}/>
+          </svg>
+          <div className="time">
+            <div className="big" style={{color}}>{left}</div>
+            <div className="small">seconds</div>
+          </div>
+        </div>
+        <div className="rest-btns">
+          <button className="rest-btn" style={{background:'var(--c2)',color:'var(--t1)'}} onClick={onSkip}>Skip</button>
+          <button className="rest-btn" style={{background:color,color:'#000'}} onClick={()=>setLeft(l=>l+15)}>+15s</button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// === SESSION TIMER ===
+const useSessionTimer=()=>{
+  const[elapsed,setElapsed]=useState(0);
+  const[running,setRunning]=useState(false);
+  const startRef=useRef(null);
+  const intervalRef=useRef(null);
+
+  const start=useCallback(()=>{
+    if(!running){
+      startRef.current=Date.now()-elapsed*1000;
+      setRunning(true);
+    }
+  },[running,elapsed]);
+
+  const stop=useCallback(()=>{setRunning(false)},[]);
+
+  useEffect(()=>{
+    if(running){
+      intervalRef.current=setInterval(()=>{
+        setElapsed(Math.floor((Date.now()-startRef.current)/1000));
+      },1000);
+    }
+    return()=>clearInterval(intervalRef.current);
+  },[running]);
+
+  return{elapsed,running,start,stop,fmtElapsed:fmtTime(elapsed)};
 };
 
 // === SET LOGGER ===
-const SetLogger=({exDef,exData,dayId,ssIdx,exIdx,onLog,phase})=>{
+const SetLogger=({exDef,dayId,ssIdx,exIdx,phase,onSetDone})=>{
   const ex=getEx(exDef.eid);
   const sets=exDef.s||3;
   const isWeight=ex.t==='w';
   const isDuration=ex.t==='d';
   const logKey=`log_p${phase||1}_${dayId}_${ssIdx}_${exIdx}`;
-  const [vals,setVals]=useState(()=>{
+  const[vals,setVals]=useState(()=>{
     const saved=ld(logKey,[]);
     return Array.from({length:sets},(_,i)=>saved[i]||{w:'',r:'',done:false});
   });
@@ -367,24 +489,26 @@ const SetLogger=({exDef,exData,dayId,ssIdx,exIdx,onLog,phase})=>{
 
   const markDone=(si)=>{
     const nv=[...vals];
+    const wasDone=nv[si].done;
     nv[si]={...nv[si],done:!nv[si].done};
     setVals(nv);
     sv(logKey,nv);
     vb();
+    if(!wasDone&&onSetDone) onSetDone();
   };
 
   const completed=vals.filter(v=>v.done).length;
 
-  return (
+  return(
     <div className="log-area">
       <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:10}}>
         <div style={{fontSize:13,color:'var(--t2)'}}>{completed}/{sets} sets</div>
-        {ex.note && <div style={{fontSize:11,color:'var(--t3)',maxWidth:'60%',textAlign:'right'}}>{ex.note}</div>}
+        {ex.note&&<div style={{fontSize:11,color:'var(--t3)',maxWidth:'60%',textAlign:'right'}}>{ex.note}</div>}
       </div>
       {vals.map((v,si)=>(
         <div key={si} className="set-row">
           <div className="set-num" style={v.done?{background:'var(--grn-d)',color:'var(--grn)'}:{}}>{si+1}</div>
-          {isWeight && <input className={`inp${v.w?' done':''}`} placeholder="kg" type="number" inputMode="decimal" value={v.w} onChange={e=>update(si,'w',e.target.value)} style={{maxWidth:80}}/>}
+          {isWeight&&<input className={`inp${v.w?' done':''}`} placeholder="kg" type="number" inputMode="decimal" value={v.w} onChange={e=>update(si,'w',e.target.value)} style={{maxWidth:80}}/>}
           <input className={`inp${v.r?' done':''}`} placeholder={isDuration?'sec':'reps'} type={isDuration?'number':'text'} inputMode={isDuration?'numeric':'text'} value={v.r} onChange={e=>update(si,'r',e.target.value)} style={{maxWidth:isWeight?80:120}}/>
           <button onClick={()=>markDone(si)} style={{width:40,height:40,borderRadius:10,border:'none',background:v.done?'var(--grn)':'var(--c2)',color:v.done?'#000':'var(--t3)',fontSize:18,cursor:'pointer',flexShrink:0}}>✓</button>
         </div>
@@ -394,7 +518,7 @@ const SetLogger=({exDef,exData,dayId,ssIdx,exIdx,onLog,phase})=>{
 };
 
 // === EXERCISE CARD ===
-const ExCard=({exDef,dayId,ssIdx,exIdx,phase})=>{
+const ExCard=({exDef,dayId,ssIdx,exIdx,phase,onSetDone})=>{
   const[open,setOpen]=useState(false);
   const ex=getEx(exDef.eid);
   return(
@@ -404,18 +528,25 @@ const ExCard=({exDef,dayId,ssIdx,exIdx,phase})=>{
           <div className="ex-name">{ex.n}</div>
           <div className="ex-info">{exDef.s} sets × {exDef.r} · {ex.eq}</div>
         </div>
-        <div style={{display:'flex',alignItems:'center',gap:4}}>
+        <div style={{display:'flex',alignItems:'center',gap:4,flexWrap:'wrap',justifyContent:'flex-end',maxWidth:160}}>
           {ex.tags?.map(t=>tagMap[t]?<span key={t} className={`ex-tag ${tagMap[t].c}`}>{tagMap[t].l}</span>:null)}
           <span style={{color:'var(--t3)',fontSize:16,marginLeft:4}}>{open?'▼':'▶'}</span>
         </div>
       </div>
-      {open && <SetLogger exDef={exDef} dayId={dayId} ssIdx={ssIdx} exIdx={exIdx} phase={phase}/>}
+      {open&&<SetLogger exDef={exDef} dayId={dayId} ssIdx={ssIdx} exIdx={exIdx} phase={phase} onSetDone={onSetDone}/>}
     </div>
   );
 };
 
 // === DAY VIEW ===
 const DayView=({day,phase,onBack})=>{
+  const[showRest,setShowRest]=useState(null);
+  const[restTime,setRestTime]=useState(()=>ld('restTime',PHASES_META.find(p=>p.id===phase)?.restDefault||60));
+  const[restEnabled,setRestEnabled]=useState(()=>ld('restEnabled',true));
+  const session=useSessionTimer();
+
+  useEffect(()=>{session.start()},[]);
+
   const totalEx=day.supersets.reduce((a,ss)=>a+ss.ex.length,0);
   const completed=day.supersets.reduce((a,ss,si)=>a+ss.ex.reduce((b,ex,ei)=>{
     const saved=ld(`log_p${phase}_${day.id}_${si}_${ei}`,[]);
@@ -424,14 +555,20 @@ const DayView=({day,phase,onBack})=>{
   const pct=Math.round((completed/totalEx)*100);
   const pMeta=PHASES_META.find(p=>p.id===phase);
 
+  const handleSetDone=(ssRest)=>{
+    session.start();
+    const t=ssRest||restTime;
+    if(restEnabled&&t>0) setShowRest(t);
+  };
+
   return(
     <div className="app">
       <div className="hdr">
         <div style={{display:'flex',alignItems:'center',gap:12}}>
-          <button onClick={onBack} style={{background:'none',border:'none',color:'var(--grn)',fontSize:16,fontWeight:600,fontFamily:'inherit',cursor:'pointer'}}>← Back</button>
+          <button onClick={()=>{session.stop();onBack()}} style={{background:'none',border:'none',color:'var(--grn)',fontSize:16,fontWeight:600,fontFamily:'inherit',cursor:'pointer'}}>← Back</button>
           <div>
             <h1>{day.icon} {day.n}</h1>
-            <p>{pMeta?.icon} {pMeta?.n} · {pct}% complete · {completed}/{totalEx} exercises</p>
+            <p>{pMeta?.icon} {pMeta?.n} · {pct}% complete · {completed}/{totalEx} exercises · {session.fmtElapsed}</p>
           </div>
         </div>
         <div className="prg" style={{marginTop:8}}><div className="prg-f" style={{width:`${pct}%`}}/></div>
@@ -450,20 +587,22 @@ const DayView=({day,phase,onBack})=>{
               <div style={{fontSize:15,fontWeight:600}}>{ss.label}</div>
             </div>
             {ss.ex.map((exDef,ei)=>(
-              <ExCard key={ei} exDef={exDef} dayId={day.id} ssIdx={si} exIdx={ei} phase={phase}/>
+              <ExCard key={ei} exDef={exDef} dayId={day.id} ssIdx={si} exIdx={ei} phase={phase} onSetDone={()=>handleSetDone(ss.rest)}/>
             ))}
           </div>
         ))}
         <div style={{marginTop:16,marginBottom:24}}>
           <button className="btn btn-g" style={{width:'100%',padding:14}} onClick={()=>{
+            session.stop();
             const ts=new Date().toISOString();
             const hist=ld('history',[]);
-            hist.push({day:day.n,date:ts,completed,total:totalEx});
+            hist.push({day:day.n,date:ts,completed,total:totalEx,duration:session.elapsed});
             sv('history',hist);
             vb();
-          }}>💾 Save Workout</button>
+          }}>💾 Save Workout ({session.fmtElapsed})</button>
         </div>
       </div>
+      {showRest&&<RestTimer seconds={showRest} onDone={()=>setShowRest(null)} onSkip={()=>setShowRest(null)}/>}
     </div>
   );
 };
@@ -481,7 +620,7 @@ const WorkoutTab=()=>{
     <>
       <div className="hdr">
         <h1>IronClad Pro</h1>
-        <p>v14.0 · Trail Runner Recovery · 3-Day Program</p>
+        <p>v15.0 · Trail Runner Recovery · 3-Day Program</p>
       </div>
       <div className="scroll">
         <div className="section-t">Phase</div>
@@ -492,7 +631,7 @@ const WorkoutTab=()=>{
             </button>
           ))}
         </div>
-        {pMeta && <div className="card" style={{padding:14,marginBottom:16}}>
+        {pMeta&&<div className="card" style={{padding:14,marginBottom:16}}>
           <div style={{fontWeight:700,fontSize:15,marginBottom:4}}>{pMeta.icon} {pMeta.n} <span style={{fontWeight:400,color:'var(--t2)',fontSize:13}}>— {pMeta.wks}</span></div>
           <div style={{fontSize:13,color:'var(--t2)',lineHeight:1.5}}>{pMeta.d}</div>
         </div>}
@@ -541,9 +680,20 @@ const WorkoutTab=()=>{
 // === PROGRESS TAB ===
 const ProgressTab=()=>{
   const hist=ld('history',[]);
+  const weightLog=ld('weightLog',[]);
   const totalWorkouts=hist.length;
   const thisWeek=hist.filter(h=>{const d=new Date(h.date);const now=new Date();const diff=(now-d)/(1000*60*60*24);return diff<=7}).length;
   const streak=(()=>{let s=0;const sorted=[...hist].sort((a,b)=>new Date(b.date)-new Date(a.date));let lastDate=new Date();for(const h of sorted){const d=new Date(h.date);const diff=Math.floor((lastDate-d)/(1000*60*60*24));if(diff<=1){s++;lastDate=d}else break}return s})();
+  const avgDuration=hist.length>0?Math.round(hist.filter(h=>h.duration).reduce((a,h)=>a+(h.duration||0),0)/Math.max(1,hist.filter(h=>h.duration).length)):0;
+  const lastWeight=weightLog.length>0?weightLog[weightLog.length-1].w:'—';
+  const firstWeight=weightLog.length>1?weightLog[0].w:null;
+  const weightDiff=firstWeight&&lastWeight!=='—'?(lastWeight-firstWeight).toFixed(1):null;
+
+  // Sparkline
+  const sparkData=weightLog.slice(-20);
+  const sparkMin=sparkData.length?Math.min(...sparkData.map(d=>d.w)):0;
+  const sparkMax=sparkData.length?Math.max(...sparkData.map(d=>d.w)):100;
+  const sparkRange=sparkMax-sparkMin||1;
 
   return(
     <>
@@ -553,13 +703,39 @@ const ProgressTab=()=>{
           <div className="stat-card"><div className="val" style={{color:'var(--grn)'}}>{totalWorkouts}</div><div className="lbl">Total Workouts</div></div>
           <div className="stat-card"><div className="val" style={{color:'var(--blu)'}}>{thisWeek}</div><div className="lbl">This Week</div></div>
           <div className="stat-card"><div className="val" style={{color:'var(--org)'}}>{streak}🔥</div><div className="lbl">Day Streak</div></div>
-          <div className="stat-card"><div className="val" style={{color:'var(--pur)'}}>{ld('bodyweight','—')}</div><div className="lbl">Body Weight (kg)</div></div>
+          <div className="stat-card"><div className="val" style={{color:'var(--pur)'}}>{lastWeight}</div><div className="lbl">Body Weight (kg)</div></div>
         </div>
+
+        {weightLog.length>1&&<>
+        <div className="section-t">Body Weight Trend</div>
+        <div className="card" style={{padding:16}}>
+          <div style={{display:'flex',justifyContent:'space-between',alignItems:'baseline',marginBottom:12}}>
+            <div>
+              <span style={{fontSize:24,fontWeight:700}}>{lastWeight}</span>
+              <span style={{fontSize:13,color:'var(--t2)',marginLeft:4}}>kg</span>
+            </div>
+            {weightDiff&&<div style={{fontSize:13,fontWeight:600,color:parseFloat(weightDiff)<0?'var(--grn)':'var(--red)'}}>
+              {parseFloat(weightDiff)<0?'↓':'↑'} {Math.abs(weightDiff)} kg
+            </div>}
+          </div>
+          <div className="wt-spark">
+            {sparkData.map((d,i)=>{
+              const h=Math.max(8,((d.w-sparkMin)/sparkRange)*52);
+              const isLast=i===sparkData.length-1;
+              return <div key={i} className="wt-bar" style={{height:h,background:isLast?'var(--grn)':parseFloat(d.w)<=parseFloat(sparkData[0].w)?'var(--grn-d)':'var(--red-d)'}} title={`${d.w}kg`}/>;
+            })}
+          </div>
+        </div>
+        </>}
+
         <div className="section-t">Recent Workouts</div>
         {hist.length===0&&<div style={{color:'var(--t3)',textAlign:'center',padding:40}}>No workouts logged yet. Get after it!</div>}
         {[...hist].reverse().slice(0,20).map((h,i)=>(
           <div key={i} className="hist-item">
-            <div><div style={{fontWeight:600}}>{h.day}</div><div style={{fontSize:13,color:'var(--t2)'}}>{fmtDate(h.date)}</div></div>
+            <div>
+              <div style={{fontWeight:600}}>{h.day}</div>
+              <div style={{fontSize:13,color:'var(--t2)'}}>{fmtDate(h.date)}{h.duration?` · ${fmtTime(h.duration)}`:''}</div>
+            </div>
             <span className="badge badge-g">{h.completed}/{h.total}</span>
           </div>
         ))}
@@ -609,19 +785,31 @@ const LibraryTab=()=>{
 
 // === SETTINGS TAB ===
 const SettingsTab=()=>{
-  const[bw,setBw]=useState(ld('bodyweight',''));
+  const[bw,setBw]=useState('');
   const[toast,setToast]=useState('');
+  const weightLog=ld('weightLog',[]);
+
+  const saveWeight=()=>{
+    if(!bw||isNaN(parseFloat(bw)))return;
+    const log=[...weightLog,{date:new Date().toISOString(),w:parseFloat(bw)}];
+    sv('weightLog',log);
+    // Also save as current for backward compat
+    sv('bodyweight',bw);
+    setBw('');
+    setToast('Weight logged: '+bw+' kg');
+    vb();
+  };
 
   const clearAll=()=>{
     if(confirm('Clear all workout data? This cannot be undone.')){
-      const keys=Object.keys(localStorage).filter(k=>k.startsWith('ic13_'));
+      const keys=Object.keys(localStorage).filter(k=>k.startsWith('ic15_'));
       keys.forEach(k=>localStorage.removeItem(k));
       setToast('All data cleared');
     }
   };
 
   const exportData=()=>{
-    const keys=Object.keys(localStorage).filter(k=>k.startsWith('ic13_'));
+    const keys=Object.keys(localStorage).filter(k=>k.startsWith('ic15_'));
     const data={};
     keys.forEach(k=>{try{data[k]=JSON.parse(localStorage.getItem(k))}catch{data[k]=localStorage.getItem(k)}});
     const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
@@ -634,14 +822,28 @@ const SettingsTab=()=>{
 
   return(
     <>
-      <div className="hdr"><h1>Settings</h1><p>IronClad Pro v14.0</p></div>
+      <div className="hdr"><h1>Settings</h1><p>IronClad Pro v15.0</p></div>
       <div className="scroll">
         <div className="section-t">Body Stats</div>
         <div className="card" style={{padding:16}}>
           <div style={{fontSize:14,color:'var(--t2)',marginBottom:8}}>Body Weight (kg)</div>
           <div style={{display:'flex',gap:8}}>
-            <input className="inp" type="number" inputMode="decimal" placeholder="e.g. 85" value={bw} onChange={e=>setBw(e.target.value)} style={{textAlign:'left',padding:'0 14px'}}/>
-            <button className="btn btn-g" onClick={()=>{sv('bodyweight',bw);setToast('Weight saved');vb()}}>Save</button>
+            <input className="inp" type="number" inputMode="decimal" placeholder="e.g. 88.5" value={bw} onChange={e=>setBw(e.target.value)} style={{textAlign:'left',padding:'0 14px'}}/>
+            <button className="btn btn-g" onClick={saveWeight}>Save</button>
+          </div>
+          {weightLog.length>0&&<div style={{marginTop:12,fontSize:13,color:'var(--t2)'}}>
+            Last: {weightLog[weightLog.length-1].w} kg · {weightLog.length} entries logged
+          </div>}
+        </div>
+
+        <div className="section-t">Rest Timer</div>
+        <div className="card" style={{padding:16}}>
+          <div style={{fontSize:13,color:'var(--t2)',marginBottom:8}}>Auto-starts between sets. Shorter rest = more calorie burn. Toggle on/off in workout view.</div>
+          <div style={{display:'flex',gap:8}}>
+            {REST_OPTIONS.map(s=>{
+              const current=ld('restTime',60);
+              return <button key={s} className={`phase-btn${current===s?' on':''}`} onClick={()=>{sv('restTime',s);setToast(`Rest timer: ${s}s`);vb()}}>{s}s</button>;
+            })}
           </div>
         </div>
 
@@ -649,7 +851,7 @@ const SettingsTab=()=>{
         <div className="card" style={{padding:16}}>
           <div style={{fontWeight:600,fontSize:16,marginBottom:8}}>Trail Runner Recovery Program</div>
           <div style={{fontSize:13,color:'var(--t2)',lineHeight:1.5}}>
-            3-day full body split with 4 progressive phases. Foundation builds base strength and begins knee rehab. Build adds progressive overload and barbell work. Strength & Power peaks with heavy loads and explosive movements. Maintain & Perform sustains your gains while running volume increases. Your trainer's prescribed exercises stay constant throughout all phases. Each phase tracks progress independently.
+            3-day full body split with 4 progressive phases and metabolic finishers. Foundation builds base strength and begins knee rehab. Build adds progressive overload and barbell work. Strength & Power peaks with heavy loads and explosive movements. Maintain & Perform sustains your gains while running volume increases. Your trainer's prescribed exercises stay constant throughout all phases. Each phase tracks progress independently.
           </div>
         </div>
 
@@ -660,7 +862,7 @@ const SettingsTab=()=>{
         </div>
 
         <div style={{textAlign:'center',padding:'32px 0',color:'var(--t3)',fontSize:12}}>
-          IronClad Pro v14.0 · Trail Runner Recovery Edition<br/>
+          IronClad Pro v15.0 · Trail Runner Recovery Edition<br/>
           Built for Matt · Knee-safe · All exercises vetted
         </div>
       </div>
