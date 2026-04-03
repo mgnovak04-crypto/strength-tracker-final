@@ -114,6 +114,26 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--t1);font-
 .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin-top:8px}
 .cal-cell{aspect-ratio:1;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600}
 .cal-label{font-size:10px;color:var(--t3);text-align:center;padding-bottom:2px}
+/* PAIN SCALE */
+.pain-row{display:flex;gap:4px;align-items:center}
+.pain-dot{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;cursor:pointer;border:2px solid transparent;transition:all .2s}
+/* RPE SELECTOR */
+.rpe-row{display:flex;gap:4px;margin:8px 0}
+.rpe-btn{width:32px;height:32px;border-radius:8px;border:1.5px solid var(--c3);background:none;color:var(--t2);font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .2s}
+.rpe-btn.on{border-color:var(--org);background:var(--org-d);color:var(--org)}
+/* MINI CHART */
+.mini-chart{display:flex;align-items:flex-end;gap:2px;height:40px}
+.mini-bar{flex:1;border-radius:2px 2px 0 0;min-width:4px;transition:height .3s}
+/* READINESS */
+.readiness-row{display:flex;gap:12px;margin:8px 0}
+.readiness-item{flex:1;text-align:center}
+.readiness-item .emoji-row{display:flex;justify-content:center;gap:4px;margin-top:4px}
+.readiness-emoji{font-size:20px;cursor:pointer;opacity:0.3;transition:opacity .2s}
+.readiness-emoji.on{opacity:1}
+/* RUNNING LOG */
+.run-stat{display:flex;flex-direction:column;align-items:center;padding:8px 0}
+.run-stat .val{font-size:18px;font-weight:700}
+.run-stat .lbl{font-size:11px;color:var(--t2)}
 </style>
 </head>
 <body>
@@ -480,6 +500,159 @@ const useSessionTimer=()=>{
   return{elapsed,running,start,stop,fmtElapsed:fmtTime(elapsed)};
 };
 
+// === PAIN SCALE ===
+const painColor=(v)=>v<=2?'var(--grn)':v<=4?'var(--yel)':v<=6?'var(--org)':'var(--red)';
+const PainScale=({value,onChange,label})=>(
+  <div>
+    <div style={{fontSize:13,color:'var(--t2)',marginBottom:6}}>{label||'Knee Pain'} <span style={{fontWeight:600,color:value!=null?painColor(value):'var(--t3)'}}>{value!=null?value+'/10':'—'}</span></div>
+    <div className="pain-row">
+      {[0,1,2,3,4,5,6,7,8,9,10].map(v=>(
+        <div key={v} className="pain-dot" onClick={()=>{onChange(v);vb()}} style={{
+          background:value===v?painColor(v)+'25':'var(--c2)',
+          color:value===v?painColor(v):'var(--t3)',
+          borderColor:value===v?painColor(v):'transparent',
+          fontSize:v===0||v===10?10:12
+        }}>{v}</div>
+      ))}
+    </div>
+  </div>
+);
+
+// === RPE SELECTOR ===
+const RPESelector=({value,onChange})=>(
+  <div>
+    <div style={{fontSize:13,color:'var(--t2)',marginBottom:4}}>How hard did this feel? <span style={{fontWeight:600,color:value?'var(--org)':'var(--t3)'}}>{value?`RPE ${value}`:''}</span></div>
+    <div className="rpe-row">
+      {[1,2,3,4,5,6,7,8,9,10].map(v=>(
+        <button key={v} className={`rpe-btn${value===v?' on':''}`} onClick={()=>{onChange(v);vb()}}>{v}</button>
+      ))}
+    </div>
+    <div style={{fontSize:11,color:'var(--t3)',display:'flex',justifyContent:'space-between'}}>
+      <span>Easy</span><span>Max effort</span>
+    </div>
+  </div>
+);
+
+// === RECOVERY READINESS CHECK-IN ===
+const ReadinessCheckIn=({onSave})=>{
+  const[sleep,setSleep]=useState(null);
+  const[soreness,setSoreness]=useState(null);
+  const[energy,setEnergy]=useState(null);
+  const[mood,setMood]=useState(null);
+  const today=new Date().toISOString().slice(0,10);
+  const existing=ld('readiness',{});
+  const todayData=existing[today];
+
+  if(todayData)return(
+    <div className="card" style={{padding:14}}>
+      <div style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}>
+        <span style={{fontSize:13,fontWeight:600}}>Today's Check-In</span>
+        <span style={{fontSize:20}}>{todayData.sleep}{todayData.soreness}{todayData.energy}{todayData.mood}</span>
+      </div>
+      <div style={{fontSize:12,color:'var(--t2)',marginTop:4}}>
+        Readiness: {Math.round(((todayData.sleepVal+todayData.sorenessVal+todayData.energyVal+todayData.moodVal)/4)*100)}%
+      </div>
+    </div>
+  );
+
+  const sleepOpts=['😴','😐','😊','🌟'];
+  const sorenessOpts=['🔥','😣','😌','💪'];
+  const energyOpts=['🪫','😮‍💨','⚡','🚀'];
+  const moodOpts=['😞','😐','😊','🔥'];
+
+  const save=()=>{
+    if(sleep===null||soreness===null||energy===null||mood===null)return;
+    const data={...existing,[today]:{
+      sleep:sleepOpts[sleep],soreness:sorenessOpts[soreness],energy:energyOpts[energy],mood:moodOpts[mood],
+      sleepVal:sleep/3,sorenessVal:soreness/3,energyVal:energy/3,moodVal:mood/3,date:today
+    }};
+    sv('readiness',data);
+    if(onSave)onSave();
+    vb();
+  };
+
+  return(
+    <div className="card" style={{padding:14}}>
+      <div style={{fontSize:14,fontWeight:600,marginBottom:10}}>Daily Check-In</div>
+      <div className="readiness-row">
+        {[{label:'Sleep',opts:sleepOpts,val:sleep,set:setSleep},{label:'Soreness',opts:sorenessOpts,val:soreness,set:setSoreness},{label:'Energy',opts:energyOpts,val:energy,set:setEnergy},{label:'Mood',opts:moodOpts,val:mood,set:setMood}].map(item=>(
+          <div key={item.label} className="readiness-item">
+            <div style={{fontSize:11,color:'var(--t2)',fontWeight:600}}>{item.label}</div>
+            <div className="emoji-row">
+              {item.opts.map((e,i)=><span key={i} className={`readiness-emoji${item.val===i?' on':''}`} onClick={()=>item.set(i)}>{e}</span>)}
+            </div>
+          </div>
+        ))}
+      </div>
+      <button className="btn btn-g" style={{width:'100%',marginTop:8,padding:10}} onClick={save} disabled={sleep===null||soreness===null||energy===null||mood===null}>Save Check-In</button>
+    </div>
+  );
+};
+
+// === RUNNING LOG ===
+const RunningLog=({onToast})=>{
+  const[dist,setDist]=useState('');
+  const[time,setTime]=useState('');
+  const[terrain,setTerrain]=useState('road');
+  const[kneeFeel,setKneeFeel]=useState(null);
+  const[runNote,setRunNote]=useState('');
+  const runs=ld('runLog',[]);
+
+  const saveRun=()=>{
+    if(!dist&&!time)return;
+    const entry={date:new Date().toISOString(),dist:parseFloat(dist)||0,time:parseInt(time)||0,terrain,kneeFeel,note:runNote||undefined};
+    if(entry.dist>0&&entry.time>0)entry.pace=Math.round(entry.time/entry.dist*10)/10;
+    const newRuns=[...runs,entry];
+    sv('runLog',newRuns);
+    setDist('');setTime('');setRunNote('');setKneeFeel(null);
+    if(onToast)onToast('Run logged');
+    vb();
+  };
+
+  const recentRuns=runs.slice(-5).reverse();
+  const totalDist=runs.reduce((a,r)=>a+(r.dist||0),0);
+  const weekRuns=runs.filter(r=>{const d=new Date(r.date);return(new Date()-d)/(1000*60*60*24)<=7});
+  const weekDist=weekRuns.reduce((a,r)=>a+(r.dist||0),0);
+
+  return(
+    <div>
+      <div className="card" style={{padding:14}}>
+        <div style={{fontSize:14,fontWeight:600,marginBottom:10}}>Log a Run</div>
+        <div style={{display:'flex',gap:8,marginBottom:8}}>
+          <input className="inp" type="number" inputMode="decimal" placeholder="km" value={dist} onChange={e=>setDist(e.target.value)} style={{textAlign:'center'}}/>
+          <input className="inp" type="number" inputMode="numeric" placeholder="min" value={time} onChange={e=>setTime(e.target.value)} style={{textAlign:'center'}}/>
+        </div>
+        <div style={{display:'flex',gap:6,marginBottom:8}}>
+          {['road','trail','track','treadmill'].map(t=>(
+            <button key={t} className={`phase-btn${terrain===t?' on':''}`} style={{flex:1,padding:'6px 0',fontSize:12}} onClick={()=>setTerrain(t)}>{t}</button>
+          ))}
+        </div>
+        <PainScale value={kneeFeel} onChange={setKneeFeel} label="Knee feel after"/>
+        <input className="inp" placeholder="Run notes (optional)" value={runNote} onChange={e=>setRunNote(e.target.value)} style={{width:'100%',marginTop:8,textAlign:'left',padding:'0 14px',height:36}}/>
+        <button className="btn btn-g" style={{width:'100%',marginTop:8,padding:10}} onClick={saveRun}>Save Run</button>
+      </div>
+
+      {runs.length>0&&<div className="card" style={{padding:14,marginTop:12}}>
+        <div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:8,marginBottom:12}}>
+          <div className="run-stat"><span className="val" style={{color:'var(--grn)'}}>{totalDist.toFixed(1)}</span><span className="lbl">Total km</span></div>
+          <div className="run-stat"><span className="val" style={{color:'var(--blu)'}}>{weekDist.toFixed(1)}</span><span className="lbl">This Week km</span></div>
+          <div className="run-stat"><span className="val" style={{color:'var(--org)'}}>{runs.length}</span><span className="lbl">Total Runs</span></div>
+        </div>
+        {recentRuns.map((r,i)=>(
+          <div key={i} style={{padding:'8px 0',borderTop:i>0?'0.5px solid var(--sep)':'none',display:'flex',justifyContent:'space-between',alignItems:'center'}}>
+            <div>
+              <div style={{fontWeight:600,fontSize:14}}>{r.dist}km · {r.time}min{r.pace?` · ${r.pace}min/km`:''}</div>
+              <div style={{fontSize:12,color:'var(--t2)'}}>{fmtDate(r.date)} · {r.terrain}{r.kneeFeel!=null?` · Knee: ${r.kneeFeel}/10`:''}</div>
+              {r.note&&<div style={{fontSize:11,color:'var(--t3)',fontStyle:'italic'}}>{r.note}</div>}
+            </div>
+            {r.kneeFeel!=null&&<span style={{fontSize:11,fontWeight:700,color:painColor(r.kneeFeel)}}>{r.kneeFeel}/10</span>}
+          </div>
+        ))}
+      </div>}
+    </div>
+  );
+};
+
 // === 1RM ESTIMATOR (Brzycki formula) ===
 const est1RM=(weight,reps)=>{
   const w=parseFloat(weight);const r=parseInt(reps);
@@ -680,6 +853,8 @@ const DayView=({day,phase,onBack})=>{
   const[restEnabled,setRestEnabled]=useState(()=>ld('restEnabled',true));
   const[toast,setToast]=useState('');
   const[note,setNote]=useState('');
+  const[kneePain,setKneePain]=useState(null);
+  const[rpe,setRpe]=useState(null);
   const[showComplete,setShowComplete]=useState(false);
   const[tick,setTick]=useState(0);
   const session=useSessionTimer();
@@ -733,7 +908,7 @@ const DayView=({day,phase,onBack})=>{
     session.stop();
     const ts=new Date().toISOString();
     const hist=ld('history',[]);
-    hist.push({day:day.n,date:ts,completed,total:totalEx,duration:session.elapsed,note:note||undefined,volume:totalVolume||undefined});
+    hist.push({day:day.n,date:ts,completed,total:totalEx,duration:session.elapsed,note:note||undefined,volume:totalVolume||undefined,kneePain:kneePain!=null?kneePain:undefined,rpe:rpe||undefined});
     sv('history',hist);
     vb();
     setShowComplete(true);
@@ -776,10 +951,14 @@ const DayView=({day,phase,onBack})=>{
             ))}
           </div>
         )})}
-        <div style={{marginTop:16,marginBottom:24}}>
-          <input className="inp" placeholder="Add a note about this workout (optional)" value={note} onChange={e=>setNote(e.target.value)} style={{width:'100%',marginBottom:10,textAlign:'left',padding:'0 14px',height:44}}/>
-          <button className="btn btn-g" style={{width:'100%',padding:14}} onClick={saveWorkout}>💾 Save Workout ({session.fmtElapsed})</button>
+        <div className="card" style={{padding:16,marginTop:16}}>
+          <div style={{fontSize:16,fontWeight:700,marginBottom:12}}>Finish Workout</div>
+          <PainScale value={kneePain} onChange={setKneePain} label="Knee pain/discomfort"/>
+          <div style={{marginTop:12}}><RPESelector value={rpe} onChange={setRpe}/></div>
+          <input className="inp" placeholder="Notes (optional)" value={note} onChange={e=>setNote(e.target.value)} style={{width:'100%',marginTop:12,textAlign:'left',padding:'0 14px',height:44}}/>
+          <button className="btn btn-g" style={{width:'100%',padding:14,marginTop:12}} onClick={saveWorkout}>💾 Save Workout ({session.fmtElapsed})</button>
         </div>
+        <div style={{height:24}}/>
       </div>
       {showRest&&<RestTimer seconds={showRest} onDone={()=>setShowRest(null)} onSkip={()=>setShowRest(null)}/>}
       {showComplete&&<CompletionSummary day={day} completed={completed} total={totalEx} duration={session.elapsed} onClose={()=>{setShowComplete(false);onBack()}}/>}
@@ -863,8 +1042,12 @@ const ProgressTab=()=>{
   const[hist,setHist]=useState(()=>ld('history',[]));
   const[showAll,setShowAll]=useState(false);
   const[prView,setPrView]=useState(false);
+  const[showLiftChart,setShowLiftChart]=useState(null);
+  const[tick,setTick]=useState(0);
   const weightLog=ld('weightLog',[]);
   const prs=ld('prs',{});
+  const exHistory=ld('exHistory',{});
+  const runs=ld('runLog',[]);
   const totalWorkouts=hist.length;
   const thisWeek=hist.filter(h=>{const d=new Date(h.date);const now=new Date();const diff=(now-d)/(1000*60*60*24);return diff<=7}).length;
   const streak=(()=>{let s=0;const sorted=[...hist].sort((a,b)=>new Date(b.date)-new Date(a.date));let lastDate=new Date();for(const h of sorted){const d=new Date(h.date);const diff=Math.floor((lastDate-d)/(1000*60*60*24));if(diff<=1){s++;lastDate=d}else break}return s})();
@@ -879,6 +1062,47 @@ const ProgressTab=()=>{
     const nh=[...hist];nh.splice(realIdx,1);setHist(nh);sv('history',nh);
   };
 
+  // Knee pain trend
+  const painData=hist.filter(h=>h.kneePain!=null).slice(-15);
+  const avgPain=painData.length>0?Math.round(painData.reduce((a,h)=>a+h.kneePain,0)/painData.length*10)/10:null;
+  const recentPain=painData.length>0?painData[painData.length-1].kneePain:null;
+  const painTrend=painData.length>=3?(painData.slice(-3).reduce((a,h)=>a+h.kneePain,0)/3-painData.slice(0,3).reduce((a,h)=>a+h.kneePain,0)/3):null;
+
+  // RPE trend
+  const rpeData=hist.filter(h=>h.rpe).slice(-10);
+  const avgRpe=rpeData.length>0?Math.round(rpeData.reduce((a,h)=>a+h.rpe,0)/rpeData.length*10)/10:null;
+
+  // Running stats
+  const weekRuns=runs.filter(r=>(new Date()-new Date(r.date))/(1000*60*60*24)<=7);
+  const weekRunDist=weekRuns.reduce((a,r)=>a+(r.dist||0),0);
+  const totalRunDist=runs.reduce((a,r)=>a+(r.dist||0),0);
+
+  // Key lift progression (exercises with history)
+  const liftProgressions=Object.entries(exHistory).filter(([eid,h])=>{
+    const ex=getEx(eid);return ex.t==='w'&&h.length>=2;
+  }).map(([eid,h])=>{
+    const ex=getEx(eid);
+    const entries=h.slice(-12).map(e=>{const maxW=Math.max(...e.sets.map(s=>parseFloat(s.w)||0));return{date:e.date,w:maxW}}).filter(e=>e.w>0);
+    return{eid,ex,entries};
+  }).filter(l=>l.entries.length>=2).sort((a,b)=>b.entries.length-a.entries.length);
+
+  // Muscle group volume from exercise history
+  const weekHist=hist.filter(h=>(new Date()-new Date(h.date))/(1000*60*60*24)<=7);
+  const muscleVolume={};
+  Object.entries(exHistory).forEach(([eid,sessions])=>{
+    const ex=getEx(eid);
+    const weekSessions=sessions.filter(s=>(new Date()-new Date(s.date))/(1000*60*60*24)<=7);
+    weekSessions.forEach(s=>{
+      const vol=s.sets.reduce((a,set)=>a+(parseFloat(set.w)||0)*(parseInt(set.r)||1),0);
+      const sets=s.sets.length;
+      if(!muscleVolume[ex.m])muscleVolume[ex.m]={volume:0,sets:0};
+      muscleVolume[ex.m].volume+=vol;
+      muscleVolume[ex.m].sets+=sets;
+    });
+  });
+  const mvEntries=Object.entries(muscleVolume).sort((a,b)=>b[1].volume-a[1].volume);
+  const maxMV=mvEntries.length>0?mvEntries[0][1].volume:1;
+
   // PR list
   const prList=Object.entries(prs).map(([eid,w])=>({ex:getEx(eid),w})).filter(p=>p.ex.n!=='Unknown').sort((a,b)=>b.w-a.w);
 
@@ -888,18 +1112,118 @@ const ProgressTab=()=>{
   const sparkMax=sparkData.length?Math.max(...sparkData.map(d=>d.w)):100;
   const sparkRange=sparkMax-sparkMin||1;
 
+  // Readiness data
+  const readiness=ld('readiness',{});
+  const readinessEntries=Object.values(readiness).sort((a,b)=>a.date>b.date?1:-1).slice(-14);
+  const avgReadiness=readinessEntries.length>0?Math.round(readinessEntries.reduce((a,r)=>a+((r.sleepVal+r.sorenessVal+r.energyVal+r.moodVal)/4),0)/readinessEntries.length*100):null;
+
   const displayed=showAll?[...hist].reverse():[...hist].reverse().slice(0,20);
 
   return(
     <>
       <div className="hdr"><h1>Progress</h1><p>Track your recovery journey</p></div>
       <div className="scroll">
-        <div className="stat-grid">
+        <ReadinessCheckIn onSave={()=>setTick(t=>t+1)}/>
+
+        <div className="stat-grid" style={{marginTop:12}}>
           <div className="stat-card"><div className="val" style={{color:'var(--grn)'}}>{totalWorkouts}</div><div className="lbl">Total Workouts</div></div>
           <div className="stat-card"><div className="val" style={{color:'var(--blu)'}}>{thisWeek}</div><div className="lbl">This Week</div></div>
           <div className="stat-card"><div className="val" style={{color:'var(--org)'}}>{streak}🔥</div><div className="lbl">Day Streak</div></div>
           <div className="stat-card"><div className="val" style={{color:'var(--pur)'}}>{avgDuration?fmtTime(avgDuration):'—'}</div><div className="lbl">Avg Duration</div></div>
         </div>
+
+        {/* RECOVERY INSIGHTS */}
+        {(painData.length>0||avgRpe||avgReadiness||runs.length>0)&&<>
+          <div className="section-t">Recovery & Load</div>
+          <div className="card" style={{padding:14}}>
+            {recentPain!=null&&<div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:8}}>
+              <span style={{fontSize:13,color:'var(--t2)'}}>Knee Pain (last)</span>
+              <div style={{display:'flex',alignItems:'center',gap:6}}>
+                <span style={{fontWeight:700,color:painColor(recentPain)}}>{recentPain}/10</span>
+                {painTrend!=null&&<span style={{fontSize:11,fontWeight:600,color:painTrend<0?'var(--grn)':painTrend>0?'var(--red)':'var(--t3)'}}>
+                  {painTrend<-0.5?'↓ improving':painTrend>0.5?'↑ worsening':'→ stable'}
+                </span>}
+              </div>
+            </div>}
+            {painData.length>=3&&<div style={{marginBottom:10}}>
+              <div className="mini-chart">
+                {painData.map((p,i)=>(
+                  <div key={i} className="mini-bar" style={{height:`${Math.max(4,(p.kneePain/10)*40)}px`,background:painColor(p.kneePain)+'90'}}/>
+                ))}
+              </div>
+              <div style={{display:'flex',justifyContent:'space-between',fontSize:10,color:'var(--t3)',marginTop:2}}>
+                <span>{fmtDate(painData[0].date).split(' ').slice(0,2).join(' ')}</span>
+                <span>now</span>
+              </div>
+            </div>}
+            {avgRpe&&<div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:8}}>
+              <span style={{fontSize:13,color:'var(--t2)'}}>Avg RPE (last {rpeData.length})</span>
+              <span style={{fontWeight:700,color:avgRpe<=5?'var(--grn)':avgRpe<=7?'var(--org)':'var(--red)'}}>{avgRpe}/10</span>
+            </div>}
+            {avgReadiness&&<div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:8}}>
+              <span style={{fontSize:13,color:'var(--t2)'}}>Avg Readiness</span>
+              <span style={{fontWeight:700,color:avgReadiness>=70?'var(--grn)':avgReadiness>=40?'var(--org)':'var(--red)'}}>{avgReadiness}%</span>
+            </div>}
+            {runs.length>0&&<div style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}>
+              <span style={{fontSize:13,color:'var(--t2)'}}>Running (this week)</span>
+              <span style={{fontWeight:700,color:'var(--cyn)'}}>{weekRunDist.toFixed(1)}km / {weekRuns.length} runs</span>
+            </div>}
+          </div>
+        </>}
+
+        {/* MUSCLE GROUP VOLUME */}
+        {mvEntries.length>0&&<>
+          <div className="section-t">Weekly Muscle Volume</div>
+          <div className="card" style={{padding:14}}>
+            {mvEntries.slice(0,8).map(([mg,data],i)=>(
+              <div key={mg} style={{marginBottom:i<mvEntries.length-1?8:0}}>
+                <div style={{display:'flex',justifyContent:'space-between',fontSize:12,marginBottom:3}}>
+                  <span style={{fontWeight:600}}>{mg}</span>
+                  <span style={{color:'var(--t2)'}}>{data.sets} sets · {(data.volume/1000).toFixed(1)}t</span>
+                </div>
+                <div style={{height:6,background:'var(--c2)',borderRadius:3,overflow:'hidden'}}>
+                  <div style={{height:'100%',width:`${(data.volume/maxMV)*100}%`,background:'var(--grn)',borderRadius:3,transition:'width .3s'}}/>
+                </div>
+              </div>
+            ))}
+          </div>
+        </>}
+
+        {/* STRENGTH PROGRESSION */}
+        {liftProgressions.length>0&&<>
+          <div className="section-t">Strength Progression</div>
+          <div style={{display:'flex',gap:6,overflowX:'auto',paddingBottom:8,marginBottom:4}}>
+            {liftProgressions.slice(0,10).map(l=>(
+              <button key={l.eid} className={`phase-btn${showLiftChart===l.eid?' on':''}`} style={{fontSize:11,padding:'5px 10px'}} onClick={()=>setShowLiftChart(showLiftChart===l.eid?null:l.eid)}>{l.ex.n}</button>
+            ))}
+          </div>
+          {showLiftChart&&(()=>{
+            const lift=liftProgressions.find(l=>l.eid===showLiftChart);
+            if(!lift)return null;
+            const entries=lift.entries;
+            const min=Math.min(...entries.map(e=>e.w));
+            const max=Math.max(...entries.map(e=>e.w));
+            const range=max-min||1;
+            const first=entries[0].w;const last=entries[entries.length-1].w;
+            const change=last-first;
+            return(
+              <div className="card" style={{padding:14}}>
+                <div style={{display:'flex',justifyContent:'space-between',alignItems:'baseline',marginBottom:8}}>
+                  <span style={{fontWeight:600,fontSize:14}}>{lift.ex.n}</span>
+                  <span style={{fontSize:13,fontWeight:600,color:change>=0?'var(--grn)':'var(--red)'}}>{change>=0?'+':''}{change}kg</span>
+                </div>
+                <div className="mini-chart" style={{height:50}}>
+                  {entries.map((e,i)=>(
+                    <div key={i} className="mini-bar" style={{height:`${Math.max(6,((e.w-min)/range)*46)}px`,background:i===entries.length-1?'var(--grn)':'var(--grn-d)'}} title={`${e.w}kg`}/>
+                  ))}
+                </div>
+                <div style={{display:'flex',justifyContent:'space-between',fontSize:10,color:'var(--t3)',marginTop:4}}>
+                  <span>{first}kg</span><span>{last}kg (current)</span>
+                </div>
+              </div>
+            );
+          })()}
+        </>}
 
         {hist.length>0&&<>
         <div className="section-t">Activity (Last 8 Weeks)</div>
@@ -989,7 +1313,9 @@ const ProgressTab=()=>{
               <div style={{fontSize:13,color:'var(--t2)'}}>{fmtDate(h.date)}{h.duration?` · ${fmtTime(h.duration)}`:''}{h.volume?` · ${(h.volume/1000).toFixed(1)}t`:''}</div>
               {h.note&&<div style={{fontSize:12,color:'var(--t3)',marginTop:3,fontStyle:'italic'}}>{h.note}</div>}
             </div>
-            <div style={{display:'flex',alignItems:'center',gap:8}}>
+            <div style={{display:'flex',alignItems:'center',gap:6,flexWrap:'wrap',justifyContent:'flex-end'}}>
+              {h.kneePain!=null&&<span style={{fontSize:10,fontWeight:700,color:painColor(h.kneePain),background:painColor(h.kneePain)+'20',padding:'2px 6px',borderRadius:4}}>🦵{h.kneePain}</span>}
+              {h.rpe&&<span style={{fontSize:10,fontWeight:700,color:'var(--org)',background:'var(--org-d)',padding:'2px 6px',borderRadius:4}}>RPE {h.rpe}</span>}
               <span className="badge badge-g">{h.completed}/{h.total}</span>
               <button onClick={()=>deleteHistEntry(i)} style={{background:'none',border:'none',color:'var(--t3)',fontSize:16,cursor:'pointer',padding:4}}>×</button>
             </div>
@@ -1157,12 +1483,76 @@ const SettingsTab=()=>{
   );
 };
 
+// === RECOVERY TAB ===
+const RecoveryTab=()=>{
+  const[toast,setToast]=useState('');
+  const[tick,setTick]=useState(0);
+  const hist=ld('history',[]);
+  const runs=ld('runLog',[]);
+  const readiness=ld('readiness',{});
+
+  // Readiness trend (last 14 days)
+  const readinessEntries=Object.values(readiness).sort((a,b)=>a.date>b.date?1:-1).slice(-14);
+
+  // Knee pain from runs
+  const runPainData=runs.filter(r=>r.kneeFeel!=null).slice(-10);
+
+  return(
+    <>
+      <div className="hdr"><h1>Recovery</h1><p>Running, readiness & rehab tracking</p></div>
+      <div className="scroll">
+        <ReadinessCheckIn onSave={()=>setTick(t=>t+1)}/>
+
+        {readinessEntries.length>=3&&<>
+          <div className="section-t">Readiness Trend</div>
+          <div className="card" style={{padding:14}}>
+            <div className="mini-chart" style={{height:50}}>
+              {readinessEntries.map((r,i)=>{
+                const val=(r.sleepVal+r.sorenessVal+r.energyVal+r.moodVal)/4;
+                return <div key={i} className="mini-bar" style={{height:`${Math.max(4,val*46)}px`,background:val>=0.66?'var(--grn)':val>=0.33?'var(--org)':'var(--red)'}} title={`${Math.round(val*100)}%`}/>;
+              })}
+            </div>
+            <div style={{display:'flex',justifyContent:'space-between',fontSize:10,color:'var(--t3)',marginTop:4}}>
+              <span>{readinessEntries[0].date}</span><span>today</span>
+            </div>
+          </div>
+        </>}
+
+        <div className="section-t">Running</div>
+        <RunningLog onToast={(msg)=>{setToast(msg);setTick(t=>t+1)}}/>
+
+        {runPainData.length>=3&&<>
+          <div className="section-t" style={{marginTop:16}}>Knee Feel After Runs</div>
+          <div className="card" style={{padding:14}}>
+            <div className="mini-chart" style={{height:40}}>
+              {runPainData.map((r,i)=>(
+                <div key={i} className="mini-bar" style={{height:`${Math.max(4,(r.kneeFeel/10)*36)}px`,background:painColor(r.kneeFeel)+'90'}} title={`${r.kneeFeel}/10`}/>
+              ))}
+            </div>
+            <div style={{fontSize:11,color:'var(--t2)',marginTop:6,textAlign:'center'}}>
+              Avg: {(runPainData.reduce((a,r)=>a+r.kneeFeel,0)/runPainData.length).toFixed(1)}/10 · {runPainData.length<3?'Need more data':''}
+              {runPainData.length>=3&&(()=>{
+                const recent=runPainData.slice(-3).reduce((a,r)=>a+r.kneeFeel,0)/3;
+                const early=runPainData.slice(0,3).reduce((a,r)=>a+r.kneeFeel,0)/3;
+                return recent<early?' · Trending better':'';
+              })()}
+            </div>
+          </div>
+        </>}
+
+        {toast&&<Toast msg={toast} onClose={()=>setToast('')}/>}
+      </div>
+    </>
+  );
+};
+
 // === APP ===
 const App=()=>{
   const[tab,setTab]=useState(0);
   const tabs=[
     {n:'Workout',icon:<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M6.5 6.5h11M4 12h16M6.5 17.5h11"/><circle cx="4" cy="6.5" r="2"/><circle cx="20" cy="12" r="2"/><circle cx="4" cy="17.5" r="2"/></svg>},
     {n:'Progress',icon:<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 20h18M6 16V8M10 16V4M14 16v-5M18 16V9"/></svg>},
+    {n:'Recovery',icon:<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 21c-4.97 0-9-4.03-9-9s4.03-9 9-9 9 4.03 9 9"/><path d="M12 7v5l3 3"/><path d="M19 16v6M16 19h6"/></svg>},
     {n:'Library',icon:<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M4 6h16M4 12h16M4 18h10"/></svg>},
     {n:'Settings',icon:<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>}
   ];
@@ -1171,8 +1561,9 @@ const App=()=>{
     <div className="app">
       {tab===0&&<WorkoutTab/>}
       {tab===1&&<ProgressTab/>}
-      {tab===2&&<LibraryTab/>}
-      {tab===3&&<SettingsTab/>}
+      {tab===2&&<RecoveryTab/>}
+      {tab===3&&<LibraryTab/>}
+      {tab===4&&<SettingsTab/>}
       <div className="tabs">
         {tabs.map((t,i)=>(
           <button key={i} className={`tab${tab===i?' on':''}`} onClick={()=>{setTab(i);vb()}}>
