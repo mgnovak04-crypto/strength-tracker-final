@@ -102,6 +102,18 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--t1);font-
 .wt-bar{flex:1;border-radius:3px 3px 0 0;min-width:6px;transition:height .3s}
 /* SESSION TIMER */
 .session-timer{display:flex;align-items:center;gap:6px;font-variant-numeric:tabular-nums;font-size:14px;font-weight:600;color:var(--org)}
+/* COMPLETION OVERLAY */
+.complete-overlay{position:fixed;inset:0;z-index:2500;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.9);backdrop-filter:blur(16px);animation:fadeIn .4s ease-out}
+@keyframes fadeIn{from{opacity:0}}
+.complete-card{text-align:center;padding:32px;animation:scaleIn .5s ease-out}
+@keyframes scaleIn{from{transform:scale(0.8);opacity:0}to{transform:scale(1);opacity:1}}
+.complete-stat{display:inline-flex;flex-direction:column;align-items:center;padding:12px 16px;margin:6px;background:var(--c1);border-radius:12px;min-width:80px}
+/* COUNTDOWN TIMER */
+.cd-timer{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:8px;font-size:14px;font-weight:700;font-variant-numeric:tabular-nums;cursor:pointer}
+/* ACTIVITY CALENDAR */
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin-top:8px}
+.cal-cell{aspect-ratio:1;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600}
+.cal-label{font-size:10px;color:var(--t3);text-align:center;padding-bottom:2px}
 </style>
 </head>
 <body>
@@ -468,6 +480,79 @@ const useSessionTimer=()=>{
   return{elapsed,running,start,stop,fmtElapsed:fmtTime(elapsed)};
 };
 
+// === 1RM ESTIMATOR (Brzycki formula) ===
+const est1RM=(weight,reps)=>{
+  const w=parseFloat(weight);const r=parseInt(reps);
+  if(!w||!r||r<1||r>30)return null;
+  if(r===1)return w;
+  return Math.round(w*(36/(37-r)));
+};
+
+// === COUNTDOWN TIMER (for duration exercises) ===
+const CountdownTimer=({targetSec})=>{
+  const[left,setLeft]=useState(targetSec||0);
+  const[active,setActive]=useState(false);
+  const[started,setStarted]=useState(false);
+
+  useEffect(()=>{
+    if(!active||left<=0){if(left<=0&&started){vb();vb();setActive(false)}return}
+    const t=setTimeout(()=>setLeft(l=>l-1),1000);
+    return()=>clearTimeout(t);
+  },[active,left,started]);
+
+  const toggle=()=>{
+    if(!started){setLeft(targetSec);setStarted(true);setActive(true)}
+    else if(active){setActive(false)}
+    else{setActive(true)}
+  };
+  const reset=()=>{setLeft(targetSec);setActive(false);setStarted(false)};
+  const done=left<=0&&started;
+
+  return(
+    <div style={{display:'flex',alignItems:'center',gap:6}}>
+      <div className="cd-timer" onClick={toggle} style={{background:done?'var(--grn-d)':active?'var(--org-d)':'var(--c2)',color:done?'var(--grn)':active?'var(--org)':'var(--t2)'}}>
+        {done?'Done':active?fmtTime(left):started?fmtTime(left):`${targetSec}s`}
+        {!done&&<span style={{fontSize:10}}>{active?'⏸':'▶'}</span>}
+      </div>
+      {started&&<span onClick={reset} style={{fontSize:12,color:'var(--t3)',cursor:'pointer'}}>↺</span>}
+    </div>
+  );
+};
+
+// === WORKOUT COMPLETION SUMMARY ===
+const CompletionSummary=({day,completed,total,duration,onClose})=>{
+  const pct=Math.round((completed/total)*100);
+  const exHist=ld('exHistory',{});
+  const prs=ld('prs',{});
+
+  // Count PRs hit this session (approximate - PRs logged today)
+  const today=new Date().toISOString().slice(0,10);
+  let prCount=0;
+  day.supersets.forEach(ss=>ss.ex.forEach(e=>{
+    const h=exHist[e.eid];
+    if(h){const last=h[h.length-1];if(last&&last.date.slice(0,10)===today){
+      last.sets.forEach(s=>{if(s.w&&parseFloat(s.w)===prs[e.eid])prCount++});
+    }}
+  }));
+
+  return(
+    <div className="complete-overlay" onClick={e=>e.target===e.currentTarget&&onClose()}>
+      <div className="complete-card">
+        <div style={{fontSize:64,marginBottom:12}}>{pct===100?'🏆':pct>=75?'💪':'👍'}</div>
+        <div style={{fontSize:28,fontWeight:700,marginBottom:4}}>Workout Complete!</div>
+        <div style={{fontSize:15,color:'var(--t2)',marginBottom:24}}>{day.n}</div>
+        <div style={{display:'flex',justifyContent:'center',flexWrap:'wrap',marginBottom:24}}>
+          <div className="complete-stat"><span style={{fontSize:22,fontWeight:700,color:'var(--grn)'}}>{pct}%</span><span style={{fontSize:11,color:'var(--t2)'}}>Completed</span></div>
+          <div className="complete-stat"><span style={{fontSize:22,fontWeight:700,color:'var(--blu)'}}>{completed}/{total}</span><span style={{fontSize:11,color:'var(--t2)'}}>Exercises</span></div>
+          <div className="complete-stat"><span style={{fontSize:22,fontWeight:700,color:'var(--org)'}}>{fmtTime(duration)}</span><span style={{fontSize:11,color:'var(--t2)'}}>Duration</span></div>
+          {prCount>0&&<div className="complete-stat"><span style={{fontSize:22,fontWeight:700,color:'var(--yel)'}}>{prCount}</span><span style={{fontSize:11,color:'var(--t2)'}}>New PRs</span></div>}
+        </div>
+        <button className="btn btn-g" onClick={onClose} style={{padding:'12px 40px'}}>Done</button>
+      </div>
+    </div>
+  );
+};
+
 // === PR TRACKER ===
 const getPR=(eid)=>{
   const prs=ld('prs',{});
@@ -530,7 +615,15 @@ const SetLogger=({exDef,dayId,ssIdx,exIdx,phase,onSetDone,onPR})=>{
     }
   };
 
+  const quickFill=()=>{
+    if(!lastSession)return;
+    const nv=[...vals];
+    lastSession.sets.forEach((s,i)=>{if(i<nv.length&&!nv[i].done){nv[i]={...nv[i],w:s.w||'',r:s.r||''}}});
+    setVals(nv);sv(logKey,nv);vb();
+  };
+
   const completed=vals.filter(v=>v.done).length;
+  const best1RM=isWeight?vals.reduce((best,v)=>{if(!v.w||!v.r)return best;const e=est1RM(v.w,parseInt(v.r)||0);return e&&e>best?e:best},0):0;
 
   return(
     <div className="log-area">
@@ -538,17 +631,20 @@ const SetLogger=({exDef,dayId,ssIdx,exIdx,phase,onSetDone,onPR})=>{
         <div style={{display:'flex',alignItems:'center',gap:8}}>
           <span style={{fontSize:13,color:'var(--t2)'}}>{completed}/{sets} sets</span>
           {isWeight&&currentPR&&<span style={{fontSize:11,color:'var(--yel)',fontWeight:600}}>PR: {currentPR}kg</span>}
+          {isWeight&&best1RM>0&&<span style={{fontSize:11,color:'var(--cyn)',fontWeight:600}}>~1RM: {best1RM}kg</span>}
         </div>
-        {ex.note&&<div style={{fontSize:11,color:'var(--t3)',maxWidth:'60%',textAlign:'right'}}>{ex.note}</div>}
+        {ex.note&&<div style={{fontSize:11,color:'var(--t3)',maxWidth:'50%',textAlign:'right'}}>{ex.note}</div>}
       </div>
-      {lastSession&&<div style={{fontSize:11,color:'var(--t3)',marginBottom:8,padding:'6px 8px',background:'var(--c2)',borderRadius:6}}>
-        Last: {lastSession.sets.map((s,i)=>`${s.w?s.w+'kg×':''}${s.r}`).join(' / ')} ({fmtDate(lastSession.date)})
+      {lastSession&&<div style={{fontSize:11,color:'var(--t3)',marginBottom:8,padding:'6px 8px',background:'var(--c2)',borderRadius:6,display:'flex',justifyContent:'space-between',alignItems:'center'}}>
+        <span>Last: {lastSession.sets.map((s,i)=>`${s.w?s.w+'kg×':''}${s.r}`).join(' / ')}</span>
+        <button onClick={quickFill} style={{background:'none',border:'1px solid var(--c3)',borderRadius:6,color:'var(--grn)',fontSize:10,fontWeight:600,padding:'2px 8px',cursor:'pointer',fontFamily:'inherit',whiteSpace:'nowrap',marginLeft:8}}>Fill</button>
       </div>}
       {vals.map((v,si)=>(
         <div key={si} className="set-row">
           <div className="set-num" style={v.done?{background:'var(--grn-d)',color:'var(--grn)'}:{}}>{si+1}</div>
           {isWeight&&<input className={`inp${v.w?' done':''}`} placeholder={lastSession?.sets[si]?.w?`${lastSession.sets[si].w}`:'kg'} type="number" inputMode="decimal" value={v.w} onChange={e=>update(si,'w',e.target.value)} style={{maxWidth:80}}/>}
           <input className={`inp${v.r?' done':''}`} placeholder={lastSession?.sets[si]?.r?`${lastSession.sets[si].r}`:(isDuration?'sec':'reps')} type={isDuration?'number':'text'} inputMode={isDuration?'numeric':'text'} value={v.r} onChange={e=>update(si,'r',e.target.value)} style={{maxWidth:isWeight?80:120}}/>
+          {isDuration&&<CountdownTimer targetSec={parseInt(exDef.r)||30}/>}
           <button onClick={()=>markDone(si)} style={{width:40,height:40,borderRadius:10,border:'none',background:v.done?'var(--grn)':'var(--c2)',color:v.done?'#000':'var(--t3)',fontSize:18,cursor:'pointer',flexShrink:0}}>✓</button>
         </div>
       ))}
@@ -584,6 +680,8 @@ const DayView=({day,phase,onBack})=>{
   const[restEnabled,setRestEnabled]=useState(()=>ld('restEnabled',true));
   const[toast,setToast]=useState('');
   const[note,setNote]=useState('');
+  const[showComplete,setShowComplete]=useState(false);
+  const[tick,setTick]=useState(0);
   const session=useSessionTimer();
 
   useEffect(()=>{session.start()},[]);
@@ -596,8 +694,24 @@ const DayView=({day,phase,onBack})=>{
   const pct=Math.round((completed/totalEx)*100);
   const pMeta=PHASES_META.find(p=>p.id===phase);
 
+  // Per-superset completion
+  const ssCompletion=day.supersets.map((ss,si)=>{
+    const done=ss.ex.reduce((b,ex,ei)=>{
+      const saved=ld(`log_p${phase}_${day.id}_${si}_${ei}`,[]);
+      return b+(saved.filter(s=>s.done).length>0?1:0);
+    },0);
+    return{done,total:ss.ex.length};
+  });
+
+  // Volume calculation
+  const totalVolume=day.supersets.reduce((vol,ss,si)=>vol+ss.ex.reduce((v,exDef,ei)=>{
+    const saved=ld(`log_p${phase}_${day.id}_${si}_${ei}`,[]);
+    return v+saved.filter(s=>s.done&&s.w&&s.r).reduce((sv2,s)=>sv2+(parseFloat(s.w)||0)*(parseInt(s.r)||0),0);
+  },0),0);
+
   const handleSetDone=(ssRest)=>{
     session.start();
+    setTick(t=>t+1);
     const t=ssRest||restTime;
     if(restEnabled&&t>0) setShowRest(t);
   };
@@ -607,15 +721,36 @@ const DayView=({day,phase,onBack})=>{
     vb();vb();
   };
 
+  const toggleRest=()=>{
+    const next=!restEnabled;
+    setRestEnabled(next);
+    sv('restEnabled',next);
+    setToast(next?'Rest timer ON':'Rest timer OFF');
+    vb();
+  };
+
+  const saveWorkout=()=>{
+    session.stop();
+    const ts=new Date().toISOString();
+    const hist=ld('history',[]);
+    hist.push({day:day.n,date:ts,completed,total:totalEx,duration:session.elapsed,note:note||undefined,volume:totalVolume||undefined});
+    sv('history',hist);
+    vb();
+    setShowComplete(true);
+  };
+
   return(
     <div className="app">
       <div className="hdr">
         <div style={{display:'flex',alignItems:'center',gap:12}}>
           <button onClick={()=>{session.stop();onBack()}} style={{background:'none',border:'none',color:'var(--grn)',fontSize:16,fontWeight:600,fontFamily:'inherit',cursor:'pointer'}}>← Back</button>
-          <div>
+          <div style={{flex:1}}>
             <h1>{day.icon} {day.n}</h1>
-            <p>{pMeta?.icon} {pMeta?.n} · {pct}% complete · {completed}/{totalEx} exercises · {session.fmtElapsed}</p>
+            <p>{pMeta?.icon} {pMeta?.n} · {pct}% · {session.fmtElapsed}{totalVolume>0?` · ${(totalVolume/1000).toFixed(1)}t`:''}</p>
           </div>
+          <button onClick={toggleRest} style={{background:restEnabled?'var(--grn-d)':'var(--c2)',border:'none',borderRadius:8,padding:'6px 10px',fontSize:12,fontWeight:600,color:restEnabled?'var(--grn)':'var(--t3)',cursor:'pointer',fontFamily:'inherit',whiteSpace:'nowrap'}}>
+            {restEnabled?`⏱ ${restTime}s`:'⏱ Off'}
+          </button>
         </div>
         <div className="prg" style={{marginTop:8}}><div className="prg-f" style={{width:`${pct}%`}}/></div>
       </div>
@@ -623,12 +758,16 @@ const DayView=({day,phase,onBack})=>{
         <div style={{display:'flex',flexWrap:'wrap',margin:'16px 0 8px'}}>
           {day.focus.map(f=><span key={f} className="focus-tag" style={{background:'var(--c1)',color:'var(--t2)'}}>{f}</span>)}
         </div>
-        {day.supersets.map((ss,si)=>(
-          <div key={si} className="card">
+        {day.supersets.map((ss,si)=>{
+          const sc=ssCompletion[si];
+          const ssDone=sc.done===sc.total;
+          return(
+          <div key={si} className="card" style={ssDone?{border:'1px solid var(--grn)',borderRadius:14}:{}}>
             <div style={{padding:'12px 16px',borderBottom:'0.5px solid var(--sep)'}}>
               <div className="ss-h">
                 <span className="ss-label">Superset {si+1}</span>
                 <span className="ss-type" style={{background:`${ss.color}22`,color:ss.color}}>{ss.type}</span>
+                <span style={{fontSize:11,color:ssDone?'var(--grn)':'var(--t3)',fontWeight:600,marginLeft:'auto'}}>{sc.done}/{sc.total}{ssDone?' ✓':''}</span>
               </div>
               <div style={{fontSize:15,fontWeight:600}}>{ss.label}</div>
             </div>
@@ -636,20 +775,14 @@ const DayView=({day,phase,onBack})=>{
               <ExCard key={ei} exDef={exDef} dayId={day.id} ssIdx={si} exIdx={ei} phase={phase} onSetDone={()=>handleSetDone(ss.rest)} onPR={handlePR}/>
             ))}
           </div>
-        ))}
+        )})}
         <div style={{marginTop:16,marginBottom:24}}>
           <input className="inp" placeholder="Add a note about this workout (optional)" value={note} onChange={e=>setNote(e.target.value)} style={{width:'100%',marginBottom:10,textAlign:'left',padding:'0 14px',height:44}}/>
-          <button className="btn btn-g" style={{width:'100%',padding:14}} onClick={()=>{
-            session.stop();
-            const ts=new Date().toISOString();
-            const hist=ld('history',[]);
-            hist.push({day:day.n,date:ts,completed,total:totalEx,duration:session.elapsed,note:note||undefined});
-            sv('history',hist);
-            vb();
-          }}>💾 Save Workout ({session.fmtElapsed})</button>
+          <button className="btn btn-g" style={{width:'100%',padding:14}} onClick={saveWorkout}>💾 Save Workout ({session.fmtElapsed})</button>
         </div>
       </div>
       {showRest&&<RestTimer seconds={showRest} onDone={()=>setShowRest(null)} onSkip={()=>setShowRest(null)}/>}
+      {showComplete&&<CompletionSummary day={day} completed={completed} total={totalEx} duration={session.elapsed} onClose={()=>{setShowComplete(false);onBack()}}/>}
       {toast&&<Toast msg={toast} onClose={()=>setToast('')}/>}
     </div>
   );
@@ -768,6 +901,34 @@ const ProgressTab=()=>{
           <div className="stat-card"><div className="val" style={{color:'var(--pur)'}}>{avgDuration?fmtTime(avgDuration):'—'}</div><div className="lbl">Avg Duration</div></div>
         </div>
 
+        {hist.length>0&&<>
+        <div className="section-t">Activity (Last 8 Weeks)</div>
+        <div className="card" style={{padding:14}}>
+          <div className="cal-grid">
+            {['M','T','W','T','F','S','S'].map((d,i)=><div key={i} className="cal-label">{d}</div>)}
+            {(()=>{
+              const cells=[];const today=new Date();
+              // Start from 8 weeks ago, aligned to Monday
+              const start=new Date(today);start.setDate(start.getDate()-55-(start.getDay()||7)+1);
+              for(let i=0;i<56;i++){
+                const d=new Date(start);d.setDate(start.getDate()+i);
+                const ds=d.toISOString().slice(0,10);
+                const count=hist.filter(h=>h.date.slice(0,10)===ds).length;
+                const isToday=ds===today.toISOString().slice(0,10);
+                const isFuture=d>today;
+                cells.push(<div key={i} className="cal-cell" style={{
+                  background:isFuture?'transparent':count>=2?'var(--grn)':count===1?'var(--grn-d)':'var(--c2)',
+                  color:count>=2?'#000':count===1?'var(--grn)':'var(--t3)',
+                  border:isToday?'1.5px solid var(--grn)':'none',
+                  opacity:isFuture?0.2:1
+                }}>{d.getDate()}</div>);
+              }
+              return cells;
+            })()}
+          </div>
+        </div>
+        </>}
+
         {weightLog.length>1&&<>
         <div className="section-t">Body Weight Trend</div>
         <div className="card" style={{padding:16}}>
@@ -825,7 +986,7 @@ const ProgressTab=()=>{
           <div key={i} className="hist-item" style={{position:'relative'}}>
             <div style={{flex:1}}>
               <div style={{fontWeight:600}}>{h.day}</div>
-              <div style={{fontSize:13,color:'var(--t2)'}}>{fmtDate(h.date)}{h.duration?` · ${fmtTime(h.duration)}`:''}</div>
+              <div style={{fontSize:13,color:'var(--t2)'}}>{fmtDate(h.date)}{h.duration?` · ${fmtTime(h.duration)}`:''}{h.volume?` · ${(h.volume/1000).toFixed(1)}t`:''}</div>
               {h.note&&<div style={{fontSize:12,color:'var(--t3)',marginTop:3,fontStyle:'italic'}}>{h.note}</div>}
             </div>
             <div style={{display:'flex',alignItems:'center',gap:8}}>
