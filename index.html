@@ -7,7 +7,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="IronClad">
 <meta name="theme-color" content="#000">
-<meta name="version" content="15.0.0">
+<meta name="version" content="16.0.0">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
@@ -468,13 +468,42 @@ const useSessionTimer=()=>{
   return{elapsed,running,start,stop,fmtElapsed:fmtTime(elapsed)};
 };
 
+// === PR TRACKER ===
+const getPR=(eid)=>{
+  const prs=ld('prs',{});
+  return prs[eid]||null;
+};
+const checkAndSavePR=(eid,weight)=>{
+  if(!weight||isNaN(parseFloat(weight)))return false;
+  const w=parseFloat(weight);
+  const prs=ld('prs',{});
+  const prev=prs[eid]||0;
+  if(w>prev){prs[eid]=w;sv('prs',prs);return true}
+  return false;
+};
+
+// === EXERCISE HISTORY ===
+const getExHistory=(eid)=>{
+  const hist=ld('exHistory',{});
+  return(hist[eid]||[]).slice(-10);
+};
+const saveExHistory=(eid,sets)=>{
+  const hist=ld('exHistory',{});
+  if(!hist[eid])hist[eid]=[];
+  const entry={date:new Date().toISOString(),sets:sets.filter(s=>s.done).map(s=>({w:s.w,r:s.r}))};
+  if(entry.sets.length>0){hist[eid].push(entry);if(hist[eid].length>20)hist[eid]=hist[eid].slice(-20);sv('exHistory',hist)}
+};
+
 // === SET LOGGER ===
-const SetLogger=({exDef,dayId,ssIdx,exIdx,phase,onSetDone})=>{
+const SetLogger=({exDef,dayId,ssIdx,exIdx,phase,onSetDone,onPR})=>{
   const ex=getEx(exDef.eid);
   const sets=exDef.s||3;
   const isWeight=ex.t==='w';
   const isDuration=ex.t==='d';
   const logKey=`log_p${phase||1}_${dayId}_${ssIdx}_${exIdx}`;
+  const prevHistory=getExHistory(exDef.eid);
+  const lastSession=prevHistory.length>0?prevHistory[prevHistory.length-1]:null;
+  const currentPR=getPR(exDef.eid);
   const[vals,setVals]=useState(()=>{
     const saved=ld(logKey,[]);
     return Array.from({length:sets},(_,i)=>saved[i]||{w:'',r:'',done:false});
@@ -494,7 +523,11 @@ const SetLogger=({exDef,dayId,ssIdx,exIdx,phase,onSetDone})=>{
     setVals(nv);
     sv(logKey,nv);
     vb();
-    if(!wasDone&&onSetDone) onSetDone();
+    if(!wasDone){
+      if(isWeight&&checkAndSavePR(exDef.eid,nv[si].w)&&onPR){onPR(ex.n,nv[si].w)}
+      saveExHistory(exDef.eid,nv);
+      if(onSetDone) onSetDone();
+    }
   };
 
   const completed=vals.filter(v=>v.done).length;
@@ -502,14 +535,20 @@ const SetLogger=({exDef,dayId,ssIdx,exIdx,phase,onSetDone})=>{
   return(
     <div className="log-area">
       <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:10}}>
-        <div style={{fontSize:13,color:'var(--t2)'}}>{completed}/{sets} sets</div>
+        <div style={{display:'flex',alignItems:'center',gap:8}}>
+          <span style={{fontSize:13,color:'var(--t2)'}}>{completed}/{sets} sets</span>
+          {isWeight&&currentPR&&<span style={{fontSize:11,color:'var(--yel)',fontWeight:600}}>PR: {currentPR}kg</span>}
+        </div>
         {ex.note&&<div style={{fontSize:11,color:'var(--t3)',maxWidth:'60%',textAlign:'right'}}>{ex.note}</div>}
       </div>
+      {lastSession&&<div style={{fontSize:11,color:'var(--t3)',marginBottom:8,padding:'6px 8px',background:'var(--c2)',borderRadius:6}}>
+        Last: {lastSession.sets.map((s,i)=>`${s.w?s.w+'kg×':''}${s.r}`).join(' / ')} ({fmtDate(lastSession.date)})
+      </div>}
       {vals.map((v,si)=>(
         <div key={si} className="set-row">
           <div className="set-num" style={v.done?{background:'var(--grn-d)',color:'var(--grn)'}:{}}>{si+1}</div>
-          {isWeight&&<input className={`inp${v.w?' done':''}`} placeholder="kg" type="number" inputMode="decimal" value={v.w} onChange={e=>update(si,'w',e.target.value)} style={{maxWidth:80}}/>}
-          <input className={`inp${v.r?' done':''}`} placeholder={isDuration?'sec':'reps'} type={isDuration?'number':'text'} inputMode={isDuration?'numeric':'text'} value={v.r} onChange={e=>update(si,'r',e.target.value)} style={{maxWidth:isWeight?80:120}}/>
+          {isWeight&&<input className={`inp${v.w?' done':''}`} placeholder={lastSession?.sets[si]?.w?`${lastSession.sets[si].w}`:'kg'} type="number" inputMode="decimal" value={v.w} onChange={e=>update(si,'w',e.target.value)} style={{maxWidth:80}}/>}
+          <input className={`inp${v.r?' done':''}`} placeholder={lastSession?.sets[si]?.r?`${lastSession.sets[si].r}`:(isDuration?'sec':'reps')} type={isDuration?'number':'text'} inputMode={isDuration?'numeric':'text'} value={v.r} onChange={e=>update(si,'r',e.target.value)} style={{maxWidth:isWeight?80:120}}/>
           <button onClick={()=>markDone(si)} style={{width:40,height:40,borderRadius:10,border:'none',background:v.done?'var(--grn)':'var(--c2)',color:v.done?'#000':'var(--t3)',fontSize:18,cursor:'pointer',flexShrink:0}}>✓</button>
         </div>
       ))}
@@ -518,7 +557,7 @@ const SetLogger=({exDef,dayId,ssIdx,exIdx,phase,onSetDone})=>{
 };
 
 // === EXERCISE CARD ===
-const ExCard=({exDef,dayId,ssIdx,exIdx,phase,onSetDone})=>{
+const ExCard=({exDef,dayId,ssIdx,exIdx,phase,onSetDone,onPR})=>{
   const[open,setOpen]=useState(false);
   const ex=getEx(exDef.eid);
   return(
@@ -533,7 +572,7 @@ const ExCard=({exDef,dayId,ssIdx,exIdx,phase,onSetDone})=>{
           <span style={{color:'var(--t3)',fontSize:16,marginLeft:4}}>{open?'▼':'▶'}</span>
         </div>
       </div>
-      {open&&<SetLogger exDef={exDef} dayId={dayId} ssIdx={ssIdx} exIdx={exIdx} phase={phase} onSetDone={onSetDone}/>}
+      {open&&<SetLogger exDef={exDef} dayId={dayId} ssIdx={ssIdx} exIdx={exIdx} phase={phase} onSetDone={onSetDone} onPR={onPR}/>}
     </div>
   );
 };
@@ -543,6 +582,8 @@ const DayView=({day,phase,onBack})=>{
   const[showRest,setShowRest]=useState(null);
   const[restTime,setRestTime]=useState(()=>ld('restTime',PHASES_META.find(p=>p.id===phase)?.restDefault||60));
   const[restEnabled,setRestEnabled]=useState(()=>ld('restEnabled',true));
+  const[toast,setToast]=useState('');
+  const[note,setNote]=useState('');
   const session=useSessionTimer();
 
   useEffect(()=>{session.start()},[]);
@@ -559,6 +600,11 @@ const DayView=({day,phase,onBack})=>{
     session.start();
     const t=ssRest||restTime;
     if(restEnabled&&t>0) setShowRest(t);
+  };
+
+  const handlePR=(name,weight)=>{
+    setToast(`New PR! ${name}: ${weight}kg`);
+    vb();vb();
   };
 
   return(
@@ -587,22 +633,24 @@ const DayView=({day,phase,onBack})=>{
               <div style={{fontSize:15,fontWeight:600}}>{ss.label}</div>
             </div>
             {ss.ex.map((exDef,ei)=>(
-              <ExCard key={ei} exDef={exDef} dayId={day.id} ssIdx={si} exIdx={ei} phase={phase} onSetDone={()=>handleSetDone(ss.rest)}/>
+              <ExCard key={ei} exDef={exDef} dayId={day.id} ssIdx={si} exIdx={ei} phase={phase} onSetDone={()=>handleSetDone(ss.rest)} onPR={handlePR}/>
             ))}
           </div>
         ))}
         <div style={{marginTop:16,marginBottom:24}}>
+          <input className="inp" placeholder="Add a note about this workout (optional)" value={note} onChange={e=>setNote(e.target.value)} style={{width:'100%',marginBottom:10,textAlign:'left',padding:'0 14px',height:44}}/>
           <button className="btn btn-g" style={{width:'100%',padding:14}} onClick={()=>{
             session.stop();
             const ts=new Date().toISOString();
             const hist=ld('history',[]);
-            hist.push({day:day.n,date:ts,completed,total:totalEx,duration:session.elapsed});
+            hist.push({day:day.n,date:ts,completed,total:totalEx,duration:session.elapsed,note:note||undefined});
             sv('history',hist);
             vb();
           }}>💾 Save Workout ({session.fmtElapsed})</button>
         </div>
       </div>
       {showRest&&<RestTimer seconds={showRest} onDone={()=>setShowRest(null)} onSkip={()=>setShowRest(null)}/>}
+      {toast&&<Toast msg={toast} onClose={()=>setToast('')}/>}
     </div>
   );
 };
@@ -620,7 +668,7 @@ const WorkoutTab=()=>{
     <>
       <div className="hdr">
         <h1>IronClad Pro</h1>
-        <p>v15.0 · Trail Runner Recovery · 3-Day Program</p>
+        <p>v16.0 · Trail Runner Recovery · 3-Day Program</p>
       </div>
       <div className="scroll">
         <div className="section-t">Phase</div>
@@ -679,8 +727,11 @@ const WorkoutTab=()=>{
 
 // === PROGRESS TAB ===
 const ProgressTab=()=>{
-  const hist=ld('history',[]);
+  const[hist,setHist]=useState(()=>ld('history',[]));
+  const[showAll,setShowAll]=useState(false);
+  const[prView,setPrView]=useState(false);
   const weightLog=ld('weightLog',[]);
+  const prs=ld('prs',{});
   const totalWorkouts=hist.length;
   const thisWeek=hist.filter(h=>{const d=new Date(h.date);const now=new Date();const diff=(now-d)/(1000*60*60*24);return diff<=7}).length;
   const streak=(()=>{let s=0;const sorted=[...hist].sort((a,b)=>new Date(b.date)-new Date(a.date));let lastDate=new Date();for(const h of sorted){const d=new Date(h.date);const diff=Math.floor((lastDate-d)/(1000*60*60*24));if(diff<=1){s++;lastDate=d}else break}return s})();
@@ -689,11 +740,22 @@ const ProgressTab=()=>{
   const firstWeight=weightLog.length>1?weightLog[0].w:null;
   const weightDiff=firstWeight&&lastWeight!=='—'?(lastWeight-firstWeight).toFixed(1):null;
 
+  const deleteHistEntry=(idx)=>{
+    const realIdx=hist.length-1-idx;
+    if(!confirm('Delete this workout entry?'))return;
+    const nh=[...hist];nh.splice(realIdx,1);setHist(nh);sv('history',nh);
+  };
+
+  // PR list
+  const prList=Object.entries(prs).map(([eid,w])=>({ex:getEx(eid),w})).filter(p=>p.ex.n!=='Unknown').sort((a,b)=>b.w-a.w);
+
   // Sparkline
   const sparkData=weightLog.slice(-20);
   const sparkMin=sparkData.length?Math.min(...sparkData.map(d=>d.w)):0;
   const sparkMax=sparkData.length?Math.max(...sparkData.map(d=>d.w)):100;
   const sparkRange=sparkMax-sparkMin||1;
+
+  const displayed=showAll?[...hist].reverse():[...hist].reverse().slice(0,20);
 
   return(
     <>
@@ -703,7 +765,7 @@ const ProgressTab=()=>{
           <div className="stat-card"><div className="val" style={{color:'var(--grn)'}}>{totalWorkouts}</div><div className="lbl">Total Workouts</div></div>
           <div className="stat-card"><div className="val" style={{color:'var(--blu)'}}>{thisWeek}</div><div className="lbl">This Week</div></div>
           <div className="stat-card"><div className="val" style={{color:'var(--org)'}}>{streak}🔥</div><div className="lbl">Day Streak</div></div>
-          <div className="stat-card"><div className="val" style={{color:'var(--pur)'}}>{lastWeight}</div><div className="lbl">Body Weight (kg)</div></div>
+          <div className="stat-card"><div className="val" style={{color:'var(--pur)'}}>{avgDuration?fmtTime(avgDuration):'—'}</div><div className="lbl">Avg Duration</div></div>
         </div>
 
         {weightLog.length>1&&<>
@@ -728,15 +790,48 @@ const ProgressTab=()=>{
         </div>
         </>}
 
-        <div className="section-t">Recent Workouts</div>
+        {prList.length>0&&<>
+          <div style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}>
+            <div className="section-t">Personal Records</div>
+            <button style={{background:'none',border:'none',color:'var(--grn)',fontSize:13,fontWeight:600,cursor:'pointer',fontFamily:'inherit'}} onClick={()=>setPrView(!prView)}>{prView?'Hide':'Show All'}</button>
+          </div>
+          {prView?prList.map((p,i)=>(
+            <div key={i} className="hist-item">
+              <div>
+                <div style={{fontWeight:600}}>{p.ex.n}</div>
+                <div style={{fontSize:13,color:'var(--t2)'}}>{p.ex.m} · {p.ex.eq}</div>
+              </div>
+              <span className="badge badge-o" style={{fontSize:14,fontWeight:700}}>{p.w}kg</span>
+            </div>
+          )):<div className="card" style={{padding:14}}>
+            <div style={{display:'flex',gap:12,flexWrap:'wrap'}}>
+              {prList.slice(0,5).map((p,i)=>(
+                <div key={i} style={{fontSize:13}}>
+                  <span style={{fontWeight:600}}>{p.ex.n}</span>
+                  <span style={{color:'var(--yel)',marginLeft:4,fontWeight:700}}>{p.w}kg</span>
+                </div>
+              ))}
+              {prList.length>5&&<span style={{fontSize:12,color:'var(--t3)'}}>+{prList.length-5} more</span>}
+            </div>
+          </div>}
+        </>}
+
+        <div style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}>
+          <div className="section-t">Recent Workouts</div>
+          {hist.length>20&&<button style={{background:'none',border:'none',color:'var(--grn)',fontSize:13,fontWeight:600,cursor:'pointer',fontFamily:'inherit'}} onClick={()=>setShowAll(!showAll)}>{showAll?'Show Less':'Show All'}</button>}
+        </div>
         {hist.length===0&&<div style={{color:'var(--t3)',textAlign:'center',padding:40}}>No workouts logged yet. Get after it!</div>}
-        {[...hist].reverse().slice(0,20).map((h,i)=>(
-          <div key={i} className="hist-item">
-            <div>
+        {displayed.map((h,i)=>(
+          <div key={i} className="hist-item" style={{position:'relative'}}>
+            <div style={{flex:1}}>
               <div style={{fontWeight:600}}>{h.day}</div>
               <div style={{fontSize:13,color:'var(--t2)'}}>{fmtDate(h.date)}{h.duration?` · ${fmtTime(h.duration)}`:''}</div>
+              {h.note&&<div style={{fontSize:12,color:'var(--t3)',marginTop:3,fontStyle:'italic'}}>{h.note}</div>}
             </div>
-            <span className="badge badge-g">{h.completed}/{h.total}</span>
+            <div style={{display:'flex',alignItems:'center',gap:8}}>
+              <span className="badge badge-g">{h.completed}/{h.total}</span>
+              <button onClick={()=>deleteHistEntry(i)} style={{background:'none',border:'none',color:'var(--t3)',fontSize:16,cursor:'pointer',padding:4}}>×</button>
+            </div>
           </div>
         ))}
       </div>
@@ -787,6 +882,7 @@ const LibraryTab=()=>{
 const SettingsTab=()=>{
   const[bw,setBw]=useState('');
   const[toast,setToast]=useState('');
+  const[customRest,setCustomRest]=useState('');
   const weightLog=ld('weightLog',[]);
 
   const saveWeight=()=>{
@@ -820,9 +916,32 @@ const SettingsTab=()=>{
     setToast('Backup exported');
   };
 
+  const importData=()=>{
+    const input=document.createElement('input');
+    input.type='file';input.accept='.json';
+    input.onchange=(e)=>{
+      const file=e.target.files[0];
+      if(!file)return;
+      const reader=new FileReader();
+      reader.onload=(ev)=>{
+        try{
+          const data=JSON.parse(ev.target.result);
+          const keys=Object.keys(data).filter(k=>k.startsWith('ic15_'));
+          if(keys.length===0){setToast('Invalid backup file');return}
+          if(!confirm(`Restore ${keys.length} items from backup? This will overwrite current data.`))return;
+          keys.forEach(k=>localStorage.setItem(k,typeof data[k]==='string'?data[k]:JSON.stringify(data[k])));
+          setToast(`Restored ${keys.length} items`);
+          setTimeout(()=>location.reload(),1500);
+        }catch{setToast('Error reading backup file')}
+      };
+      reader.readAsText(file);
+    };
+    input.click();
+  };
+
   return(
     <>
-      <div className="hdr"><h1>Settings</h1><p>IronClad Pro v15.0</p></div>
+      <div className="hdr"><h1>Settings</h1><p>IronClad Pro v16.0</p></div>
       <div className="scroll">
         <div className="section-t">Body Stats</div>
         <div className="card" style={{padding:16}}>
@@ -838,12 +957,17 @@ const SettingsTab=()=>{
 
         <div className="section-t">Rest Timer</div>
         <div className="card" style={{padding:16}}>
-          <div style={{fontSize:13,color:'var(--t2)',marginBottom:8}}>Auto-starts between sets. Shorter rest = more calorie burn. Toggle on/off in workout view.</div>
-          <div style={{display:'flex',gap:8}}>
+          <div style={{fontSize:13,color:'var(--t2)',marginBottom:8}}>Auto-starts between sets. Shorter rest = more calorie burn.</div>
+          <div style={{display:'flex',gap:8,flexWrap:'wrap'}}>
             {REST_OPTIONS.map(s=>{
               const current=ld('restTime',60);
               return <button key={s} className={`phase-btn${current===s?' on':''}`} onClick={()=>{sv('restTime',s);setToast(`Rest timer: ${s}s`);vb()}}>{s}s</button>;
             })}
+          </div>
+          <div style={{display:'flex',gap:8,marginTop:10,alignItems:'center'}}>
+            <span style={{fontSize:13,color:'var(--t2)',whiteSpace:'nowrap'}}>Custom:</span>
+            <input className="inp" type="number" inputMode="numeric" placeholder="sec" value={customRest} onChange={e=>setCustomRest(e.target.value)} style={{maxWidth:80,textAlign:'center'}}/>
+            <button className="btn btn-s" onClick={()=>{const v=parseInt(customRest);if(v>0&&v<=300){sv('restTime',v);setToast(`Rest timer: ${v}s`);setCustomRest('');vb()}}}>Set</button>
           </div>
         </div>
 
@@ -858,11 +982,12 @@ const SettingsTab=()=>{
         <div className="section-t">Data</div>
         <div style={{display:'flex',flexDirection:'column',gap:8}}>
           <button className="btn btn-s" onClick={exportData} style={{width:'100%'}}>📤 Export Backup</button>
+          <button className="btn btn-s" onClick={importData} style={{width:'100%'}}>📥 Restore from Backup</button>
           <button className="btn btn-d" onClick={clearAll} style={{width:'100%'}}>🗑 Clear All Data</button>
         </div>
 
         <div style={{textAlign:'center',padding:'32px 0',color:'var(--t3)',fontSize:12}}>
-          IronClad Pro v15.0 · Trail Runner Recovery Edition<br/>
+          IronClad Pro v16.0 · Trail Runner Recovery Edition<br/>
           Built for Matt · Knee-safe · All exercises vetted
         </div>
       </div>
