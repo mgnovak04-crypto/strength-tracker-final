@@ -138,6 +138,23 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--t1);font-
 </head>
 <body>
 <div id="root"></div>
+<script>
+// === SERVICE WORKER (inline registration for offline PWA) ===
+if('serviceWorker' in navigator){
+  const swCode=`
+    const CACHE='ironclad-v16';
+    const ASSETS=['/'];
+    self.addEventListener('install',e=>e.waitUntil(caches.open(CACHE).then(c=>c.addAll(ASSETS)).then(()=>self.skipWaiting())));
+    self.addEventListener('activate',e=>e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim())));
+    self.addEventListener('fetch',e=>{
+      if(e.request.method!=='GET')return;
+      e.respondWith(fetch(e.request).then(r=>{if(r.ok){const rc=r.clone();caches.open(CACHE).then(c=>c.put(e.request,rc))}return r}).catch(()=>caches.match(e.request)));
+    });
+  `;
+  const blob=new Blob([swCode],{type:'application/javascript'});
+  navigator.serviceWorker.register(URL.createObjectURL(blob)).catch(()=>{});
+}
+</script>
 <script type="text/babel">
 const{useState,useEffect,useRef,useCallback}=React;
 
@@ -782,8 +799,8 @@ const SetLogger=({exDef,dayId,ssIdx,exIdx,phase,onSetDone,onPR})=>{
     sv(logKey,nv);
     vb();
     if(!wasDone){
-      if(isWeight&&checkAndSavePR(exDef.eid,nv[si].w)&&onPR){onPR(ex.n,nv[si].w)}
-      saveExHistory(exDef.eid,nv);
+      if(isWeight&&!nv[si].warmup&&checkAndSavePR(exDef.eid,nv[si].w)&&onPR){onPR(ex.n,nv[si].w)}
+      saveExHistory(exDef.eid,nv.filter(s=>!s.warmup));
       if(onSetDone) onSetDone();
     }
   };
@@ -795,8 +812,15 @@ const SetLogger=({exDef,dayId,ssIdx,exIdx,phase,onSetDone,onPR})=>{
     setVals(nv);sv(logKey,nv);vb();
   };
 
+  const toggleWarmup=(si)=>{
+    const nv=[...vals];
+    nv[si]={...nv[si],warmup:!nv[si].warmup};
+    setVals(nv);sv(logKey,nv);vb();
+  };
+
   const completed=vals.filter(v=>v.done).length;
-  const best1RM=isWeight?vals.reduce((best,v)=>{if(!v.w||!v.r)return best;const e=est1RM(v.w,parseInt(v.r)||0);return e&&e>best?e:best},0):0;
+  const workingSets=vals.filter(v=>!v.warmup);
+  const best1RM=isWeight?workingSets.reduce((best,v)=>{if(!v.w||!v.r)return best;const e=est1RM(v.w,parseInt(v.r)||0);return e&&e>best?e:best},0):0;
 
   return(
     <div className="log-area">
@@ -814,11 +838,11 @@ const SetLogger=({exDef,dayId,ssIdx,exIdx,phase,onSetDone,onPR})=>{
       </div>}
       {vals.map((v,si)=>(
         <div key={si} className="set-row">
-          <div className="set-num" style={v.done?{background:'var(--grn-d)',color:'var(--grn)'}:{}}>{si+1}</div>
-          {isWeight&&<input className={`inp${v.w?' done':''}`} placeholder={lastSession?.sets[si]?.w?`${lastSession.sets[si].w}`:'kg'} type="number" inputMode="decimal" value={v.w} onChange={e=>update(si,'w',e.target.value)} style={{maxWidth:80}}/>}
-          <input className={`inp${v.r?' done':''}`} placeholder={lastSession?.sets[si]?.r?`${lastSession.sets[si].r}`:(isDuration?'sec':'reps')} type={isDuration?'number':'text'} inputMode={isDuration?'numeric':'text'} value={v.r} onChange={e=>update(si,'r',e.target.value)} style={{maxWidth:isWeight?80:120}}/>
+          <div className="set-num" onClick={()=>{if(isWeight)toggleWarmup(si)}} style={v.done?{background:'var(--grn-d)',color:'var(--grn)'}:v.warmup?{background:'var(--org-d)',color:'var(--org)',fontSize:9,cursor:'pointer'}:{cursor:isWeight?'pointer':'default'}} title={isWeight?'Tap to toggle warm-up':''}>{v.warmup?'W':si+1}</div>
+          {isWeight&&<input className={`inp${v.w?' done':''}`} placeholder={lastSession?.sets[si]?.w?`${lastSession.sets[si].w}`:'kg'} type="number" inputMode="decimal" value={v.w} onChange={e=>update(si,'w',e.target.value)} style={{maxWidth:80,opacity:v.warmup?0.6:1}}/>}
+          <input className={`inp${v.r?' done':''}`} placeholder={lastSession?.sets[si]?.r?`${lastSession.sets[si].r}`:(isDuration?'sec':'reps')} type={isDuration?'number':'text'} inputMode={isDuration?'numeric':'text'} value={v.r} onChange={e=>update(si,'r',e.target.value)} style={{maxWidth:isWeight?80:120,opacity:v.warmup?0.6:1}}/>
           {isDuration&&<CountdownTimer targetSec={parseInt(exDef.r)||30}/>}
-          <button onClick={()=>markDone(si)} style={{width:40,height:40,borderRadius:10,border:'none',background:v.done?'var(--grn)':'var(--c2)',color:v.done?'#000':'var(--t3)',fontSize:18,cursor:'pointer',flexShrink:0}}>✓</button>
+          <button onClick={()=>markDone(si)} style={{width:40,height:40,borderRadius:10,border:'none',background:v.done?v.warmup?'var(--org)':'var(--grn)':'var(--c2)',color:v.done?'#000':'var(--t3)',fontSize:18,cursor:'pointer',flexShrink:0}}>✓</button>
         </div>
       ))}
     </div>
@@ -828,20 +852,42 @@ const SetLogger=({exDef,dayId,ssIdx,exIdx,phase,onSetDone,onPR})=>{
 // === EXERCISE CARD ===
 const ExCard=({exDef,dayId,ssIdx,exIdx,phase,onSetDone,onPR})=>{
   const[open,setOpen]=useState(false);
-  const ex=getEx(exDef.eid);
+  const[showSwap,setShowSwap]=useState(false);
+  const[currentEid,setCurrentEid]=useState(exDef.eid);
+  const ex=getEx(currentEid);
+  const activeExDef={...exDef,eid:currentEid};
+
+  const alternatives=EXDB.filter(e=>e.m===ex.m&&e.id!==currentEid&&e.t===ex.t).slice(0,8);
+
+  const swapEx=(newEid)=>{
+    setCurrentEid(newEid);
+    setShowSwap(false);
+    vb();
+  };
+
   return(
     <div>
       <div className="ex-row" onClick={()=>{setOpen(!open);vb()}} style={{cursor:'pointer'}}>
-        <div>
-          <div className="ex-name">{ex.n}</div>
+        <div style={{flex:1}}>
+          <div className="ex-name">{ex.n}{currentEid!==exDef.eid?<span style={{fontSize:10,color:'var(--org)',marginLeft:6}}>swapped</span>:null}</div>
           <div className="ex-info">{exDef.s} sets × {exDef.r} · {ex.eq}</div>
         </div>
         <div style={{display:'flex',alignItems:'center',gap:4,flexWrap:'wrap',justifyContent:'flex-end',maxWidth:160}}>
           {ex.tags?.map(t=>tagMap[t]?<span key={t} className={`ex-tag ${tagMap[t].c}`}>{tagMap[t].l}</span>:null)}
-          <span style={{color:'var(--t3)',fontSize:16,marginLeft:4}}>{open?'▼':'▶'}</span>
+          {alternatives.length>0&&<span onClick={(e)=>{e.stopPropagation();setShowSwap(!showSwap);vb()}} style={{color:'var(--blu)',fontSize:12,cursor:'pointer',padding:'2px 4px'}}>⇄</span>}
+          <span style={{color:'var(--t3)',fontSize:16,marginLeft:2}}>{open?'▼':'▶'}</span>
         </div>
       </div>
-      {open&&<SetLogger exDef={exDef} dayId={dayId} ssIdx={ssIdx} exIdx={exIdx} phase={phase} onSetDone={onSetDone} onPR={onPR}/>}
+      {showSwap&&<div style={{padding:'8px 16px',background:'var(--c2)',borderTop:'0.5px solid var(--sep)'}}>
+        <div style={{fontSize:12,fontWeight:600,color:'var(--t2)',marginBottom:6}}>Swap with ({ex.m}):</div>
+        <div style={{display:'flex',flexWrap:'wrap',gap:4}}>
+          {currentEid!==exDef.eid&&<button onClick={()=>swapEx(exDef.eid)} style={{padding:'4px 10px',borderRadius:6,border:'1px solid var(--grn)',background:'var(--grn-d)',color:'var(--grn)',fontSize:11,fontWeight:600,cursor:'pointer',fontFamily:'inherit'}}>↩ Original</button>}
+          {alternatives.map(alt=>(
+            <button key={alt.id} onClick={()=>swapEx(alt.id)} style={{padding:'4px 10px',borderRadius:6,border:'1px solid var(--c3)',background:'none',color:'var(--t1)',fontSize:11,cursor:'pointer',fontFamily:'inherit'}}>{alt.n}</button>
+          ))}
+        </div>
+      </div>}
+      {open&&<SetLogger exDef={activeExDef} dayId={dayId} ssIdx={ssIdx} exIdx={exIdx} phase={phase} onSetDone={onSetDone} onPR={onPR}/>}
     </div>
   );
 };
@@ -971,8 +1017,33 @@ const DayView=({day,phase,onBack})=>{
 const WorkoutTab=()=>{
   const[activeDay,setActiveDay]=useState(null);
   const[phase,setPhase]=useState(ld('phase',1));
+  const[toast,setToast]=useState('');
+  const[tick,setTick]=useState(0);
   const days=getProgramDays(phase);
   const pMeta=PHASES_META.find(p=>p.id===phase);
+
+  const resetDay=(dayId,e)=>{
+    e.stopPropagation();
+    if(!confirm(`Reset Day ${dayId} for a new week? This clears all logged sets for this day.`))return;
+    const day=days.find(d=>d.id===dayId);
+    if(!day)return;
+    day.supersets.forEach((ss,si)=>ss.ex.forEach((ex,ei)=>{
+      localStorage.removeItem('ic15_log_p'+phase+'_'+dayId+'_'+si+'_'+ei);
+    }));
+    setTick(t=>t+1);
+    setToast(`Day ${dayId} reset`);
+    vb();
+  };
+
+  const resetAllDays=()=>{
+    if(!confirm('Reset ALL days for a new week? This clears all logged sets for the current phase.'))return;
+    days.forEach(day=>day.supersets.forEach((ss,si)=>ss.ex.forEach((ex,ei)=>{
+      localStorage.removeItem('ic15_log_p'+phase+'_'+day.id+'_'+si+'_'+ei);
+    })));
+    setTick(t=>t+1);
+    setToast('All days reset for new week');
+    vb();
+  };
 
   if(activeDay) return <DayView day={activeDay} phase={phase} onBack={()=>setActiveDay(null)}/>;
 
@@ -996,7 +1067,10 @@ const WorkoutTab=()=>{
           <div style={{fontSize:13,color:'var(--t2)',lineHeight:1.5}}>{pMeta.d}</div>
         </div>}
 
-        <div className="section-t">Workouts</div>
+        <div style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}>
+          <div className="section-t">Workouts</div>
+          <button onClick={resetAllDays} style={{background:'none',border:'1px solid var(--c3)',borderRadius:8,color:'var(--org)',fontSize:12,fontWeight:600,padding:'4px 10px',cursor:'pointer',fontFamily:'inherit'}}>↺ New Week</button>
+        </div>
         {days.map(day=>{
           const totalEx=day.supersets.reduce((a,ss)=>a+ss.ex.length,0);
           const completed=day.supersets.reduce((a,ss,si)=>a+ss.ex.reduce((b,ex,ei)=>{
@@ -1014,7 +1088,8 @@ const WorkoutTab=()=>{
                     <div className="sub">{day.supersets.length} supersets · {totalEx} exercises</div>
                   </div>
                 </div>
-                <div style={{textAlign:'right'}}>
+                <div style={{display:'flex',alignItems:'center',gap:8}}>
+                  {pct>0&&<button onClick={(e)=>resetDay(day.id,e)} style={{background:'none',border:'none',color:'var(--t3)',fontSize:14,cursor:'pointer',padding:4}} title="Reset day">↺</button>}
                   <span className={`badge ${pct===100?'badge-g':pct>0?'badge-o':'badge-b'}`}>{pct}%</span>
                 </div>
               </div>
@@ -1033,6 +1108,7 @@ const WorkoutTab=()=>{
           </div>
         </div>
       </div>
+      {toast&&<Toast msg={toast} onClose={()=>setToast('')}/>}
     </>
   );
 };
@@ -1117,6 +1193,35 @@ const ProgressTab=()=>{
   const readinessEntries=Object.values(readiness).sort((a,b)=>a.date>b.date?1:-1).slice(-14);
   const avgReadiness=readinessEntries.length>0?Math.round(readinessEntries.reduce((a,r)=>a+((r.sleepVal+r.sorenessVal+r.energyVal+r.moodVal)/4),0)/readinessEntries.length*100):null;
 
+  // ACWR (Acute:Chronic Workload Ratio)
+  const acuteVolume=hist.filter(h=>(new Date()-new Date(h.date))/(1000*60*60*24)<=7).reduce((a,h)=>a+(h.volume||0),0);
+  const chronicVolume=hist.filter(h=>{const d=(new Date()-new Date(h.date))/(1000*60*60*24);return d<=28}).reduce((a,h)=>a+(h.volume||0),0)/4;
+  const acwr=chronicVolume>0?Math.round((acuteVolume/chronicVolume)*100)/100:null;
+  const acwrColor=acwr?acwr<0.8?'var(--blu)':acwr<=1.3?'var(--grn)':acwr<=1.5?'var(--org)':'var(--red)':'var(--t3)';
+  const acwrLabel=acwr?acwr<0.8?'Detraining zone':acwr<=1.3?'Sweet spot':acwr<=1.5?'Caution — high ramp':'Danger — injury risk':'—';
+
+  // Weekly summary (this week vs last week)
+  const lastWeekHist=hist.filter(h=>{const d=(new Date()-new Date(h.date))/(1000*60*60*24);return d>7&&d<=14});
+  const thisWeekVol=hist.filter(h=>(new Date()-new Date(h.date))/(1000*60*60*24)<=7).reduce((a,h)=>a+(h.volume||0),0);
+  const lastWeekVol=lastWeekHist.reduce((a,h)=>a+(h.volume||0),0);
+  const lastWeekCount=lastWeekHist.length;
+  const thisWeekRunKm=runs.filter(r=>(new Date()-new Date(r.date))/(1000*60*60*24)<=7).reduce((a,r)=>a+(r.dist||0),0);
+  const lastWeekRunKm=runs.filter(r=>{const d=(new Date()-new Date(r.date))/(1000*60*60*24);return d>7&&d<=14}).reduce((a,r)=>a+(r.dist||0),0);
+  const thisWeekAvgPain=painData.filter(h=>(new Date()-new Date(h.date))/(1000*60*60*24)<=7);
+  const lastWeekAvgPain=painData.filter(h=>{const d=(new Date()-new Date(h.date))/(1000*60*60*24);return d>7&&d<=14});
+  const twPain=thisWeekAvgPain.length>0?Math.round(thisWeekAvgPain.reduce((a,h)=>a+h.kneePain,0)/thisWeekAvgPain.length*10)/10:null;
+  const lwPain=lastWeekAvgPain.length>0?Math.round(lastWeekAvgPain.reduce((a,h)=>a+h.kneePain,0)/lastWeekAvgPain.length*10)/10:null;
+
+  // Phase progression recommendation
+  const currentPhase=ld('phase',1);
+  const phaseWeeksKey=`phaseStart_${currentPhase}`;
+  const phaseStart=ld(phaseWeeksKey,null);
+  if(!phaseStart&&hist.length>0){sv(phaseWeeksKey,new Date().toISOString())}
+  const weeksInPhase=phaseStart?Math.floor((new Date()-new Date(phaseStart))/(1000*60*60*24*7)):0;
+  const phaseMinWeeks=PHASES_META.find(p=>p.id===currentPhase)?.id===4?99:4;
+  const recentCompletion=hist.slice(-6).length>0?Math.round(hist.slice(-6).reduce((a,h)=>a+(h.completed/h.total),0)/Math.min(6,hist.slice(-6).length)*100):0;
+  const readyToProgress=currentPhase<4&&weeksInPhase>=phaseMinWeeks&&recentCompletion>=75&&(twPain===null||twPain<=4)&&(avgRpe===null||avgRpe<=7);
+
   const displayed=showAll?[...hist].reverse():[...hist].reverse().slice(0,20);
 
   return(
@@ -1125,12 +1230,74 @@ const ProgressTab=()=>{
       <div className="scroll">
         <ReadinessCheckIn onSave={()=>setTick(t=>t+1)}/>
 
+        {/* WEEKLY SUMMARY */}
+        {(thisWeek>0||lastWeekCount>0)&&<>
+          <div className="section-t">This Week vs Last</div>
+          <div className="card" style={{padding:14}}>
+            <div style={{display:'grid',gridTemplateColumns:'1fr auto 1fr',gap:8,fontSize:13,textAlign:'center'}}>
+              <div style={{textAlign:'left',fontWeight:600,color:'var(--t2)'}}>This Week</div>
+              <div></div>
+              <div style={{textAlign:'right',fontWeight:600,color:'var(--t3)'}}>Last Week</div>
+
+              <div style={{textAlign:'left'}}><span style={{fontWeight:700,color:'var(--grn)'}}>{thisWeek}</span> workouts</div>
+              <div style={{color:'var(--t3)',fontSize:11}}>🏋️</div>
+              <div style={{textAlign:'right'}}><span style={{fontWeight:700,color:'var(--t3)'}}>{lastWeekCount}</span> workouts</div>
+
+              {(thisWeekVol>0||lastWeekVol>0)&&<>
+                <div style={{textAlign:'left'}}><span style={{fontWeight:700,color:'var(--grn)'}}>{(thisWeekVol/1000).toFixed(1)}t</span></div>
+                <div style={{color:'var(--t3)',fontSize:11}}>📊</div>
+                <div style={{textAlign:'right'}}><span style={{fontWeight:700,color:'var(--t3)'}}>{(lastWeekVol/1000).toFixed(1)}t</span></div>
+              </>}
+
+              {(thisWeekRunKm>0||lastWeekRunKm>0)&&<>
+                <div style={{textAlign:'left'}}><span style={{fontWeight:700,color:'var(--cyn)'}}>{thisWeekRunKm.toFixed(1)}km</span></div>
+                <div style={{color:'var(--t3)',fontSize:11}}>🏃</div>
+                <div style={{textAlign:'right'}}><span style={{fontWeight:700,color:'var(--t3)'}}>{lastWeekRunKm.toFixed(1)}km</span></div>
+              </>}
+
+              {(twPain!==null||lwPain!==null)&&<>
+                <div style={{textAlign:'left'}}><span style={{fontWeight:700,color:twPain!==null?painColor(twPain):'var(--t3)'}}>{twPain!==null?twPain+'/10':'—'}</span></div>
+                <div style={{color:'var(--t3)',fontSize:11}}>🦵</div>
+                <div style={{textAlign:'right'}}><span style={{fontWeight:700,color:'var(--t3)'}}>{lwPain!==null?lwPain+'/10':'—'}</span></div>
+              </>}
+            </div>
+          </div>
+        </>}
+
         <div className="stat-grid" style={{marginTop:12}}>
           <div className="stat-card"><div className="val" style={{color:'var(--grn)'}}>{totalWorkouts}</div><div className="lbl">Total Workouts</div></div>
           <div className="stat-card"><div className="val" style={{color:'var(--blu)'}}>{thisWeek}</div><div className="lbl">This Week</div></div>
           <div className="stat-card"><div className="val" style={{color:'var(--org)'}}>{streak}🔥</div><div className="lbl">Day Streak</div></div>
           <div className="stat-card"><div className="val" style={{color:'var(--pur)'}}>{avgDuration?fmtTime(avgDuration):'—'}</div><div className="lbl">Avg Duration</div></div>
         </div>
+
+        {/* ACWR + PHASE PROGRESSION */}
+        {(acwr||readyToProgress)&&<>
+          <div className="section-t">Training Load</div>
+          <div className="card" style={{padding:14}}>
+            {acwr&&<div style={{marginBottom:readyToProgress?12:0}}>
+              <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:6}}>
+                <span style={{fontSize:13,color:'var(--t2)'}}>Acute:Chronic Workload</span>
+                <span style={{fontWeight:700,color:acwrColor}}>{acwr}</span>
+              </div>
+              <div style={{height:8,background:'var(--c2)',borderRadius:4,overflow:'hidden',position:'relative'}}>
+                <div style={{position:'absolute',left:'26.6%',width:'33.3%',height:'100%',background:'var(--grn)',opacity:0.15,borderRadius:4}}/>
+                <div style={{position:'absolute',left:`${Math.min(95,Math.max(2,acwr/2*100))}%`,width:6,height:'100%',background:acwrColor,borderRadius:3,transform:'translateX(-50%)'}}/>
+              </div>
+              <div style={{display:'flex',justifyContent:'space-between',fontSize:9,color:'var(--t3)',marginTop:3}}>
+                <span>0</span><span>0.8</span><span style={{color:'var(--grn)'}}>sweet spot</span><span>1.3</span><span>2.0</span>
+              </div>
+              <div style={{fontSize:11,color:acwrColor,marginTop:4,fontWeight:600}}>{acwrLabel}</div>
+            </div>}
+            {readyToProgress&&<div style={{padding:10,background:'var(--grn-d)',borderRadius:8,border:'1px solid var(--grn)'}}>
+              <div style={{fontWeight:700,color:'var(--grn)',fontSize:14,marginBottom:4}}>Ready to progress!</div>
+              <div style={{fontSize:12,color:'var(--t2)'}}>
+                {weeksInPhase} weeks in {PHASES_META.find(p=>p.id===currentPhase)?.n} · {recentCompletion}% completion · {twPain!==null?`Pain ${twPain}/10`:'No pain data'} · {avgRpe?`RPE ${avgRpe}`:''}
+              </div>
+              <div style={{fontSize:11,color:'var(--t3)',marginTop:4}}>Consider moving to {PHASES_META.find(p=>p.id===currentPhase+1)?.n} phase</div>
+            </div>}
+          </div>
+        </>}
 
         {/* RECOVERY INSIGHTS */}
         {(painData.length>0||avgRpe||avgReadiness||runs.length>0)&&<>
