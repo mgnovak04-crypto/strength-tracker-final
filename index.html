@@ -134,6 +134,20 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--t1);font-
 .run-stat{display:flex;flex-direction:column;align-items:center;padding:8px 0}
 .run-stat .val{font-size:18px;font-weight:700}
 .run-stat .lbl{font-size:11px;color:var(--t2)}
+/* GOAL PROGRESS */
+.goal-bar{height:12px;background:var(--c2);border-radius:6px;overflow:hidden;position:relative}
+.goal-fill{height:100%;border-radius:6px;transition:width .5s}
+.goal-marker{position:absolute;top:-2px;width:2px;height:16px;background:var(--t1);border-radius:1px}
+/* MILESTONE */
+.ms-item{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:0.5px solid var(--sep)}
+.ms-item:last-child{border-bottom:none}
+.ms-check{width:24px;height:24px;border-radius:12px;border:2px solid var(--c3);display:flex;align-items:center;justify-content:center;font-size:14px;cursor:pointer;flex-shrink:0;transition:all .2s}
+.ms-check.done{border-color:var(--grn);background:var(--grn);color:#000}
+/* CORRELATION CHART */
+.corr-chart{position:relative;height:80px;display:flex;align-items:flex-end;gap:2px}
+.corr-bar{display:flex;flex-direction:column;align-items:center;flex:1;gap:1px}
+.corr-bar .top{border-radius:2px 2px 0 0;width:100%;min-width:3px}
+.corr-bar .bot{border-radius:0 0 2px 2px;width:100%;min-width:3px}
 </style>
 </head>
 <body>
@@ -552,25 +566,13 @@ const RPESelector=({value,onChange})=>(
 
 // === RECOVERY READINESS CHECK-IN ===
 const ReadinessCheckIn=({onSave})=>{
+  const today=new Date().toISOString().slice(0,10);
+  const[todayData,setTodayData]=useState(()=>ld('readiness',{})[today]||null);
   const[sleep,setSleep]=useState(null);
   const[soreness,setSoreness]=useState(null);
   const[energy,setEnergy]=useState(null);
   const[mood,setMood]=useState(null);
-  const today=new Date().toISOString().slice(0,10);
-  const existing=ld('readiness',{});
-  const todayData=existing[today];
-
-  if(todayData)return(
-    <div className="card" style={{padding:14}}>
-      <div style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}>
-        <span style={{fontSize:13,fontWeight:600}}>Today's Check-In</span>
-        <span style={{fontSize:20}}>{todayData.sleep}{todayData.soreness}{todayData.energy}{todayData.mood}</span>
-      </div>
-      <div style={{fontSize:12,color:'var(--t2)',marginTop:4}}>
-        Readiness: {Math.round(((todayData.sleepVal+todayData.sorenessVal+todayData.energyVal+todayData.moodVal)/4)*100)}%
-      </div>
-    </div>
-  );
+  const[err,setErr]=useState('');
 
   const sleepOpts=['😴','😐','😊','🌟'];
   const sorenessOpts=['🔥','😣','😌','💪'];
@@ -578,15 +580,44 @@ const ReadinessCheckIn=({onSave})=>{
   const moodOpts=['😞','😐','😊','🔥'];
 
   const save=()=>{
-    if(sleep===null||soreness===null||energy===null||mood===null)return;
-    const data={...existing,[today]:{
+    if(sleep===null||soreness===null||energy===null||mood===null){
+      setErr('Please tap one emoji in each row');
+      return;
+    }
+    const entry={
       sleep:sleepOpts[sleep],soreness:sorenessOpts[soreness],energy:energyOpts[energy],mood:moodOpts[mood],
       sleepVal:sleep/3,sorenessVal:soreness/3,energyVal:energy/3,moodVal:mood/3,date:today
-    }};
+    };
+    const existing=ld('readiness',{});
+    const data={...existing,[today]:entry};
     sv('readiness',data);
+    setTodayData(entry);
+    setErr('');
     if(onSave)onSave();
     vb();
   };
+
+  const reset=()=>{
+    const existing=ld('readiness',{});
+    delete existing[today];
+    sv('readiness',existing);
+    setTodayData(null);
+    setSleep(null);setSoreness(null);setEnergy(null);setMood(null);
+    if(onSave)onSave();
+  };
+
+  if(todayData)return(
+    <div className="card" style={{padding:14}}>
+      <div style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}>
+        <span style={{fontSize:13,fontWeight:600}}>Today's Check-In ✓</span>
+        <span style={{fontSize:20}}>{todayData.sleep}{todayData.soreness}{todayData.energy}{todayData.mood}</span>
+      </div>
+      <div style={{fontSize:12,color:'var(--t2)',marginTop:4,display:'flex',justifyContent:'space-between',alignItems:'center'}}>
+        <span>Readiness: {Math.round(((todayData.sleepVal+todayData.sorenessVal+todayData.energyVal+todayData.moodVal)/4)*100)}%</span>
+        <span onClick={reset} style={{fontSize:11,color:'var(--t3)',cursor:'pointer',textDecoration:'underline'}}>Edit</span>
+      </div>
+    </div>
+  );
 
   return(
     <div className="card" style={{padding:14}}>
@@ -596,12 +627,13 @@ const ReadinessCheckIn=({onSave})=>{
           <div key={item.label} className="readiness-item">
             <div style={{fontSize:11,color:'var(--t2)',fontWeight:600}}>{item.label}</div>
             <div className="emoji-row">
-              {item.opts.map((e,i)=><span key={i} className={`readiness-emoji${item.val===i?' on':''}`} onClick={()=>item.set(i)}>{e}</span>)}
+              {item.opts.map((e,i)=><span key={i} className={`readiness-emoji${item.val===i?' on':''}`} onClick={()=>{item.set(i);setErr('')}}>{e}</span>)}
             </div>
           </div>
         ))}
       </div>
-      <button className="btn btn-g" style={{width:'100%',marginTop:8,padding:10}} onClick={save} disabled={sleep===null||soreness===null||energy===null||mood===null}>Save Check-In</button>
+      {err&&<div style={{fontSize:12,color:'var(--red)',textAlign:'center',marginTop:6}}>{err}</div>}
+      <button className="btn btn-g" style={{width:'100%',marginTop:8,padding:10}} onClick={save}>Save Check-In</button>
     </div>
   );
 };
@@ -613,15 +645,22 @@ const RunningLog=({onToast})=>{
   const[terrain,setTerrain]=useState('road');
   const[kneeFeel,setKneeFeel]=useState(null);
   const[runNote,setRunNote]=useState('');
-  const runs=ld('runLog',[]);
+  const[runs,setRuns]=useState(()=>ld('runLog',[]));
+  const[err,setErr]=useState('');
 
   const saveRun=()=>{
-    if(!dist&&!time)return;
-    const entry={date:new Date().toISOString(),dist:parseFloat(dist)||0,time:parseInt(time)||0,terrain,kneeFeel,note:runNote||undefined};
-    if(entry.dist>0&&entry.time>0)entry.pace=Math.round(entry.time/entry.dist*10)/10;
+    const d=parseFloat(dist)||0;
+    const t=parseInt(time)||0;
+    if(d<=0&&t<=0){
+      setErr('Enter distance or time');
+      return;
+    }
+    const entry={date:new Date().toISOString(),dist:d,time:t,terrain,kneeFeel,note:runNote||undefined};
+    if(d>0&&t>0)entry.pace=Math.round(t/d*10)/10;
     const newRuns=[...runs,entry];
     sv('runLog',newRuns);
-    setDist('');setTime('');setRunNote('');setKneeFeel(null);
+    setRuns(newRuns);
+    setDist('');setTime('');setRunNote('');setKneeFeel(null);setErr('');
     if(onToast)onToast('Run logged');
     vb();
   };
@@ -646,6 +685,7 @@ const RunningLog=({onToast})=>{
         </div>
         <PainScale value={kneeFeel} onChange={setKneeFeel} label="Knee feel after"/>
         <input className="inp" placeholder="Run notes (optional)" value={runNote} onChange={e=>setRunNote(e.target.value)} style={{width:'100%',marginTop:8,textAlign:'left',padding:'0 14px',height:36}}/>
+        {err&&<div style={{fontSize:12,color:'var(--red)',textAlign:'center',marginTop:6}}>{err}</div>}
         <button className="btn btn-g" style={{width:'100%',marginTop:8,padding:10}} onClick={saveRun}>Save Run</button>
       </div>
 
@@ -710,7 +750,7 @@ const CountdownTimer=({targetSec})=>{
 };
 
 // === WORKOUT COMPLETION SUMMARY ===
-const CompletionSummary=({day,completed,total,duration,onClose})=>{
+const CompletionSummary=({day,completed,total,duration,calories,onClose})=>{
   const pct=Math.round((completed/total)*100);
   const exHist=ld('exHistory',{});
   const prs=ld('prs',{});
@@ -735,6 +775,7 @@ const CompletionSummary=({day,completed,total,duration,onClose})=>{
           <div className="complete-stat"><span style={{fontSize:22,fontWeight:700,color:'var(--grn)'}}>{pct}%</span><span style={{fontSize:11,color:'var(--t2)'}}>Completed</span></div>
           <div className="complete-stat"><span style={{fontSize:22,fontWeight:700,color:'var(--blu)'}}>{completed}/{total}</span><span style={{fontSize:11,color:'var(--t2)'}}>Exercises</span></div>
           <div className="complete-stat"><span style={{fontSize:22,fontWeight:700,color:'var(--org)'}}>{fmtTime(duration)}</span><span style={{fontSize:11,color:'var(--t2)'}}>Duration</span></div>
+          {calories>0&&<div className="complete-stat"><span style={{fontSize:22,fontWeight:700,color:'var(--red)'}}>{calories}</span><span style={{fontSize:11,color:'var(--t2)'}}>Est. kcal</span></div>}
           {prCount>0&&<div className="complete-stat"><span style={{fontSize:22,fontWeight:700,color:'var(--yel)'}}>{prCount}</span><span style={{fontSize:11,color:'var(--t2)'}}>New PRs</span></div>}
         </div>
         <button className="btn btn-g" onClick={onClose} style={{padding:'12px 40px'}}>Done</button>
@@ -950,11 +991,15 @@ const DayView=({day,phase,onBack})=>{
     vb();
   };
 
+  const[lastCalories,setLastCalories]=useState(0);
   const saveWorkout=()=>{
     session.stop();
     const ts=new Date().toISOString();
+    const bw=ld('bodyweight',80);
+    const calories=estCalories(session.elapsed,totalVolume,parseFloat(bw)||80);
+    setLastCalories(calories);
     const hist=ld('history',[]);
-    hist.push({day:day.n,date:ts,completed,total:totalEx,duration:session.elapsed,note:note||undefined,volume:totalVolume||undefined,kneePain:kneePain!=null?kneePain:undefined,rpe:rpe||undefined});
+    hist.push({day:day.n,date:ts,completed,total:totalEx,duration:session.elapsed,note:note||undefined,volume:totalVolume||undefined,kneePain:kneePain!=null?kneePain:undefined,rpe:rpe||undefined,calories});
     sv('history',hist);
     vb();
     setShowComplete(true);
@@ -1007,7 +1052,7 @@ const DayView=({day,phase,onBack})=>{
         <div style={{height:24}}/>
       </div>
       {showRest&&<RestTimer seconds={showRest} onDone={()=>setShowRest(null)} onSkip={()=>setShowRest(null)}/>}
-      {showComplete&&<CompletionSummary day={day} completed={completed} total={totalEx} duration={session.elapsed} onClose={()=>{setShowComplete(false);onBack()}}/>}
+      {showComplete&&<CompletionSummary day={day} completed={completed} total={totalEx} duration={session.elapsed} calories={lastCalories} onClose={()=>{setShowComplete(false);onBack()}}/>}
       {toast&&<Toast msg={toast} onClose={()=>setToast('')}/>}
     </div>
   );
@@ -1532,21 +1577,57 @@ const LibraryTab=()=>{
   );
 };
 
+// === CALORIE ESTIMATE ===
+const estCalories=(duration,volume,bodyweight)=>{
+  const bw=bodyweight||80;
+  const baseMET=5;
+  const durationMin=(duration||0)/60;
+  const baseCalories=baseMET*bw/60*durationMin;
+  const volumeBonus=volume>0?volume/500:0;
+  return Math.round(baseCalories+volumeBonus);
+};
+
 // === SETTINGS TAB ===
 const SettingsTab=()=>{
   const[bw,setBw]=useState('');
   const[toast,setToast]=useState('');
   const[customRest,setCustomRest]=useState('');
+  const[goalW,setGoalW]=useState(()=>ld('weightGoal',''));
+  const[mWaist,setMWaist]=useState('');
+  const[mChest,setMChest]=useState('');
+  const[mThigh,setMThigh]=useState('');
   const weightLog=ld('weightLog',[]);
+  const measurements=ld('measurements',[]);
+
+  // Weigh-in nudge
+  const lastWeighIn=weightLog.length>0?weightLog[weightLog.length-1]:null;
+  const daysSinceWeighIn=lastWeighIn?Math.floor((new Date()-new Date(lastWeighIn.date))/(1000*60*60*24)):99;
+  const needsWeighIn=daysSinceWeighIn>=7;
 
   const saveWeight=()=>{
     if(!bw||isNaN(parseFloat(bw)))return;
     const log=[...weightLog,{date:new Date().toISOString(),w:parseFloat(bw)}];
     sv('weightLog',log);
-    // Also save as current for backward compat
     sv('bodyweight',bw);
     setBw('');
     setToast('Weight logged: '+bw+' kg');
+    vb();
+  };
+
+  const saveGoal=()=>{
+    if(!goalW||isNaN(parseFloat(goalW)))return;
+    sv('weightGoal',parseFloat(goalW));
+    setToast('Goal set: '+goalW+' kg');
+    vb();
+  };
+
+  const saveMeasurements=()=>{
+    if(!mWaist&&!mChest&&!mThigh)return;
+    const entry={date:new Date().toISOString(),waist:parseFloat(mWaist)||null,chest:parseFloat(mChest)||null,thigh:parseFloat(mThigh)||null};
+    const log=[...measurements,entry];
+    sv('measurements',log);
+    setMWaist('');setMChest('');setMThigh('');
+    setToast('Measurements saved');
     vb();
   };
 
@@ -1597,16 +1678,75 @@ const SettingsTab=()=>{
     <>
       <div className="hdr"><h1>Settings</h1><p>IronClad Pro v16.0</p></div>
       <div className="scroll">
-        <div className="section-t">Body Stats</div>
+        {needsWeighIn&&<div className="card" style={{padding:14,border:'1px solid var(--org)',marginBottom:12}}>
+          <div style={{display:'flex',alignItems:'center',gap:8}}>
+            <span style={{fontSize:20}}>⚖️</span>
+            <div>
+              <div style={{fontWeight:600,fontSize:14,color:'var(--org)'}}>Time to weigh in!</div>
+              <div style={{fontSize:12,color:'var(--t2)'}}>Last weigh-in was {daysSinceWeighIn} days ago. Weekly consistency = reliable trends.</div>
+            </div>
+          </div>
+        </div>}
+
+        <div className="section-t">Body Weight</div>
         <div className="card" style={{padding:16}}>
-          <div style={{fontSize:14,color:'var(--t2)',marginBottom:8}}>Body Weight (kg)</div>
-          <div style={{display:'flex',gap:8}}>
-            <input className="inp" type="number" inputMode="decimal" placeholder="e.g. 88.5" value={bw} onChange={e=>setBw(e.target.value)} style={{textAlign:'left',padding:'0 14px'}}/>
+          <div style={{display:'flex',gap:8,marginBottom:8}}>
+            <input className="inp" type="number" inputMode="decimal" placeholder="Current weight (kg)" value={bw} onChange={e=>setBw(e.target.value)} style={{textAlign:'left',padding:'0 14px'}}/>
             <button className="btn btn-g" onClick={saveWeight}>Save</button>
           </div>
-          {weightLog.length>0&&<div style={{marginTop:12,fontSize:13,color:'var(--t2)'}}>
-            Last: {weightLog[weightLog.length-1].w} kg · {weightLog.length} entries logged
+          {weightLog.length>0&&<div style={{fontSize:13,color:'var(--t2)',marginBottom:8}}>
+            Current: {weightLog[weightLog.length-1].w} kg · {weightLog.length} entries · {daysSinceWeighIn===0?'today':daysSinceWeighIn+'d ago'}
           </div>}
+          <div style={{display:'flex',gap:8,alignItems:'center'}}>
+            <input className="inp" type="number" inputMode="decimal" placeholder="Goal weight (kg)" value={goalW} onChange={e=>setGoalW(e.target.value)} style={{textAlign:'left',padding:'0 14px',maxWidth:160}}/>
+            <button className="btn btn-s" onClick={saveGoal}>Set Goal</button>
+          </div>
+          {(()=>{
+            const goal=ld('weightGoal',null);
+            const current=weightLog.length>0?weightLog[weightLog.length-1].w:null;
+            const start=weightLog.length>1?weightLog[0].w:null;
+            if(!goal||!current)return null;
+            const totalToLose=start?(start-goal):0;
+            const lost=start?(start-current):0;
+            const remaining=current-goal;
+            const pct=totalToLose>0?Math.min(100,Math.max(0,Math.round((lost/totalToLose)*100))):0;
+            return(
+              <div style={{marginTop:10}}>
+                <div style={{display:'flex',justifyContent:'space-between',fontSize:12,color:'var(--t2)',marginBottom:4}}>
+                  <span>{start||current}kg</span>
+                  <span style={{color:remaining<=0?'var(--grn)':'var(--t1)',fontWeight:600}}>{remaining<=0?'Goal reached!':remaining.toFixed(1)+'kg to go'}</span>
+                  <span>{goal}kg</span>
+                </div>
+                <div className="goal-bar">
+                  <div className="goal-fill" style={{width:`${pct}%`,background:pct>=100?'var(--grn)':pct>=50?'var(--blu)':'var(--org)'}}/>
+                </div>
+                <div style={{fontSize:11,color:'var(--t3)',marginTop:4,textAlign:'center'}}>{pct}% of the way there</div>
+              </div>
+            );
+          })()}
+        </div>
+
+        <div className="section-t">Body Measurements</div>
+        <div className="card" style={{padding:16}}>
+          <div style={{fontSize:13,color:'var(--t2)',marginBottom:8}}>Track changes beyond the scale (cm)</div>
+          <div style={{display:'flex',gap:6,marginBottom:8}}>
+            <input className="inp" type="number" inputMode="decimal" placeholder="Waist" value={mWaist} onChange={e=>setMWaist(e.target.value)} style={{textAlign:'center'}}/>
+            <input className="inp" type="number" inputMode="decimal" placeholder="Chest" value={mChest} onChange={e=>setMChest(e.target.value)} style={{textAlign:'center'}}/>
+            <input className="inp" type="number" inputMode="decimal" placeholder="Thigh" value={mThigh} onChange={e=>setMThigh(e.target.value)} style={{textAlign:'center'}}/>
+          </div>
+          <button className="btn btn-g" style={{width:'100%'}} onClick={saveMeasurements}>Save Measurements</button>
+          {measurements.length>0&&(()=>{
+            const last=measurements[measurements.length-1];
+            const first=measurements[0];
+            return <div style={{marginTop:10,fontSize:12,color:'var(--t2)'}}>
+              <div style={{display:'flex',justifyContent:'space-between'}}>
+                {last.waist&&<span>Waist: {last.waist}cm{measurements.length>1&&first.waist?<span style={{color:last.waist<first.waist?'var(--grn)':'var(--red)',marginLeft:4}}>{(last.waist-first.waist)>0?'+':''}{(last.waist-first.waist).toFixed(1)}</span>:null}</span>}
+                {last.chest&&<span>Chest: {last.chest}cm{measurements.length>1&&first.chest?<span style={{color:last.chest>first.chest?'var(--grn)':'var(--red)',marginLeft:4}}>{(last.chest-first.chest)>0?'+':''}{(last.chest-first.chest).toFixed(1)}</span>:null}</span>}
+                {last.thigh&&<span>Thigh: {last.thigh}cm{measurements.length>1&&first.thigh?<span style={{color:last.thigh>first.thigh?'var(--grn)':'var(--red)',marginLeft:4}}>{(last.thigh-first.thigh)>0?'+':''}{(last.thigh-first.thigh).toFixed(1)}</span>:null}</span>}
+              </div>
+              <div style={{color:'var(--t3)',marginTop:4}}>{measurements.length} entries logged</div>
+            </div>;
+          })()}
         </div>
 
         <div className="section-t">Rest Timer</div>
@@ -1654,15 +1794,79 @@ const SettingsTab=()=>{
 const RecoveryTab=()=>{
   const[toast,setToast]=useState('');
   const[tick,setTick]=useState(0);
+  const[milestones,setMilestones]=useState(()=>ld('kneeMilestones',{}));
   const hist=ld('history',[]);
   const runs=ld('runLog',[]);
   const readiness=ld('readiness',{});
+  const exHistory=ld('exHistory',{});
 
   // Readiness trend (last 14 days)
   const readinessEntries=Object.values(readiness).sort((a,b)=>a.date>b.date?1:-1).slice(-14);
 
   // Knee pain from runs
   const runPainData=runs.filter(r=>r.kneeFeel!=null).slice(-10);
+
+  // Rehab compliance: % of knee-tagged exercises done this week
+  const weekAgo=new Date();weekAgo.setDate(weekAgo.getDate()-7);
+  const kneeExIds=EXERCISES.filter(e=>e.tags&&e.tags.includes('k')).map(e=>e.id);
+  const kneeDoneThisWeek=kneeExIds.filter(eid=>{
+    const sessions=exHistory[eid]||[];
+    return sessions.some(s=>new Date(s.date)>=weekAgo);
+  }).length;
+  const totalKneeEx=kneeExIds.length;
+  const compliancePct=totalKneeEx>0?Math.round((kneeDoneThisWeek/totalKneeEx)*100):0;
+
+  // Knee recovery milestones
+  const MILESTONES=[
+    {id:'pain3',label:'Pain ≤ 3/10 during workouts'},
+    {id:'fullsquat',label:'Full bodyweight squat pain-free'},
+    {id:'singleleg',label:'Single-leg balance 30s each side'},
+    {id:'run5k',label:'Run 5k pain-free'},
+    {id:'jump',label:'Box jump 12" pain-free'},
+    {id:'split',label:'Bulgarian split squat with weight'},
+    {id:'trail',label:'Trail run 30+ minutes'},
+    {id:'noNSAID',label:'7 days without NSAIDs'},
+  ];
+  const toggleMs=(id)=>{
+    const next={...milestones,[id]:!milestones[id]};
+    setMilestones(next);
+    sv('kneeMilestones',next);
+    vb();
+  };
+  const msDoneCount=MILESTONES.filter(m=>milestones[m.id]).length;
+
+  // Pain vs training load correlation (last 8 weeks)
+  const corrWeeks=[];
+  for(let i=7;i>=0;i--){
+    const ws=new Date();ws.setDate(ws.getDate()-(i*7+6));ws.setHours(0,0,0,0);
+    const we=new Date();we.setDate(we.getDate()-(i*7));we.setHours(23,59,59,999);
+    const wHist=hist.filter(h=>{const d=new Date(h.date);return d>=ws&&d<=we});
+    const wRuns=runs.filter(r=>{const d=new Date(r.date);return d>=ws&&d<=we});
+    const load=wHist.reduce((a,h)=>a+(h.volume||0),0)/1000+wRuns.reduce((a,r)=>a+(r.dist||0),0);
+    const pains=[...wHist.filter(h=>h.kneePain!=null).map(h=>h.kneePain),...wRuns.filter(r=>r.kneeFeel!=null).map(r=>r.kneeFeel)];
+    const avgPain=pains.length>0?pains.reduce((a,p)=>a+p,0)/pains.length:null;
+    corrWeeks.push({load,avgPain,wkLabel:`${ws.getMonth()+1}/${ws.getDate()}`});
+  }
+  const maxLoad=Math.max(1,...corrWeeks.map(w=>w.load));
+
+  // Weekly km progression with 10% rule
+  const weekKm=[];
+  for(let i=7;i>=0;i--){
+    const ws=new Date();ws.setDate(ws.getDate()-(i*7+6));ws.setHours(0,0,0,0);
+    const we=new Date();we.setDate(we.getDate()-(i*7));we.setHours(23,59,59,999);
+    const km=runs.filter(r=>{const d=new Date(r.date);return d>=ws&&d<=we}).reduce((a,r)=>a+(r.dist||0),0);
+    weekKm.push(km);
+  }
+  const lastWk=weekKm[weekKm.length-2]||0;
+  const safeNext=lastWk*1.1;
+  const thisWk=weekKm[weekKm.length-1]||0;
+  const overTen=lastWk>0&&thisWk>safeNext;
+  const maxKm=Math.max(1,...weekKm,safeNext);
+
+  // Pace trend (last 10 runs with valid pace)
+  const paceRuns=runs.filter(r=>r.pace>0).slice(-10);
+  const maxPace=paceRuns.length>0?Math.max(...paceRuns.map(r=>r.pace)):0;
+  const minPace=paceRuns.length>0?Math.min(...paceRuns.map(r=>r.pace)):0;
 
   return(
     <>
@@ -1685,8 +1889,84 @@ const RecoveryTab=()=>{
           </div>
         </>}
 
+        <div className="section-t">Knee Rehab Compliance</div>
+        <div className="card" style={{padding:14}}>
+          <div style={{display:'flex',justifyContent:'space-between',marginBottom:6,fontSize:13}}>
+            <span style={{fontWeight:600}}>This week</span>
+            <span style={{color:compliancePct>=70?'var(--grn)':compliancePct>=40?'var(--org)':'var(--red)',fontWeight:700}}>{kneeDoneThisWeek}/{totalKneeEx} ({compliancePct}%)</span>
+          </div>
+          <div className="goal-bar">
+            <div className="goal-fill" style={{width:`${compliancePct}%`,background:compliancePct>=70?'var(--grn)':compliancePct>=40?'var(--org)':'var(--red)'}}/>
+          </div>
+          <div style={{fontSize:11,color:'var(--t3)',marginTop:6}}>{compliancePct>=70?'Excellent rehab consistency':compliancePct>=40?'Keep going — aim for 70%+':'Try to hit more knee-safe exercises this week'}</div>
+        </div>
+
+        <div className="section-t">Knee Recovery Milestones <span style={{color:'var(--t3)',fontWeight:400,fontSize:11}}>({msDoneCount}/{MILESTONES.length})</span></div>
+        <div className="card" style={{padding:'4px 14px'}}>
+          {MILESTONES.map(m=>(
+            <div key={m.id} className="ms-item" onClick={()=>toggleMs(m.id)} style={{cursor:'pointer'}}>
+              <div className={`ms-check${milestones[m.id]?' done':''}`}>{milestones[m.id]?'✓':''}</div>
+              <div style={{fontSize:13,color:milestones[m.id]?'var(--t3)':'var(--t1)',textDecoration:milestones[m.id]?'line-through':'none'}}>{m.label}</div>
+            </div>
+          ))}
+        </div>
+
         <div className="section-t">Running</div>
         <RunningLog onToast={(msg)=>{setToast(msg);setTick(t=>t+1)}}/>
+
+        {weekKm.some(k=>k>0)&&<>
+          <div className="section-t" style={{marginTop:16}}>Weekly km · 10% Rule</div>
+          <div className="card" style={{padding:14}}>
+            <div className="mini-chart" style={{height:60,alignItems:'flex-end'}}>
+              {weekKm.map((k,i)=>(
+                <div key={i} className="mini-bar" style={{height:`${Math.max(2,(k/maxKm)*56)}px`,background:i===weekKm.length-1&&overTen?'var(--red)':'var(--blu)'}} title={`${k.toFixed(1)}km`}/>
+              ))}
+            </div>
+            <div style={{display:'flex',justifyContent:'space-between',fontSize:11,color:'var(--t2)',marginTop:6}}>
+              <span>This wk: <b style={{color:overTen?'var(--red)':'var(--t1)'}}>{thisWk.toFixed(1)}km</b></span>
+              <span>Last wk: {lastWk.toFixed(1)}km</span>
+              <span>Safe max: {safeNext.toFixed(1)}km</span>
+            </div>
+            {overTen&&<div style={{fontSize:11,color:'var(--red)',marginTop:4,textAlign:'center'}}>⚠️ Volume jumped &gt;10% — injury risk</div>}
+          </div>
+        </>}
+
+        {paceRuns.length>=3&&<>
+          <div className="section-t" style={{marginTop:16}}>Pace Trend</div>
+          <div className="card" style={{padding:14}}>
+            <div className="mini-chart" style={{height:50,alignItems:'flex-end'}}>
+              {paceRuns.map((r,i)=>{
+                const range=maxPace-minPace||1;
+                const norm=1-((r.pace-minPace)/range);
+                return <div key={i} className="mini-bar" style={{height:`${Math.max(4,norm*46+4)}px`,background:'var(--grn)'}} title={`${r.pace}min/km`}/>;
+              })}
+            </div>
+            <div style={{display:'flex',justifyContent:'space-between',fontSize:11,color:'var(--t2)',marginTop:6}}>
+              <span>Best: {minPace.toFixed(1)}min/km</span>
+              <span>Avg: {(paceRuns.reduce((a,r)=>a+r.pace,0)/paceRuns.length).toFixed(1)}min/km</span>
+              <span>Slowest: {maxPace.toFixed(1)}min/km</span>
+            </div>
+          </div>
+        </>}
+
+        {corrWeeks.filter(w=>w.avgPain!=null).length>=3&&<>
+          <div className="section-t" style={{marginTop:16}}>Load vs Knee Pain</div>
+          <div className="card" style={{padding:14}}>
+            <div className="corr-chart">
+              {corrWeeks.map((w,i)=>(
+                <div key={i} className="corr-bar">
+                  <div className="top" style={{height:`${(w.load/maxLoad)*36}px`,background:'var(--blu)'}} title={`Load: ${w.load.toFixed(1)}`}/>
+                  <div className="bot" style={{height:`${w.avgPain!=null?(w.avgPain/10)*36:0}px`,background:w.avgPain!=null?painColor(w.avgPain):'transparent'}} title={w.avgPain!=null?`Pain: ${w.avgPain.toFixed(1)}/10`:''}/>
+                </div>
+              ))}
+            </div>
+            <div style={{display:'flex',justifyContent:'space-between',fontSize:10,color:'var(--t3)',marginTop:6}}>
+              <span style={{color:'var(--blu)'}}>■ Load (top)</span>
+              <span style={{color:'var(--red)'}}>■ Pain (bottom)</span>
+            </div>
+            <div style={{fontSize:11,color:'var(--t2)',marginTop:4,textAlign:'center'}}>8 weeks · spot if higher load = more pain</div>
+          </div>
+        </>}
 
         {runPainData.length>=3&&<>
           <div className="section-t" style={{marginTop:16}}>Knee Feel After Runs</div>
