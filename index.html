@@ -7,14 +7,14 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="IronClad">
 <meta name="theme-color" content="#000">
-<meta name="version" content="17.3.0">
+<meta name="version" content="17.4.0">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <title>IronClad Pro</title>
-<script src="https://unpkg.com/react@18/umd/react.production.min.js?v=17"></script>
-<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js?v=17"></script>
-<script src="https://unpkg.com/@babel/standalone/babel.min.js?v=17"></script>
+<script src="https://unpkg.com/react@18/umd/react.production.min.js?v=17.4"></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js?v=17.4"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js?v=17.4"></script>
 <style>
 :root{--bg:#000;--c1:#1c1c1e;--c2:#2c2c2e;--c3:#3a3a3c;--sep:rgba(84,84,88,0.65);--t1:#fff;--t2:rgba(235,235,245,0.6);--t3:rgba(235,235,245,0.3);--grn:#009A44;--grn-d:rgba(0,154,68,0.15);--org:#FF8C00;--org-d:rgba(255,140,0,0.15);--red:#ff453a;--red-d:rgba(255,69,58,0.15);--blu:#0a84ff;--pur:#bf5af2;--cyn:#64d2ff;--yel:#ffd60a;--safe-t:env(safe-area-inset-top);--safe-b:env(safe-area-inset-bottom)}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;margin:0;padding:0}
@@ -136,7 +136,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--t1);font-
 <script>
 if('serviceWorker' in navigator){
   const swCode=`
-    const CACHE='ironclad-v17';
+    const CACHE='ironclad-v17.4';
     const ASSETS=['/'];
     self.addEventListener('install',e=>e.waitUntil(caches.open(CACHE).then(c=>c.addAll(ASSETS)).then(()=>self.skipWaiting())));
     self.addEventListener('activate',e=>e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim())));
@@ -938,7 +938,7 @@ const WorkoutTab=({onOpenDay})=>{
     <>
       <div className="hdr">
         <h1>Workout</h1>
-        <p>v17.3 · Knee-Rehab + Weight-Loss Edition · Full Body Split</p>
+        <p>v17.4 · Knee-Rehab + Weight-Loss Edition · Full Body Split</p>
       </div>
       <div className="scroll">
         <div className="phase-sel">
