@@ -197,6 +197,7 @@ const estCalories=(duration,volume,bodyweight)=>{
 
 // === est1RM ===
 const est1RM=(w,r)=>{if(!w||!r||r<1)return 0;if(r===1)return w;return Math.round(w*(1+r/30))};
+const estRunCal=(distKm,bw)=>Math.round((bw||80)*distKm*1.036);
 
 // === EXERCISE DATABASE ===
 const EXDB=[
@@ -978,12 +979,126 @@ const WorkoutTab=({onOpenDay})=>{
   );
 };
 
+// === RUNNING LOG ===
+const RunningLog=({showToast})=>{
+  const[dist,setDist]=useState('');
+  const[dur,setDur]=useState('');
+  const[runType,setRunType]=useState('easy');
+  const[runs,setRuns]=useState(()=>ld('runLog',[]));
+  const bw=ld('bodyweight',80);
+
+  const saveRun=()=>{
+    const d=parseFloat(dist);const m=parseInt(dur);
+    if(!d||d<=0)return;
+    const cal=estRunCal(d,bw);
+    const pace=m>0?Math.round(m/d*100)/100:0;
+    const entry={date:today(),dist:d,dur:m||0,pace,type:runType,cal};
+    const log=[entry,...runs];
+    sv('runLog',log);setRuns(log);
+    setDist('');setDur('');setRunType('easy');
+    if(showToast)showToast('Run logged: '+d+'km · '+cal+' kcal');
+  };
+
+  const deleteRun=(i)=>{
+    if(!confirm('Delete this run?'))return;
+    const log=[...runs];log.splice(i,1);sv('runLog',log);setRuns(log);
+  };
+
+  const weekRuns=runs.filter(r=>(new Date()-new Date(r.date))/86400000<7);
+  const weekKm=weekRuns.reduce((a,r)=>a+r.dist,0);
+  const weekCal=weekRuns.reduce((a,r)=>a+(r.cal||0),0);
+
+  return (
+    <>
+      <div className="section-t">Running Log</div>
+      <div className="card" style={{padding:16}}>
+        <div style={{display:'flex',gap:8,marginBottom:8}}>
+          <input className="inp" style={{flex:1}} type="number" inputMode="decimal" placeholder="km" value={dist} onChange={e=>setDist(e.target.value)} />
+          <input className="inp" style={{flex:1}} type="number" inputMode="numeric" placeholder="min" value={dur} onChange={e=>setDur(e.target.value)} />
+        </div>
+        <div style={{display:'flex',gap:6,marginBottom:10,flexWrap:'wrap'}}>
+          {['easy','tempo','interval','long'].map(t=>(
+            <button key={t} className={'btn'+(runType===t?' btn-g':' btn-s')} style={{padding:'6px 12px',fontSize:13,textTransform:'capitalize'}} onClick={()=>setRunType(t)}>{t}</button>
+          ))}
+        </div>
+        <button className="btn btn-g" style={{width:'100%'}} onClick={saveRun}>Log Run</button>
+      </div>
+      <div className="stat-grid">
+        <div className="stat-card"><div className="val">{weekKm.toFixed(1)}</div><div className="lbl">km this week</div></div>
+        <div className="stat-card"><div className="val">{weekCal}</div><div className="lbl">run kcal this week</div></div>
+      </div>
+      {runs.slice(0,10).map((r,i)=>(
+        <div key={i} className="hist-item">
+          <div>
+            <div style={{fontWeight:600,fontSize:15}}>{r.dist}km &middot; {r.type}</div>
+            <div style={{fontSize:12,color:'var(--t2)'}}>{fmtDate(r.date)}{r.dur>0?' · '+r.dur+'min':''}{r.pace>0?' · '+r.pace.toFixed(1)+' min/km':''} &middot; {r.cal} kcal</div>
+          </div>
+          <button style={{background:'none',border:'none',color:'var(--red)',fontSize:16,cursor:'pointer',padding:4}} onClick={()=>deleteRun(i)}>X</button>
+        </div>
+      ))}
+    </>
+  );
+};
+
+// === PROTEIN TRACKER ===
+const ProteinTracker=()=>{
+  const bw=ld('bodyweight',80);
+  const target=Math.round(bw*2);
+  const todayKey=today();
+  const[todayGrams,setTodayGrams]=useState(()=>{const log=ld('proteinLog',{});return log[todayKey]||0});
+
+  const addProtein=(g)=>{
+    const log=ld('proteinLog',{});
+    const newVal=(log[todayKey]||0)+g;
+    log[todayKey]=newVal;
+    sv('proteinLog',log);
+    setTodayGrams(newVal);
+  };
+
+  const resetToday=()=>{
+    const log=ld('proteinLog',{});
+    log[todayKey]=0;
+    sv('proteinLog',log);
+    setTodayGrams(0);
+  };
+
+  const pct=target>0?Math.min(100,Math.round(todayGrams/target*100)):0;
+  const proteinLog=ld('proteinLog',{});
+  const days7=[];
+  for(let i=0;i<7;i++){const d=new Date();d.setDate(d.getDate()-i);days7.push(d.toISOString().slice(0,10))}
+  const compDays=days7.filter(k=>(proteinLog[k]||0)>=target).length;
+
+  return (
+    <>
+      <div className="section-t">Protein Tracker</div>
+      <div className="card" style={{padding:16}}>
+        <div style={{display:'flex',justifyContent:'space-between',alignItems:'baseline',marginBottom:8}}>
+          <div style={{fontSize:24,fontWeight:700}}>{todayGrams}g</div>
+          <div style={{fontSize:13,color:'var(--t2)'}}>/ {target}g target</div>
+        </div>
+        <div className="prg" style={{height:10,marginBottom:12}}>
+          <div className="prg-f" style={{width:pct+'%',background:pct>=100?'var(--grn)':'var(--org)'}} />
+        </div>
+        <div style={{display:'flex',gap:6,flexWrap:'wrap',marginBottom:8}}>
+          {[20,30,40,50].map(g=>(
+            <button key={g} className="btn btn-s" style={{flex:1,padding:'10px 0',fontSize:14}} onClick={()=>addProtein(g)}>+{g}g</button>
+          ))}
+        </div>
+        <button className="btn btn-s" style={{width:'100%',fontSize:13,padding:8}} onClick={resetToday}>Reset Today</button>
+        <div style={{fontSize:12,color:'var(--t2)',marginTop:10}}>{compDays}/7 days hit target this week</div>
+      </div>
+    </>
+  );
+};
+
 // === PROGRESS TAB ===
-const ProgressTab=()=>{
+const ProgressTab=({showToast})=>{
   const history=ld('history',[]);
   const weightLog=ld('weightLog',[]);
   const prs=ld('prs',{});
   const bw=ld('bodyweight',80);
+  const runLog=ld('runLog',[]);
+  const proteinLog=ld('proteinLog',{});
 
   const totalWorkouts=history.length;
   const thisWeek=history.filter(h=>{const d=new Date(h.date);const now=new Date();const diff=(now-d)/86400000;return diff<7}).length;
@@ -1041,6 +1156,24 @@ const ProgressTab=()=>{
 
   const deleteHist=(idx)=>{const h=[...history];h.splice(idx,1);sv('history',h);window.location.reload()};
 
+  const weekWorkoutKcal=recentHist.reduce((a,h)=>a+(h.calories||0),0);
+  const weekRunsP=runLog.filter(r=>(new Date()-new Date(r.date))/86400000<7);
+  const weekRunKm=weekRunsP.reduce((a,r)=>a+r.dist,0);
+  const weekRunKcal=weekRunsP.reduce((a,r)=>a+(r.cal||0),0);
+  const weekTotalKcal=weekWorkoutKcal+weekRunKcal;
+  const proteinTarget=Math.round(bw*2);
+  const proteinDays7=[];
+  for(let i=0;i<7;i++){const d=new Date();d.setDate(d.getDate()-i);proteinDays7.push(d.toISOString().slice(0,10))}
+  const proteinCompDays=proteinDays7.filter(k=>(proteinLog[k]||0)>=proteinTarget).length;
+  let weeklyWeightRate=0;
+  const recentWeights=weightLog.filter(w=>(new Date()-new Date(w.date))/86400000<14);
+  if(recentWeights.length>=2){
+    const sorted=[...recentWeights].sort((a,b)=>new Date(a.date)-new Date(b.date));
+    const first=sorted[0];const last=sorted[sorted.length-1];
+    const daysDiff=(new Date(last.date)-new Date(first.date))/86400000;
+    if(daysDiff>0)weeklyWeightRate=Math.round((last.kg-first.kg)/daysDiff*7*10)/10;
+  }
+
   return (
     <>
       <div className="hdr"><h1>Progress</h1></div>
@@ -1090,20 +1223,35 @@ const ProgressTab=()=>{
           </div>
         </div>
 
-        <div className="section-t">Weekly Summary</div>
+        <div className="section-t">Weekly Dashboard</div>
         <div className="card" style={{padding:16}}>
           <div style={{display:'flex',justifyContent:'space-between',marginBottom:8}}>
-            <span style={{color:'var(--t2)'}}>This week</span>
-            <span style={{fontWeight:600}}>{thisWeek} workouts</span>
+            <span style={{color:'var(--t2)'}}>Workouts</span>
+            <span style={{fontWeight:600}}>{thisWeek} <span style={{fontSize:12,color:'var(--t3)'}}>({lastWeek} last wk)</span></span>
           </div>
           <div style={{display:'flex',justifyContent:'space-between',marginBottom:8}}>
-            <span style={{color:'var(--t2)'}}>Last week</span>
-            <span style={{fontWeight:600}}>{lastWeek} workouts</span>
+            <span style={{color:'var(--t2)'}}>Total kcal burned</span>
+            <span style={{fontWeight:600,color:'var(--org)'}}>{weekTotalKcal.toLocaleString()}</span>
           </div>
-          <div style={{display:'flex',justifyContent:'space-between'}}>
-            <span style={{color:'var(--t2)'}}>Trend</span>
-            <span style={{fontWeight:600,color:thisWeek>=lastWeek?'var(--grn)':'var(--red)'}}>{thisWeek>=lastWeek?'Up':'Down'}</span>
+          <div style={{display:'flex',justifyContent:'space-between',marginBottom:8}}>
+            <span style={{color:'var(--t2)'}}>Running</span>
+            <span style={{fontWeight:600}}>{weekRunKm.toFixed(1)} km &middot; {weekRunKcal} kcal</span>
           </div>
+          <div style={{display:'flex',justifyContent:'space-between',marginBottom:8}}>
+            <span style={{color:'var(--t2)'}}>Protein compliance</span>
+            <span style={{fontWeight:600,color:proteinCompDays>=5?'var(--grn)':'var(--org)'}}>{proteinCompDays}/7 days</span>
+          </div>
+          <div style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}>
+            <span style={{color:'var(--t2)'}}>Weight rate</span>
+            <span style={{fontWeight:600,color:Math.abs(weeklyWeightRate)>0.5?'var(--red)':'var(--grn)'}}>
+              {weeklyWeightRate>0?'+':''}{weeklyWeightRate} kg/wk
+            </span>
+          </div>
+          {Math.abs(weeklyWeightRate)>0.5 && (
+            <div style={{fontSize:11,color:'var(--red)',marginTop:8,padding:'6px 10px',background:'var(--red-d)',borderRadius:8}}>
+              {weeklyWeightRate<-0.5?'Losing too fast — risk of muscle loss. Slow down deficit.':'Gaining too fast — check calorie surplus.'}
+            </div>
+          )}
         </div>
 
         <div className="section-t">ACWR Gauge</div>
@@ -1188,6 +1336,8 @@ const ProgressTab=()=>{
             ))}
           </>
         )}
+
+        <RunningLog showToast={showToast} />
       </div>
     </>
   );
@@ -1333,6 +1483,8 @@ const SettingsTab=({showToast})=>{
           {lastWeighIn && <div style={{fontSize:12,color:'var(--t2)',marginTop:8}}>Last: {lastWeighIn.kg}kg on {fmtDate(lastWeighIn.date)}</div>}
         </div>
 
+        <ProteinTracker />
+
         <div className="section-t">Weight Goal</div>
         <div className="card" style={{padding:16}}>
           <div style={{display:'flex',gap:8,marginBottom:12}}>
@@ -1402,7 +1554,7 @@ const SettingsTab=({showToast})=>{
             3-day full-body split with 4 progressive phases. Each day has 3 strength supersets (grouped by equipment) + 1 metabolic finisher. Phase 1: Foundation (3x10-12), Phase 2: Build (4x8-10), Phase 3: Strength &amp; Power (4x5-8), Phase 4: Maintain &amp; Perform (3x6-10). 7 trainer-prescribed knee-rehab exercises integrated across all phases. Equipment: Barbells, dumbbells, cables, kettlebells, rowing machine, SkiErg, bands, foam roller, bench, steps, bars.
           </div>
         </div>
-        <div style={{textAlign:'center',padding:'16px 0',fontSize:12,color:'var(--t3)'}}>v17.3 IronClad Pro</div>
+        <div style={{textAlign:'center',padding:'16px 0',fontSize:12,color:'var(--t3)'}}>v17.4 IronClad Pro</div>
       </div>
     </>
   );
@@ -1428,7 +1580,7 @@ const App=()=>{
   return (
     <div className="app">
       {tab==='workout' && <WorkoutTab onOpenDay={(day,phase)=>setDayView({day,phase})} />}
-      {tab==='progress' && <ProgressTab />}
+      {tab==='progress' && <ProgressTab showToast={showToast} />}
       {tab==='library' && <LibraryTab />}
       {tab==='settings' && <SettingsTab showToast={showToast} />}
       <div className="tabs">
