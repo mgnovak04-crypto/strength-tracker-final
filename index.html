@@ -7,7 +7,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="IronClad">
 <meta name="theme-color" content="#000">
-<meta name="version" content="17.0.0">
+<meta name="version" content="17.1.0">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
@@ -272,86 +272,95 @@ const EXDB=[
 const exMap=Object.fromEntries(EXDB.map(e=>[e.id,e]));
 
 // === PROGRAM ===
+// Equipment grouping: Free Weights (Barbell/Dumbbell/Kettlebell), Bodyweight (Bodyweight/Band/Step/Box/Foam Roller/Bench/Bar), Cable/Machine
+// Every superset = exactly 3 exercises. Finishers can mix equipment.
+// Trainer exercises in ALL phases: trapbar(A), foamquad(A), staggerpallof(A), johnsoncalf(B), copenadduct(B), starplank(C), anklejump(C)
 const PHASE_NAMES=['Foundation','Build','Strength & Power','Maintain & Perform'];
 const getProgramDays=(phase)=>{
-  // Trainer exercises per day:
-  // A: trapbar, foamquad, staggerpallof
-  // B: johnsoncalf, copenadduct
-  // C: starplank, anklejump
   if(phase===1) return [
     {name:'Full Body A',focus:['Lower','Push','Core'],supersets:[
-      {label:'Superset 1',type:'Strength',rest:45,exercises:[
+      {label:'Superset 1',type:'Free Weights',rest:45,exercises:[
         {eid:'trapbar',sets:3,reps:'10-12',note:'Light load, form focus'},
-        {eid:'dbbench',sets:3,reps:'10-12'}
+        {eid:'dbbench',sets:3,reps:'10-12'},
+        {eid:'kbswing',sets:3,reps:'10-12'}
       ]},
-      {label:'Superset 2',type:'Strength',rest:45,exercises:[
-        {eid:'hipthrust',sets:3,reps:'10-12'},
-        {eid:'latpd',sets:3,reps:'10-12'}
+      {label:'Superset 2',type:'Cable / Machine',rest:45,exercises:[
+        {eid:'latpd',sets:3,reps:'10-12'},
+        {eid:'legcurl',sets:3,reps:'10-12'},
+        {eid:'staggerpallof',sets:3,reps:'10 each side'}
       ]},
-      {label:'Superset 3',type:'Rehab + Core',rest:45,exercises:[
+      {label:'Superset 3',type:'Bodyweight + Rehab',rest:45,exercises:[
         {eid:'foamquad',sets:2,reps:'90s each'},
-        {eid:'staggerpallof',sets:3,reps:'10 each side'},
-        {eid:'deadbug',sets:3,reps:'8 each side'}
+        {eid:'deadbug',sets:3,reps:'8 each side'},
+        {eid:'plank',sets:3,reps:'30s'}
       ]},
       {label:'Metabolic Finisher',type:'AMRAP 8min',rest:30,exercises:[
-        {eid:'kbswing',sets:1,reps:'15'},
+        {eid:'rowing',sets:1,reps:'500m'},
         {eid:'bearcrwl',sets:1,reps:'20m'},
         {eid:'jumpingjack',sets:1,reps:'30'}
       ]}
     ]},
     {name:'Full Body B',focus:['Lower','Pull','Arms'],supersets:[
-      {label:'Superset 1',type:'Strength',rest:45,exercises:[
+      {label:'Superset 1',type:'Free Weights',rest:45,exercises:[
         {eid:'rdl',sets:3,reps:'10-12'},
-        {eid:'dbrow',sets:3,reps:'10-12'}
+        {eid:'dbrow',sets:3,reps:'10-12'},
+        {eid:'johnsoncalf',sets:3,reps:'12-15'}
       ]},
-      {label:'Superset 2',type:'Strength',rest:45,exercises:[
-        {eid:'johnsoncalf',sets:3,reps:'12-15'},
-        {eid:'dbohp',sets:3,reps:'10-12'}
+      {label:'Superset 2',type:'Cable / Machine',rest:45,exercises:[
+        {eid:'cablerow',sets:3,reps:'10-12'},
+        {eid:'calfstand',sets:3,reps:'12-15'},
+        {eid:'ropepush',sets:3,reps:'10-12'}
       ]},
-      {label:'Superset 3',type:'Rehab + Arms',rest:45,exercises:[
+      {label:'Superset 3',type:'Bodyweight + Rehab',rest:45,exercises:[
         {eid:'copenadduct',sets:2,reps:'8 each side'},
-        {eid:'dbcurl',sets:3,reps:'10-12'},
-        {eid:'birddog',sets:3,reps:'8 each side'}
+        {eid:'birddog',sets:3,reps:'8 each side'},
+        {eid:'clamshell',sets:3,reps:'12 each'}
       ]},
       {label:'Metabolic Finisher',type:'Intervals',rest:30,exercises:[
         {eid:'rowing',sets:1,reps:'5x 500m'},
-        {eid:'mtclimb',sets:1,reps:'30s'}
+        {eid:'mtclimb',sets:1,reps:'30s'},
+        {eid:'jumpingjack',sets:1,reps:'30'}
       ]}
     ]},
     {name:'Full Body C',focus:['Lower','Push','Pull'],supersets:[
-      {label:'Superset 1',type:'Strength',rest:45,exercises:[
-        {eid:'glutebridge',sets:3,reps:'12-15'},
-        {eid:'pushup',sets:3,reps:'10-15'}
+      {label:'Superset 1',type:'Free Weights',rest:45,exercises:[
+        {eid:'hipthrust',sets:3,reps:'10-12'},
+        {eid:'dbohp',sets:3,reps:'10-12'},
+        {eid:'dbcurl',sets:3,reps:'10-12'}
       ]},
-      {label:'Superset 2',type:'Strength',rest:45,exercises:[
-        {eid:'cablerow',sets:3,reps:'10-12'},
-        {eid:'calfstand',sets:3,reps:'12-15'}
+      {label:'Superset 2',type:'Cable / Machine',rest:45,exercises:[
+        {eid:'facepull',sets:3,reps:'10-12'},
+        {eid:'cablefly',sets:3,reps:'10-12'},
+        {eid:'seatedcalf',sets:3,reps:'12-15'}
       ]},
-      {label:'Superset 3',type:'Rehab + Core',rest:45,exercises:[
+      {label:'Superset 3',type:'Bodyweight + Rehab',rest:45,exercises:[
         {eid:'starplank',sets:3,reps:'20s each side'},
         {eid:'anklejump',sets:3,reps:'10 each'},
         {eid:'tke',sets:3,reps:'15 each leg'}
       ]},
       {label:'Metabolic Finisher',type:'EMOM 6min',rest:30,exercises:[
         {eid:'skierg',sets:1,reps:'30s max effort'},
-        {eid:'farmerwalk',sets:1,reps:'40m'}
+        {eid:'farmerwalk',sets:1,reps:'40m'},
+        {eid:'kbswing',sets:1,reps:'15'}
       ]}
     ]}
   ];
   if(phase===2) return [
     {name:'Full Body A',focus:['Lower','Push','Core'],supersets:[
-      {label:'Superset 1',type:'Strength',rest:45,exercises:[
+      {label:'Superset 1',type:'Free Weights',rest:45,exercises:[
         {eid:'trapbar',sets:4,reps:'8-10',note:'Progressive overload'},
-        {eid:'bbench',sets:4,reps:'8-10'}
+        {eid:'dbincbench',sets:4,reps:'8-10'},
+        {eid:'skierswing',sets:4,reps:'8-10'}
       ]},
-      {label:'Superset 2',type:'Strength',rest:45,exercises:[
-        {eid:'hipthrust',sets:4,reps:'8-10'},
-        {eid:'latpd',sets:4,reps:'8-10'}
+      {label:'Superset 2',type:'Cable / Machine',rest:45,exercises:[
+        {eid:'latpd',sets:4,reps:'8-10'},
+        {eid:'legcurl',sets:4,reps:'8-10'},
+        {eid:'staggerpallof',sets:3,reps:'12 each side'}
       ]},
-      {label:'Superset 3',type:'Rehab + Core',rest:45,exercises:[
+      {label:'Superset 3',type:'Bodyweight + Rehab',rest:45,exercises:[
         {eid:'foamquad',sets:2,reps:'90s each'},
-        {eid:'staggerpallof',sets:3,reps:'12 each side'},
-        {eid:'hangknee',sets:3,reps:'10-12'}
+        {eid:'hangknee',sets:3,reps:'10-12'},
+        {eid:'deadbug',sets:3,reps:'10 each side'}
       ]},
       {label:'Metabolic Finisher',type:'AMRAP 8min',rest:30,exercises:[
         {eid:'kbswing',sets:1,reps:'20'},
@@ -360,74 +369,85 @@ const getProgramDays=(phase)=>{
       ]}
     ]},
     {name:'Full Body B',focus:['Lower','Pull','Arms'],supersets:[
-      {label:'Superset 1',type:'Strength',rest:45,exercises:[
+      {label:'Superset 1',type:'Free Weights',rest:45,exercises:[
         {eid:'rdl',sets:4,reps:'8-10'},
-        {eid:'cablerow',sets:4,reps:'8-10'}
+        {eid:'dbrow',sets:4,reps:'8-10'},
+        {eid:'johnsoncalf',sets:4,reps:'10-12'}
       ]},
-      {label:'Superset 2',type:'Strength',rest:45,exercises:[
-        {eid:'johnsoncalf',sets:4,reps:'10-12'},
-        {eid:'bbohp',sets:4,reps:'8-10'}
+      {label:'Superset 2',type:'Cable / Machine',rest:45,exercises:[
+        {eid:'cablerow',sets:4,reps:'8-10'},
+        {eid:'calfstand',sets:4,reps:'10-12'},
+        {eid:'ropepush',sets:4,reps:'8-10'}
       ]},
-      {label:'Superset 3',type:'Rehab + Arms',rest:45,exercises:[
+      {label:'Superset 3',type:'Bodyweight + Rehab',rest:45,exercises:[
         {eid:'copenadduct',sets:3,reps:'10 each side'},
-        {eid:'hammercurl',sets:3,reps:'10-12'},
-        {eid:'pallof',sets:3,reps:'10 each side'}
+        {eid:'birddog',sets:3,reps:'10 each side'},
+        {eid:'clamshell',sets:3,reps:'15 each'}
       ]},
       {label:'Metabolic Finisher',type:'Intervals',rest:30,exercises:[
         {eid:'rowinterval',sets:1,reps:'4x 500m'},
-        {eid:'bearcrwl',sets:1,reps:'20m x3'}
+        {eid:'bearcrwl',sets:1,reps:'20m x3'},
+        {eid:'jumpingjack',sets:1,reps:'30'}
       ]}
     ]},
     {name:'Full Body C',focus:['Lower','Push','Pull'],supersets:[
-      {label:'Superset 1',type:'Strength',rest:45,exercises:[
+      {label:'Superset 1',type:'Free Weights',rest:45,exercises:[
         {eid:'bulgsplit',sets:4,reps:'8-10 each'},
-        {eid:'dbincbench',sets:4,reps:'8-10'}
+        {eid:'dbohp',sets:4,reps:'8-10'},
+        {eid:'hammercurl',sets:4,reps:'8-10'}
       ]},
-      {label:'Superset 2',type:'Strength',rest:45,exercises:[
+      {label:'Superset 2',type:'Cable / Machine',rest:45,exercises:[
         {eid:'facepull',sets:4,reps:'10-12'},
+        {eid:'cablefly',sets:4,reps:'8-10'},
         {eid:'seatedcalf',sets:4,reps:'12-15'}
       ]},
-      {label:'Superset 3',type:'Rehab + Core',rest:45,exercises:[
+      {label:'Superset 3',type:'Bodyweight + Rehab',rest:45,exercises:[
         {eid:'starplank',sets:3,reps:'25s each side'},
         {eid:'anklejump',sets:3,reps:'12 each'},
         {eid:'eccstepdown',sets:3,reps:'8 each leg'}
       ]},
       {label:'Metabolic Finisher',type:'EMOM 8min',rest:30,exercises:[
         {eid:'skierg',sets:1,reps:'30s max effort'},
-        {eid:'kbswing',sets:1,reps:'15'}
+        {eid:'kbswing',sets:1,reps:'15'},
+        {eid:'farmerwalk',sets:1,reps:'40m'}
       ]}
     ]}
   ];
   if(phase===3) return [
     {name:'Full Body A',focus:['Lower','Push','Core'],supersets:[
-      {label:'Superset 1',type:'Heavy Strength',rest:60,exercises:[
+      {label:'Superset 1',type:'Free Weights - Heavy',rest:60,exercises:[
         {eid:'trapbar',sets:4,reps:'5-6',note:'Heavy day'},
-        {eid:'bbench',sets:4,reps:'5-6'}
+        {eid:'bbench',sets:4,reps:'5-6'},
+        {eid:'skierswing',sets:4,reps:'6-8'}
       ]},
-      {label:'Superset 2',type:'Strength',rest:60,exercises:[
-        {eid:'hipthrusthvy',sets:4,reps:'6-8'},
-        {eid:'wtpullup',sets:4,reps:'5-8'}
+      {label:'Superset 2',type:'Cable / Machine',rest:60,exercises:[
+        {eid:'latpd',sets:4,reps:'6-8'},
+        {eid:'legcurl',sets:4,reps:'6-8'},
+        {eid:'staggerpallof',sets:3,reps:'12 each side'}
       ]},
-      {label:'Superset 3',type:'Rehab + Core',rest:45,exercises:[
+      {label:'Superset 3',type:'Bodyweight + Rehab',rest:45,exercises:[
         {eid:'foamquad',sets:2,reps:'90s each'},
-        {eid:'staggerpallof',sets:3,reps:'12 each side'},
-        {eid:'hanglegraise',sets:3,reps:'8-10'}
+        {eid:'hanglegraise',sets:3,reps:'8-10'},
+        {eid:'deadbug',sets:3,reps:'10 each side'}
       ]},
       {label:'Metabolic Finisher',type:'Intervals',rest:30,exercises:[
         {eid:'skierg',sets:1,reps:'6x 30s on/30s off'},
-        {eid:'farmerwalk',sets:1,reps:'3x 40m heavy'}
+        {eid:'farmerwalk',sets:1,reps:'3x 40m heavy'},
+        {eid:'kbswing',sets:1,reps:'20 heavy'}
       ]}
     ]},
     {name:'Full Body B',focus:['Lower','Pull','Power'],supersets:[
-      {label:'Superset 1',type:'Heavy Strength',rest:60,exercises:[
+      {label:'Superset 1',type:'Free Weights - Heavy',rest:60,exercises:[
         {eid:'rdl',sets:4,reps:'5-6'},
-        {eid:'tbarrow',sets:4,reps:'6-8'}
+        {eid:'tbarrow',sets:4,reps:'6-8'},
+        {eid:'johnsoncalf',sets:4,reps:'8-10'}
       ]},
-      {label:'Superset 2',type:'Strength + Power',rest:60,exercises:[
-        {eid:'johnsoncalf',sets:4,reps:'8-10'},
-        {eid:'bbohp',sets:4,reps:'5-8'}
+      {label:'Superset 2',type:'Cable / Machine',rest:60,exercises:[
+        {eid:'cablerow',sets:4,reps:'6-8'},
+        {eid:'calfstand',sets:4,reps:'8-10'},
+        {eid:'pallof',sets:4,reps:'10 each side'}
       ]},
-      {label:'Superset 3',type:'Rehab + Explosive',rest:45,exercises:[
+      {label:'Superset 3',type:'Bodyweight + Rehab',rest:45,exercises:[
         {eid:'copenadduct',sets:3,reps:'10 each side'},
         {eid:'lowboxjump',sets:3,reps:'5'},
         {eid:'sideplank',sets:3,reps:'30s each side'}
@@ -439,40 +459,45 @@ const getProgramDays=(phase)=>{
       ]}
     ]},
     {name:'Full Body C',focus:['Lower','Push','Pull'],supersets:[
-      {label:'Superset 1',type:'Heavy Strength',rest:60,exercises:[
+      {label:'Superset 1',type:'Free Weights - Heavy',rest:60,exercises:[
+        {eid:'hipthrusthvy',sets:4,reps:'6-8'},
         {eid:'dblunge',sets:4,reps:'6-8 each'},
-        {eid:'dbincbench',sets:4,reps:'6-8'}
+        {eid:'hammercurl',sets:4,reps:'6-8'}
       ]},
-      {label:'Superset 2',type:'Strength',rest:60,exercises:[
-        {eid:'skierswing',sets:4,reps:'8-10'},
-        {eid:'cablerow',sets:4,reps:'6-8'}
+      {label:'Superset 2',type:'Cable / Machine',rest:60,exercises:[
+        {eid:'facepull',sets:4,reps:'8-10'},
+        {eid:'cablefly',sets:4,reps:'6-8'},
+        {eid:'seatedcalf',sets:4,reps:'8-10'}
       ]},
-      {label:'Superset 3',type:'Rehab + Core',rest:45,exercises:[
+      {label:'Superset 3',type:'Bodyweight + Rehab',rest:45,exercises:[
         {eid:'starplank',sets:3,reps:'30s each side'},
         {eid:'anklejump',sets:3,reps:'15 each'},
         {eid:'slhop',sets:3,reps:'5 each leg'}
       ]},
       {label:'Metabolic Finisher',type:'EMOM 8min',rest:30,exercises:[
         {eid:'rowinterval',sets:1,reps:'3x 500m max'},
-        {eid:'bearcrwl',sets:1,reps:'20m'}
+        {eid:'bearcrwl',sets:1,reps:'20m'},
+        {eid:'skierg',sets:1,reps:'30s max'}
       ]}
     ]}
   ];
   // Phase 4
   return [
     {name:'Full Body A',focus:['Lower','Push','Core'],supersets:[
-      {label:'Superset 1',type:'Strength',rest:45,exercises:[
+      {label:'Superset 1',type:'Free Weights',rest:45,exercises:[
         {eid:'trapbar',sets:3,reps:'6-10'},
-        {eid:'bbench',sets:3,reps:'6-10'}
+        {eid:'dbbench',sets:3,reps:'6-10'},
+        {eid:'kbswing',sets:3,reps:'8-10'}
       ]},
-      {label:'Superset 2',type:'Strength',rest:45,exercises:[
-        {eid:'hipthrust',sets:3,reps:'8-10'},
-        {eid:'latpd',sets:3,reps:'8-10'}
+      {label:'Superset 2',type:'Cable / Machine',rest:45,exercises:[
+        {eid:'latpd',sets:3,reps:'8-10'},
+        {eid:'legcurl',sets:3,reps:'8-10'},
+        {eid:'staggerpallof',sets:3,reps:'10 each side'}
       ]},
-      {label:'Superset 3',type:'Rehab + Core',rest:45,exercises:[
+      {label:'Superset 3',type:'Bodyweight + Rehab',rest:45,exercises:[
         {eid:'foamquad',sets:2,reps:'90s each'},
-        {eid:'staggerpallof',sets:3,reps:'10 each side'},
-        {eid:'deadbug',sets:3,reps:'10 each side'}
+        {eid:'deadbug',sets:3,reps:'10 each side'},
+        {eid:'plank',sets:3,reps:'40s'}
       ]},
       {label:'Metabolic Finisher',type:'AMRAP 8min',rest:30,exercises:[
         {eid:'kbswing',sets:1,reps:'15'},
@@ -481,41 +506,47 @@ const getProgramDays=(phase)=>{
       ]}
     ]},
     {name:'Full Body B',focus:['Lower','Pull','Arms'],supersets:[
-      {label:'Superset 1',type:'Strength',rest:45,exercises:[
+      {label:'Superset 1',type:'Free Weights',rest:45,exercises:[
         {eid:'rdl',sets:3,reps:'8-10'},
-        {eid:'dbrow',sets:3,reps:'8-10'}
+        {eid:'dbrow',sets:3,reps:'8-10'},
+        {eid:'johnsoncalf',sets:3,reps:'10-12'}
       ]},
-      {label:'Superset 2',type:'Strength',rest:45,exercises:[
-        {eid:'johnsoncalf',sets:3,reps:'10-12'},
-        {eid:'dbohp',sets:3,reps:'8-10'}
+      {label:'Superset 2',type:'Cable / Machine',rest:45,exercises:[
+        {eid:'cablerow',sets:3,reps:'8-10'},
+        {eid:'calfstand',sets:3,reps:'10-12'},
+        {eid:'ropepush',sets:3,reps:'8-10'}
       ]},
-      {label:'Superset 3',type:'Rehab + Arms',rest:45,exercises:[
+      {label:'Superset 3',type:'Bodyweight + Rehab',rest:45,exercises:[
         {eid:'copenadduct',sets:3,reps:'10 each side'},
-        {eid:'hammercurl',sets:3,reps:'10-12'},
-        {eid:'pallof',sets:3,reps:'10 each side'}
+        {eid:'birddog',sets:3,reps:'10 each side'},
+        {eid:'clamshell',sets:3,reps:'15 each'}
       ]},
       {label:'Metabolic Finisher',type:'Intervals',rest:30,exercises:[
         {eid:'rowing',sets:1,reps:'5x 500m'},
-        {eid:'mtclimb',sets:1,reps:'30s x4'}
+        {eid:'mtclimb',sets:1,reps:'30s x4'},
+        {eid:'bearcrwl',sets:1,reps:'20m'}
       ]}
     ]},
     {name:'Full Body C',focus:['Lower','Push','Pull'],supersets:[
-      {label:'Superset 1',type:'Strength',rest:45,exercises:[
+      {label:'Superset 1',type:'Free Weights',rest:45,exercises:[
         {eid:'gobsquat',sets:3,reps:'8-10'},
-        {eid:'cablefly',sets:3,reps:'10-12'}
+        {eid:'dbohp',sets:3,reps:'8-10'},
+        {eid:'hammercurl',sets:3,reps:'8-10'}
       ]},
-      {label:'Superset 2',type:'Strength',rest:45,exercises:[
+      {label:'Superset 2',type:'Cable / Machine',rest:45,exercises:[
         {eid:'facepull',sets:3,reps:'10-12'},
-        {eid:'calfstand',sets:3,reps:'12-15'}
+        {eid:'cablefly',sets:3,reps:'10-12'},
+        {eid:'seatedcalf',sets:3,reps:'12-15'}
       ]},
-      {label:'Superset 3',type:'Rehab + Core',rest:45,exercises:[
+      {label:'Superset 3',type:'Bodyweight + Rehab',rest:45,exercises:[
         {eid:'starplank',sets:3,reps:'25s each side'},
         {eid:'anklejump',sets:3,reps:'12 each'},
-        {eid:'hangknee',sets:3,reps:'10-12'}
+        {eid:'eccheeldrop',sets:3,reps:'10 each'}
       ]},
       {label:'Metabolic Finisher',type:'EMOM 6min',rest:30,exercises:[
         {eid:'skierg',sets:1,reps:'30s max'},
-        {eid:'kbswing',sets:1,reps:'15'}
+        {eid:'kbswing',sets:1,reps:'15'},
+        {eid:'farmerwalk',sets:1,reps:'40m'}
       ]}
     ]}
   ];
@@ -524,7 +555,7 @@ const getProgramDays=(phase)=>{
 // === TOAST COMPONENT ===
 const Toast=({msg,onDone})=>{
   useEffect(()=>{const t=setTimeout(onDone,2200);return()=>clearTimeout(t)},[onDone]);
-  return React.createElement('div',{className:'toast'},msg);
+  return <div className="toast">{msg}</div>;
 };
 
 // === REST TIMER ===
@@ -537,23 +568,25 @@ const RestTimer=({seconds,onDone})=>{
   },[seconds,onDone]);
   const pct=left/seconds;
   const r=90,c=2*Math.PI*r;
-  return React.createElement('div',{className:'rest-overlay',onClick:onDone},
-    React.createElement('div',{style:{textAlign:'center'}},
-      React.createElement('div',{className:'rest-ring'},
-        React.createElement('svg',{width:200,height:200},
-          React.createElement('circle',{cx:100,cy:100,r:r,fill:'none',stroke:'var(--c2)',strokeWidth:8}),
-          React.createElement('circle',{cx:100,cy:100,r:r,fill:'none',stroke:'var(--grn)',strokeWidth:8,strokeLinecap:'round',strokeDasharray:c,strokeDashoffset:c*(1-pct)})
-        ),
-        React.createElement('div',{className:'time'},
-          React.createElement('div',{className:'big'},left),
-          React.createElement('div',{className:'small'},'REST')
-        )
-      ),
-      React.createElement('div',{className:'rest-btns'},
-        React.createElement('button',{className:'rest-btn',style:{background:'var(--c2)',color:'var(--t1)'},onClick:e=>{e.stopPropagation();onDone()}},'+15s is skip'),
-        React.createElement('button',{className:'rest-btn',style:{background:'var(--grn)',color:'#000'},onClick:e=>{e.stopPropagation();onDone()}},'Skip')
-      )
-    )
+  return (
+    <div className="rest-overlay" onClick={onDone}>
+      <div style={{textAlign:'center'}}>
+        <div className="rest-ring">
+          <svg width={200} height={200}>
+            <circle cx={100} cy={100} r={r} fill="none" stroke="var(--c2)" strokeWidth={8} />
+            <circle cx={100} cy={100} r={r} fill="none" stroke="var(--grn)" strokeWidth={8} strokeLinecap="round" strokeDasharray={c} strokeDashoffset={c*(1-pct)} />
+          </svg>
+          <div className="time">
+            <div className="big">{left}</div>
+            <div className="small">REST</div>
+          </div>
+        </div>
+        <div className="rest-btns">
+          <button className="rest-btn" style={{background:'var(--c2)',color:'var(--t1)'}} onClick={e=>{e.stopPropagation();onDone()}}>Skip</button>
+          <button className="rest-btn" style={{background:'var(--grn)',color:'#000'}} onClick={e=>{e.stopPropagation();onDone()}}>Done</button>
+        </div>
+      </div>
+    </div>
   );
 };
 
@@ -577,23 +610,31 @@ const useSessionTimer=()=>{
 // === PAIN SCALE ===
 const PainScale=({value,onChange})=>{
   const colors=['var(--grn)','#7bc67e','var(--yel)','var(--org)','var(--red)'];
-  return React.createElement('div',null,
-    React.createElement('div',{style:{fontSize:13,color:'var(--t2)',marginBottom:6}},'Knee Pain (0=none, 4=severe)'),
-    React.createElement('div',{className:'pain-row'},
-      [0,1,2,3,4].map(v=>React.createElement('div',{key:v,className:'pain-dot',
-        style:{background:value===v?colors[v]:'var(--c2)',borderColor:value===v?colors[v]:'var(--c3)',color:value===v?'#000':'var(--t2)'},
-        onClick:()=>{vb();onChange(v)}},v))
-    )
+  return (
+    <div>
+      <div style={{fontSize:13,color:'var(--t2)',marginBottom:6}}>Knee Pain (0=none, 4=severe)</div>
+      <div className="pain-row">
+        {[0,1,2,3,4].map(v=>(
+          <div key={v} className="pain-dot"
+            style={{background:value===v?colors[v]:'var(--c2)',borderColor:value===v?colors[v]:'var(--c3)',color:value===v?'#000':'var(--t2)'}}
+            onClick={()=>{vb();onChange(v)}}>{v}</div>
+        ))}
+      </div>
+    </div>
   );
 };
 
 // === RPE SELECTOR ===
 const RPESelector=({value,onChange})=>{
-  return React.createElement('div',null,
-    React.createElement('div',{style:{fontSize:13,color:'var(--t2)',marginBottom:6}},'RPE (Rate of Perceived Exertion)'),
-    React.createElement('div',{className:'rpe-row'},
-      [5,6,7,8,9,10].map(v=>React.createElement('button',{key:v,className:'rpe-btn'+(value===v?' on':''),onClick:()=>{vb();onChange(v)}},v))
-    )
+  return (
+    <div>
+      <div style={{fontSize:13,color:'var(--t2)',marginBottom:6}}>RPE (Rate of Perceived Exertion)</div>
+      <div className="rpe-row">
+        {[5,6,7,8,9,10].map(v=>(
+          <button key={v} className={'rpe-btn'+(value===v?' on':'')} onClick={()=>{vb();onChange(v)}}>{v}</button>
+        ))}
+      </div>
+    </div>
   );
 };
 
@@ -609,8 +650,10 @@ const CountdownTimer=({duration})=>{
     ivRef.current=setInterval(()=>setLeft(p=>{if(p<=1){clearInterval(ivRef.current);setActive(false);vb();return 0}return p-1}),1000);
   };
   useEffect(()=>()=>clearInterval(ivRef.current),[]);
-  return React.createElement('div',{className:'cd-timer',style:{background:active?'var(--org-d)':'var(--c2)',color:active?'var(--org)':'var(--t2)'},onClick:toggle},
-    active?fmtTime(left):'Start '+secs+'s'
+  return (
+    <div className="cd-timer" style={{background:active?'var(--org-d)':'var(--c2)',color:active?'var(--org)':'var(--t2)'}} onClick={toggle}>
+      {active?fmtTime(left):'Start '+secs+'s'}
+    </div>
   );
 };
 
@@ -619,39 +662,47 @@ const SetLogger=({ex,exData,sets,onUpdate,onDone,onSetsDelta})=>{
   const exHist=ld('exHistory',{});
   const lastSession=exHist[ex.eid]||null;
   const isDuration=ex.t==='d'||ex.t==='c';
-  return React.createElement('div',{className:'log-area'},
-    React.createElement('div',{style:{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:8}},
-      React.createElement('div',{style:{fontSize:15,fontWeight:600}},exMap[ex.eid]?.n||ex.eid),
-      React.createElement('div',{style:{display:'flex',gap:6}},
-        React.createElement('button',{className:'btn btn-s',style:{padding:'4px 10px',fontSize:12},onClick:()=>onSetsDelta(-1)},'-Set'),
-        React.createElement('button',{className:'btn btn-s',style:{padding:'4px 10px',fontSize:12},onClick:()=>onSetsDelta(1)},'+Set')
-      )
-    ),
-    lastSession&&React.createElement('div',{style:{fontSize:12,color:'var(--t2)',marginBottom:8,cursor:'pointer'},onClick:()=>{
-      const filled=[];
-      lastSession.forEach((s,i)=>{if(i<sets)filled.push({w:s.w||'',r:s.r||'',done:false,warmup:false})});
-      onUpdate(filled);
-    }},'Quick fill from last: '+lastSession.map(s=>s.w+'x'+s.r).join(', ')),
-    isDuration&&React.createElement('div',{style:{marginBottom:10}},React.createElement(CountdownTimer,{duration:ex.reps})),
-    Array.from({length:sets}).map((_,i)=>{
-      const s=exData[i]||{w:'',r:'',done:false,warmup:false};
-      return React.createElement('div',{key:i,className:'set-row'},
-        React.createElement('div',{className:'set-num',style:s.warmup?{background:'var(--org-d)',color:'var(--org)'}:s.done?{background:'var(--grn)',color:'#000'}:{}},s.warmup?'W':i+1),
-        !isDuration&&React.createElement('input',{className:'inp'+(s.done?' done':''),type:'number',inputMode:'decimal',placeholder:s.warmup?'Warm':'kg',value:s.w,
-          onChange:e=>{const d=[...exData];d[i]={...s,w:e.target.value};onUpdate(d)}}),
-        React.createElement('input',{className:'inp'+(s.done?' done':''),type:'number',inputMode:'numeric',placeholder:isDuration?'sec':'reps',value:s.r,
-          onChange:e=>{const d=[...exData];d[i]={...s,r:e.target.value};onUpdate(d)}}),
-        React.createElement('button',{className:'btn'+(s.done?' btn-g':' btn-s'),style:{padding:'8px 12px',fontSize:13},onClick:()=>{
-          const d=[...exData];d[i]={...s,done:!s.done};onUpdate(d);if(!s.done){vb();onDone(ex,d[i])}
-        }},s.done?'Done':'Log'),
-        React.createElement('button',{className:'btn btn-s',style:{padding:'8px 10px',fontSize:11,color:'var(--org)'},onClick:()=>{
-          const d=[...exData];d[i]={...s,warmup:!s.warmup};onUpdate(d);
-        }},s.warmup?'W':'w')
-      );
-    }),
-    exData.length>0&&exData.some(s=>s.done&&s.w&&s.r&&!isDuration)&&React.createElement('div',{style:{fontSize:12,color:'var(--t2)',marginTop:4}},
-      'Est 1RM: '+est1RM(parseFloat(exData.find(s=>s.done)?.w||0),parseInt(exData.find(s=>s.done)?.r||0))+' kg'
-    )
+  return (
+    <div className="log-area">
+      <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:8}}>
+        <div style={{fontSize:15,fontWeight:600}}>{exMap[ex.eid]?.n||ex.eid}</div>
+        <div style={{display:'flex',gap:6}}>
+          <button className="btn btn-s" style={{padding:'4px 10px',fontSize:12}} onClick={()=>onSetsDelta(-1)}>-Set</button>
+          <button className="btn btn-s" style={{padding:'4px 10px',fontSize:12}} onClick={()=>onSetsDelta(1)}>+Set</button>
+        </div>
+      </div>
+      {lastSession && (
+        <div style={{fontSize:12,color:'var(--t2)',marginBottom:8,cursor:'pointer'}} onClick={()=>{
+          const filled=[];
+          lastSession.forEach((s,i)=>{if(i<sets)filled.push({w:s.w||'',r:s.r||'',done:false,warmup:false})});
+          onUpdate(filled);
+        }}>Quick fill from last: {lastSession.map(s=>s.w+'x'+s.r).join(', ')}</div>
+      )}
+      {isDuration && <div style={{marginBottom:10}}><CountdownTimer duration={ex.reps} /></div>}
+      {Array.from({length:sets}).map((_,i)=>{
+        const s=exData[i]||{w:'',r:'',done:false,warmup:false};
+        return (
+          <div key={i} className="set-row">
+            <div className="set-num" style={s.warmup?{background:'var(--org-d)',color:'var(--org)'}:s.done?{background:'var(--grn)',color:'#000'}:{}}>{s.warmup?'W':i+1}</div>
+            {!isDuration && <input className={'inp'+(s.done?' done':'')} type="number" inputMode="decimal" placeholder={s.warmup?'Warm':'kg'} value={s.w}
+              onChange={e=>{const d=[...exData];d[i]={...s,w:e.target.value};onUpdate(d)}} />}
+            <input className={'inp'+(s.done?' done':'')} type="number" inputMode="numeric" placeholder={isDuration?'sec':'reps'} value={s.r}
+              onChange={e=>{const d=[...exData];d[i]={...s,r:e.target.value};onUpdate(d)}} />
+            <button className={'btn'+(s.done?' btn-g':' btn-s')} style={{padding:'8px 12px',fontSize:13}} onClick={()=>{
+              const d=[...exData];d[i]={...s,done:!s.done};onUpdate(d);if(!s.done){vb();onDone(ex,d[i])}
+            }}>{s.done?'Done':'Log'}</button>
+            <button className="btn btn-s" style={{padding:'8px 10px',fontSize:11,color:'var(--org)'}} onClick={()=>{
+              const d=[...exData];d[i]={...s,warmup:!s.warmup};onUpdate(d);
+            }}>{s.warmup?'W':'w'}</button>
+          </div>
+        );
+      })}
+      {exData.length>0&&exData.some(s=>s.done&&s.w&&s.r&&!isDuration)&&(
+        <div style={{fontSize:12,color:'var(--t2)',marginTop:4}}>
+          Est 1RM: {est1RM(parseFloat(exData.find(s=>s.done)?.w||0),parseInt(exData.find(s=>s.done)?.r||0))} kg
+        </div>
+      )}
+    </div>
   );
 };
 
@@ -663,48 +714,59 @@ const ExCard=({ex,exData,sets,onUpdate,onDone,onSwap,onSetsDelta})=>{
   if(!info)return null;
   const doneSets=(exData||[]).filter(s=>s.done).length;
   const pct=sets>0?Math.round(doneSets/sets*100):0;
+  const tagLabels={k:'KS',e:'EC',p:'PW',b:'BL',t:'TR',f:'FT'};
   const swapOptions=EXDB.filter(e=>e.m===info.m&&e.t===info.t&&e.id!==ex.eid);
-  return React.createElement('div',{style:{marginBottom:2}},
-    React.createElement('div',{className:'ex-row',onClick:()=>setOpen(!open),style:{cursor:'pointer'}},
-      React.createElement('div',{style:{flex:1}},
-        React.createElement('div',{className:'ex-name'},info.n),
-        React.createElement('div',{className:'ex-info'},ex.sets+'x'+ex.reps+(info.note?' - '+info.note:''))
-      ),
-      React.createElement('div',{style:{display:'flex',alignItems:'center',gap:6}},
-        pct===100&&React.createElement('span',{className:'badge badge-g'},'Done'),
-        pct>0&&pct<100&&React.createElement('span',{className:'badge badge-o'},pct+'%'),
-        info.tags.map(t=>React.createElement('span',{key:t,className:'ex-tag tag-'+t},{k:'KS',e:'EC',p:'PW',b:'BL',t:'TR',f:'FT'}[t]||t))
-      )
-    ),
-    showSwap&&React.createElement('div',{style:{padding:'8px 16px',background:'var(--c2)',borderRadius:8,margin:'4px 0'}},
-      React.createElement('div',{style:{fontSize:13,fontWeight:600,marginBottom:6}},'Swap with:'),
-      swapOptions.map(s=>React.createElement('div',{key:s.id,style:{padding:'6px 0',borderBottom:'0.5px solid var(--sep)',cursor:'pointer',fontSize:14},
-        onClick:()=>{onSwap(ex.eid,s.id);setShowSwap(false)}},s.n))
-    ),
-    open&&React.createElement('div',null,
-      React.createElement('div',{style:{padding:'4px 16px'}},
-        React.createElement('button',{className:'btn btn-s',style:{fontSize:12,padding:'4px 10px',marginRight:6},onClick:e=>{e.stopPropagation();setShowSwap(!showSwap)}},'Swap Exercise')
-      ),
-      React.createElement(SetLogger,{ex,exData:exData||[],sets,onUpdate,onDone,onSetsDelta})
-    )
+  return (
+    <div style={{marginBottom:2}}>
+      <div className="ex-row" onClick={()=>setOpen(!open)} style={{cursor:'pointer'}}>
+        <div style={{flex:1}}>
+          <div className="ex-name">{info.n}</div>
+          <div className="ex-info">{ex.sets}x{ex.reps}{info.note?' - '+info.note:''}</div>
+        </div>
+        <div style={{display:'flex',alignItems:'center',gap:6}}>
+          {pct===100 && <span className="badge badge-g">Done</span>}
+          {pct>0&&pct<100 && <span className="badge badge-o">{pct}%</span>}
+          {info.tags.map(t=><span key={t} className={'ex-tag tag-'+t}>{tagLabels[t]||t}</span>)}
+        </div>
+      </div>
+      {showSwap && (
+        <div style={{padding:'8px 16px',background:'var(--c2)',borderRadius:8,margin:'4px 0'}}>
+          <div style={{fontSize:13,fontWeight:600,marginBottom:6}}>Swap with:</div>
+          {swapOptions.map(s=>(
+            <div key={s.id} style={{padding:'6px 0',borderBottom:'0.5px solid var(--sep)',cursor:'pointer',fontSize:14}}
+              onClick={()=>{onSwap(ex.eid,s.id);setShowSwap(false)}}>{s.n}</div>
+          ))}
+        </div>
+      )}
+      {open && (
+        <div>
+          <div style={{padding:'4px 16px'}}>
+            <button className="btn btn-s" style={{fontSize:12,padding:'4px 10px',marginRight:6}} onClick={e=>{e.stopPropagation();setShowSwap(!showSwap)}}>Swap Exercise</button>
+          </div>
+          <SetLogger ex={ex} exData={exData||[]} sets={sets} onUpdate={onUpdate} onDone={onDone} onSetsDelta={onSetsDelta} />
+        </div>
+      )}
+    </div>
   );
 };
 
 // === COMPLETION SUMMARY ===
 const CompletionSummary=({stats,onClose})=>{
-  return React.createElement('div',{className:'complete-overlay',onClick:onClose},
-    React.createElement('div',{className:'complete-card',onClick:e=>e.stopPropagation()},
-      React.createElement('div',{style:{fontSize:48,marginBottom:12}},'Workout Complete!'),
-      React.createElement('div',{style:{fontSize:22,fontWeight:700,marginBottom:20}},'Great work!'),
-      React.createElement('div',{style:{display:'flex',flexWrap:'wrap',justifyContent:'center'}},
-        React.createElement('div',{className:'complete-stat'},React.createElement('div',{style:{fontSize:24,fontWeight:700,color:'var(--grn)'}},stats.pct+'%'),React.createElement('div',{style:{fontSize:11,color:'var(--t2)'}},'Complete')),
-        React.createElement('div',{className:'complete-stat'},React.createElement('div',{style:{fontSize:24,fontWeight:700,color:'var(--blu)'}},stats.exercises),React.createElement('div',{style:{fontSize:11,color:'var(--t2)'}},'Exercises')),
-        React.createElement('div',{className:'complete-stat'},React.createElement('div',{style:{fontSize:24,fontWeight:700,color:'var(--org)'}},fmtTime(stats.duration)),React.createElement('div',{style:{fontSize:11,color:'var(--t2)'}},'Duration')),
-        React.createElement('div',{className:'complete-stat'},React.createElement('div',{style:{fontSize:24,fontWeight:700,color:'var(--red)'}},stats.kcal),React.createElement('div',{style:{fontSize:11,color:'var(--t2)'}},'Est kcal')),
-        stats.newPRs>0&&React.createElement('div',{className:'complete-stat'},React.createElement('div',{style:{fontSize:24,fontWeight:700,color:'var(--pur)'}},stats.newPRs),React.createElement('div',{style:{fontSize:11,color:'var(--t2)'}},'New PRs'))
-      ),
-      React.createElement('button',{className:'btn btn-g',style:{marginTop:24,width:'100%'},onClick:onClose},'Done')
-    )
+  return (
+    <div className="complete-overlay" onClick={onClose}>
+      <div className="complete-card" onClick={e=>e.stopPropagation()}>
+        <div style={{fontSize:48,marginBottom:12}}>Workout Complete!</div>
+        <div style={{fontSize:22,fontWeight:700,marginBottom:20}}>Great work!</div>
+        <div style={{display:'flex',flexWrap:'wrap',justifyContent:'center'}}>
+          <div className="complete-stat"><div style={{fontSize:24,fontWeight:700,color:'var(--grn)'}}>{stats.pct}%</div><div style={{fontSize:11,color:'var(--t2)'}}>Complete</div></div>
+          <div className="complete-stat"><div style={{fontSize:24,fontWeight:700,color:'var(--blu)'}}>{stats.exercises}</div><div style={{fontSize:11,color:'var(--t2)'}}>Exercises</div></div>
+          <div className="complete-stat"><div style={{fontSize:24,fontWeight:700,color:'var(--org)'}}>{fmtTime(stats.duration)}</div><div style={{fontSize:11,color:'var(--t2)'}}>Duration</div></div>
+          <div className="complete-stat"><div style={{fontSize:24,fontWeight:700,color:'var(--red)'}}>{stats.kcal}</div><div style={{fontSize:11,color:'var(--t2)'}}>Est kcal</div></div>
+          {stats.newPRs>0 && <div className="complete-stat"><div style={{fontSize:24,fontWeight:700,color:'var(--pur)'}}>{stats.newPRs}</div><div style={{fontSize:11,color:'var(--t2)'}}>New PRs</div></div>}
+        </div>
+        <button className="btn btn-g" style={{marginTop:24,width:'100%'}} onClick={onClose}>Done</button>
+      </div>
+    </div>
   );
 };
 
@@ -742,7 +804,6 @@ const DayView=({day,phase,onBack})=>{
   },0);
 
   const handleSetDone=(ex,setData)=>{
-    // PR detection
     const info=exMap[getEid(ex.eid)];
     if(info&&info.t==='w'&&setData.w&&setData.r&&!setData.warmup){
       const prs=ld('prs',{});
@@ -753,13 +814,11 @@ const DayView=({day,phase,onBack})=>{
         sv('prs',prs);
       }
     }
-    // Save exercise history
     const hist=ld('exHistory',{});
     const eid=getEid(ex.eid);
     const d=logData[eid]||[];
     hist[eid]=d.filter(s=>s.done);
     sv('exHistory',hist);
-    // Auto rest timer
     if(restEnabled)setShowRest(true);
   };
 
@@ -767,7 +826,6 @@ const DayView=({day,phase,onBack})=>{
     timer.stop();
     const exDone=allExercises.filter(ex=>{const d=logData[getEid(ex.eid)]||[];return d.some(s=>s.done)}).length;
     const kcal=estCalories(timer.elapsed,totalVolume,bw);
-    // Check new PRs
     const prs=ld('prs',{});
     let newPRs=0;
     allExercises.forEach(ex=>{
@@ -779,72 +837,76 @@ const DayView=({day,phase,onBack})=>{
     const history=ld('history',[]);
     history.unshift(record);
     sv('history',history);
-    // Update week completion
     const wk=ld('weekDone',{});
     wk[day.name]=today();
     sv('weekDone',wk);
     setShowComplete({pct,exercises:exDone,duration:timer.elapsed,kcal,newPRs});
   };
 
-  return React.createElement('div',{className:'app'},
-    React.createElement('div',{className:'hdr'},
-      React.createElement('div',{style:{display:'flex',justifyContent:'space-between',alignItems:'center'}},
-        React.createElement('div',null,
-          React.createElement('div',{style:{display:'flex',alignItems:'center',gap:8}},
-            React.createElement('button',{className:'btn btn-s',style:{padding:'6px 10px',fontSize:13},onClick:()=>{timer.stop();onBack()}},'Back'),
-            React.createElement('h1',{style:{fontSize:20}},day.name)
-          ),
-          React.createElement('div',{style:{display:'flex',gap:8,marginTop:4}},
-            day.focus.map(f=>React.createElement('span',{key:f,className:'focus-tag',style:{background:'var(--c2)'}},f))
-          )
-        ),
-        React.createElement('div',{style:{display:'flex',flexDirection:'column',alignItems:'flex-end',gap:4}},
-          React.createElement('div',{className:'session-timer'},fmtTime(timer.elapsed)),
-          React.createElement('button',{className:'btn btn-s',style:{padding:'2px 8px',fontSize:10},
-            onClick:()=>{const v=!ld('restEnabled',true);sv('restEnabled',v);window.location.reload()}},restEnabled?'Rest: ON':'Rest: OFF')
-        )
-      ),
-      React.createElement('div',{className:'prg'},React.createElement('div',{className:'prg-f',style:{width:pct+'%'}}))
-    ),
-    React.createElement('div',{className:'scroll'},
-      day.supersets.map((ss,si)=>{
-        const isFinisher=ss.label.includes('Finisher');
-        return React.createElement('div',{key:si,className:'card'},
-          React.createElement('div',{className:'ss-h',style:{padding:'12px 16px'}},
-            React.createElement('span',{className:'ss-label'},ss.label),
-            React.createElement('span',{className:'ss-type',style:{background:isFinisher?'var(--red-d)':'var(--blu)',color:isFinisher?'var(--red)':'#fff'}},
-              isFinisher?ss.type:ss.type||'Strength'),
-            React.createElement('span',{style:{fontSize:11,color:'var(--t3)',marginLeft:'auto'}},'Rest: '+ss.rest+'s')
-          ),
-          ss.exercises.map((ex,ei)=>{
-            const eid=getEid(ex.eid);
-            const sets=setsOverride[eid]||ex.sets;
-            return React.createElement(ExCard,{key:eid+ei,ex:{...ex,eid},exData:logData[eid]||[],sets,
-              onUpdate:d=>{const l={...logData};l[eid]=d;setLogData(l)},
-              onDone:handleSetDone,
-              onSwap:handleSwap,
-              onSetsDelta:delta=>{
-                const cur=setsOverride[eid]||ex.sets;
-                const next=Math.max(1,cur+delta);
-                setSetsOverride(p=>({...p,[eid]:next}));
-              }
-            });
-          })
-        );
-      }),
-      React.createElement('div',{className:'card',style:{padding:16}},
-        React.createElement('div',{style:{fontSize:17,fontWeight:600,marginBottom:12}},'Finish Workout'),
-        React.createElement(PainScale,{value:pain,onChange:setPain}),
-        React.createElement('div',{style:{height:12}}),
-        React.createElement(RPESelector,{value:rpe,onChange:setRpe}),
-        React.createElement('textarea',{style:{width:'100%',height:60,background:'var(--c2)',border:'1.5px solid var(--c3)',borderRadius:10,padding:10,color:'var(--t1)',fontFamily:'inherit',fontSize:14,resize:'none',marginTop:8},
-          placeholder:'Notes...',value:notes,onChange:e=>setNotes(e.target.value)}),
-        React.createElement('button',{className:'btn btn-g',style:{width:'100%',marginTop:12},onClick:finishWorkout},
-          'Save Workout ('+fmtTime(timer.elapsed)+')')
-      )
-    ),
-    showRest&&React.createElement(RestTimer,{seconds:ld('restTime',45),onDone:()=>setShowRest(false)}),
-    showComplete&&React.createElement(CompletionSummary,{stats:showComplete,onClose:()=>{setShowComplete(null);onBack()}})
+  return (
+    <div className="app">
+      <div className="hdr">
+        <div style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}>
+          <div>
+            <div style={{display:'flex',alignItems:'center',gap:8}}>
+              <button className="btn btn-s" style={{padding:'6px 10px',fontSize:13}} onClick={()=>{timer.stop();onBack()}}>Back</button>
+              <h1 style={{fontSize:20}}>{day.name}</h1>
+            </div>
+            <div style={{display:'flex',gap:8,marginTop:4}}>
+              {day.focus.map(f=><span key={f} className="focus-tag" style={{background:'var(--c2)'}}>{f}</span>)}
+            </div>
+          </div>
+          <div style={{display:'flex',flexDirection:'column',alignItems:'flex-end',gap:4}}>
+            <div className="session-timer">{fmtTime(timer.elapsed)}</div>
+            <button className="btn btn-s" style={{padding:'2px 8px',fontSize:10}}
+              onClick={()=>{const v=!ld('restEnabled',true);sv('restEnabled',v);window.location.reload()}}>{restEnabled?'Rest: ON':'Rest: OFF'}</button>
+          </div>
+        </div>
+        <div className="prg"><div className="prg-f" style={{width:pct+'%'}} /></div>
+      </div>
+      <div className="scroll">
+        {day.supersets.map((ss,si)=>{
+          const isFinisher=ss.label.includes('Finisher');
+          return (
+            <div key={si} className="card">
+              <div className="ss-h" style={{padding:'12px 16px'}}>
+                <span className="ss-label">{ss.label}</span>
+                <span className="ss-type" style={{background:isFinisher?'var(--red-d)':'var(--blu)',color:isFinisher?'var(--red)':'#fff'}}>
+                  {isFinisher?ss.type:ss.type||'Strength'}
+                </span>
+                <span style={{fontSize:11,color:'var(--t3)',marginLeft:'auto'}}>Rest: {ss.rest}s</span>
+              </div>
+              {ss.exercises.map((ex,ei)=>{
+                const eid=getEid(ex.eid);
+                const sets=setsOverride[eid]||ex.sets;
+                return <ExCard key={eid+ei} ex={{...ex,eid}} exData={logData[eid]||[]} sets={sets}
+                  onUpdate={d=>{const l={...logData};l[eid]=d;setLogData(l)}}
+                  onDone={handleSetDone}
+                  onSwap={handleSwap}
+                  onSetsDelta={delta=>{
+                    const cur=setsOverride[eid]||ex.sets;
+                    const next=Math.max(1,cur+delta);
+                    setSetsOverride(p=>({...p,[eid]:next}));
+                  }} />;
+              })}
+            </div>
+          );
+        })}
+        <div className="card" style={{padding:16}}>
+          <div style={{fontSize:17,fontWeight:600,marginBottom:12}}>Finish Workout</div>
+          <PainScale value={pain} onChange={setPain} />
+          <div style={{height:12}} />
+          <RPESelector value={rpe} onChange={setRpe} />
+          <textarea style={{width:'100%',height:60,background:'var(--c2)',border:'1.5px solid var(--c3)',borderRadius:10,padding:10,color:'var(--t1)',fontFamily:'inherit',fontSize:14,resize:'none',marginTop:8}}
+            placeholder="Notes..." value={notes} onChange={e=>setNotes(e.target.value)} />
+          <button className="btn btn-g" style={{width:'100%',marginTop:12}} onClick={finishWorkout}>
+            Save Workout ({fmtTime(timer.elapsed)})
+          </button>
+        </div>
+      </div>
+      {showRest && <RestTimer seconds={ld('restTime',45)} onDone={()=>setShowRest(false)} />}
+      {showComplete && <CompletionSummary stats={showComplete} onClose={()=>{setShowComplete(null);onBack()}} />}
+    </div>
   );
 };
 
@@ -869,41 +931,48 @@ const WorkoutTab=({onOpenDay})=>{
     return total>0?Math.round(done/total*100):0;
   };
 
-  return React.createElement(React.Fragment,null,
-    React.createElement('div',{className:'hdr'},
-      React.createElement('h1',null,'Workout'),
-      React.createElement('p',null,'v17.0 · Knee-Rehab + Weight-Loss Edition · Full Body Split')
-    ),
-    React.createElement('div',{className:'scroll'},
-      React.createElement('div',{className:'phase-sel'},
-        [1,2,3,4].map(p=>React.createElement('button',{key:p,className:'phase-btn'+(phase===p?' on':''),
-          onClick:()=>changePhase(p)},'P'+p+': '+PHASE_NAMES[p-1]))
-      ),
-      React.createElement('div',{style:{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:12}},
-        React.createElement('div',{style:{fontSize:14,color:'var(--t2)'}},'Week '+weekNum+' of '+(phase===4?'ongoing':phase<=2?'4':'4')),
-        React.createElement('button',{className:'btn btn-s',style:{fontSize:12,padding:'6px 12px'},onClick:newWeek},'New Week')
-      ),
-      days.map((day,i)=>{
-        const p=dayPct(day);
-        const isDone=weekDone[day.name];
-        return React.createElement('div',{key:i,className:'card',onClick:()=>onOpenDay(day,phase),style:{cursor:'pointer'}},
-          React.createElement('div',{className:'card-h'},
-            React.createElement('div',null,
-              React.createElement('h3',null,day.name),
-              React.createElement('div',{className:'sub'},day.focus.join(' + ')+' · '+day.supersets.length+' blocks')
-            ),
-            React.createElement('div',{style:{display:'flex',alignItems:'center',gap:8}},
-              isDone&&React.createElement('span',{className:'badge badge-g'},'Done'),
-              p>0&&!isDone&&React.createElement('span',{className:'badge badge-o'},p+'%'),
-              React.createElement('span',{style:{fontSize:20,color:'var(--t3)'}},'>')
-            )
-          ),
-          React.createElement('div',{style:{padding:'0 16px 12px'}},
-            React.createElement('div',{className:'prg'},React.createElement('div',{className:'prg-f',style:{width:p+'%'}}))
-          )
-        );
-      })
-    )
+  return (
+    <>
+      <div className="hdr">
+        <h1>Workout</h1>
+        <p>v17.1 · Knee-Rehab + Weight-Loss Edition · Full Body Split</p>
+      </div>
+      <div className="scroll">
+        <div className="phase-sel">
+          {[1,2,3,4].map(p=>(
+            <button key={p} className={'phase-btn'+(phase===p?' on':'')} onClick={()=>changePhase(p)}>
+              P{p}: {PHASE_NAMES[p-1]}
+            </button>
+          ))}
+        </div>
+        <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:12}}>
+          <div style={{fontSize:14,color:'var(--t2)'}}>Week {weekNum}</div>
+          <button className="btn btn-s" style={{fontSize:12,padding:'6px 12px'}} onClick={newWeek}>New Week</button>
+        </div>
+        {days.map((day,i)=>{
+          const p=dayPct(day);
+          const isDone=weekDone[day.name];
+          return (
+            <div key={i} className="card" onClick={()=>onOpenDay(day,phase)} style={{cursor:'pointer'}}>
+              <div className="card-h">
+                <div>
+                  <h3>{day.name}</h3>
+                  <div className="sub">{day.focus.join(' + ')} · {day.supersets.length} blocks</div>
+                </div>
+                <div style={{display:'flex',alignItems:'center',gap:8}}>
+                  {isDone && <span className="badge badge-g">Done</span>}
+                  {p>0&&!isDone && <span className="badge badge-o">{p}%</span>}
+                  <span style={{fontSize:20,color:'var(--t3)'}}>{'>'}</span>
+                </div>
+              </div>
+              <div style={{padding:'0 16px 12px'}}>
+                <div className="prg"><div className="prg-f" style={{width:p+'%'}} /></div>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </>
   );
 };
 
@@ -914,12 +983,10 @@ const ProgressTab=()=>{
   const prs=ld('prs',{});
   const bw=ld('bodyweight',80);
 
-  // Stats
   const totalWorkouts=history.length;
   const thisWeek=history.filter(h=>{const d=new Date(h.date);const now=new Date();const diff=(now-d)/86400000;return diff<7}).length;
   const totalKcal=history.reduce((a,h)=>a+(h.calories||0),0);
 
-  // Streak
   let streak=0;
   const sortedDates=[...new Set(history.map(h=>h.date))].sort().reverse();
   if(sortedDates.length>0){
@@ -931,7 +998,6 @@ const ProgressTab=()=>{
     }
   }
 
-  // 8-week calendar
   const calDays=[];
   const now=new Date();
   for(let i=55;i>=0;i--){
@@ -941,16 +1007,13 @@ const ProgressTab=()=>{
     calDays.push({date:ds,count,day:d.getDay()});
   }
 
-  // Weekly comparison
   const lastWeek=history.filter(h=>{const d=(new Date()-new Date(h.date))/86400000;return d>=7&&d<14}).length;
 
-  // ACWR
   const acuteLoad=history.filter(h=>(new Date()-new Date(h.date))/86400000<7).reduce((a,h)=>a+(h.volume||0),0);
   const chronicLoad=history.filter(h=>(new Date()-new Date(h.date))/86400000<28).reduce((a,h)=>a+(h.volume||0),0)/4;
   const acwr=chronicLoad>0?(acuteLoad/chronicLoad).toFixed(2):0;
   const acwrPct=Math.min(100,Math.max(0,(parseFloat(acwr)/2)*100));
 
-  // Muscle volume
   const recentHist=history.filter(h=>(new Date()-new Date(h.date))/86400000<7);
   const muscleVol={};
   recentHist.forEach(h=>{
@@ -964,10 +1027,8 @@ const ProgressTab=()=>{
   });
   const maxVol=Math.max(1,...Object.values(muscleVol));
 
-  // PR list
   const prList=Object.entries(prs).map(([eid,data])=>({eid,name:exMap[eid]?.n||eid,...data})).sort((a,b)=>new Date(b.date)-new Date(a.date));
 
-  // Strength chart data
   const strengthData={};
   history.slice(0,20).reverse().forEach(h=>{
     if(h.day&&h.date){
@@ -978,133 +1039,155 @@ const ProgressTab=()=>{
 
   const deleteHist=(idx)=>{const h=[...history];h.splice(idx,1);sv('history',h);window.location.reload()};
 
-  return React.createElement(React.Fragment,null,
-    React.createElement('div',{className:'hdr'},React.createElement('h1',null,'Progress')),
-    React.createElement('div',{className:'scroll'},
-      React.createElement('div',{className:'stat-grid'},
-        React.createElement('div',{className:'stat-card'},React.createElement('div',{className:'val'},totalWorkouts),React.createElement('div',{className:'lbl'},'Total Workouts')),
-        React.createElement('div',{className:'stat-card'},React.createElement('div',{className:'val'},thisWeek),React.createElement('div',{className:'lbl'},'This Week')),
-        React.createElement('div',{className:'stat-card'},React.createElement('div',{className:'val'},streak),React.createElement('div',{className:'lbl'},'Day Streak')),
-        React.createElement('div',{className:'stat-card'},React.createElement('div',{className:'val'},totalKcal.toLocaleString()),React.createElement('div',{className:'lbl'},'Total kcal'))
-      ),
-      // Weight sparkline
-      weightLog.length>1&&React.createElement('div',{className:'wt-chart'},
-        React.createElement('div',{style:{fontSize:14,fontWeight:600,marginBottom:8}},'Body Weight Trend'),
-        React.createElement('div',{className:'wt-spark'},
-          (()=>{
-            const last20=weightLog.slice(-20);
-            const mn=Math.min(...last20.map(w=>w.kg));
-            const mx=Math.max(...last20.map(w=>w.kg));
-            const range=mx-mn||1;
-            return last20.map((w,i)=>React.createElement('div',{key:i,className:'wt-bar',
-              style:{height:Math.max(4,((w.kg-mn)/range)*56)+'px',background:i===last20.length-1?'var(--grn)':'var(--c3)'},
-              title:w.kg+'kg '+w.date}));
-          })()
-        ),
-        React.createElement('div',{style:{display:'flex',justifyContent:'space-between',fontSize:11,color:'var(--t3)',marginTop:4}},
-          React.createElement('span',null,weightLog[weightLog.length-1]?.kg+'kg'),
-          React.createElement('span',null,weightLog.length+' entries')
-        )
-      ),
-      // 8-week calendar
-      React.createElement('div',{className:'section-t'},'Activity (8 weeks)'),
-      React.createElement('div',{className:'card',style:{padding:12}},
-        React.createElement('div',{style:{display:'grid',gridTemplateColumns:'repeat(7,1fr)',gap:2,marginBottom:4}},
-          ['M','T','W','T','F','S','S'].map((d,i)=>React.createElement('div',{key:i,className:'cal-label'},d))
-        ),
-        React.createElement('div',{className:'cal-grid'},
-          calDays.map((d,i)=>React.createElement('div',{key:i,className:'cal-cell',
-            style:{background:d.count>0?'var(--grn)':'var(--c2)',color:d.count>0?'#000':'var(--t3)',opacity:d.count>1?1:d.count>0?0.7:0.3}},
-            d.count>0?d.count:''))
-        )
-      ),
-      // Weekly summary
-      React.createElement('div',{className:'section-t'},'Weekly Summary'),
-      React.createElement('div',{className:'card',style:{padding:16}},
-        React.createElement('div',{style:{display:'flex',justifyContent:'space-between',marginBottom:8}},
-          React.createElement('span',{style:{color:'var(--t2)'}},'This week'),
-          React.createElement('span',{style:{fontWeight:600}},thisWeek+' workouts')
-        ),
-        React.createElement('div',{style:{display:'flex',justifyContent:'space-between',marginBottom:8}},
-          React.createElement('span',{style:{color:'var(--t2)'}},'Last week'),
-          React.createElement('span',{style:{fontWeight:600}},lastWeek+' workouts')
-        ),
-        React.createElement('div',{style:{display:'flex',justifyContent:'space-between'}},
-          React.createElement('span',{style:{color:'var(--t2)'}},'Trend'),
-          React.createElement('span',{style:{fontWeight:600,color:thisWeek>=lastWeek?'var(--grn)':'var(--red)'}},thisWeek>=lastWeek?'Up':'Down')
-        )
-      ),
-      // ACWR
-      React.createElement('div',{className:'section-t'},'ACWR Gauge'),
-      React.createElement('div',{className:'card',style:{padding:16}},
-        React.createElement('div',{style:{display:'flex',justifyContent:'space-between',marginBottom:4}},
-          React.createElement('span',{style:{fontSize:13,color:'var(--t2)'}},'Acute:Chronic Workload'),
-          React.createElement('span',{style:{fontSize:15,fontWeight:700,color:parseFloat(acwr)>1.5?'var(--red)':parseFloat(acwr)>0.8?'var(--grn)':'var(--org)'}},acwr)
-        ),
-        React.createElement('div',{className:'acwr-gauge'},
-          React.createElement('div',{className:'acwr-fill',style:{width:acwrPct+'%',background:parseFloat(acwr)>1.5?'var(--red)':parseFloat(acwr)>0.8?'var(--grn)':'var(--org)',borderRadius:12}}),
-          React.createElement('div',{className:'acwr-marker',style:{left:'calc('+acwrPct+'% - 1.5px)'}})
-        ),
-        React.createElement('div',{style:{display:'flex',justifyContent:'space-between',fontSize:10,color:'var(--t3)'}},
-          React.createElement('span',null,'Under'),React.createElement('span',null,'Sweet Spot'),React.createElement('span',null,'Overreach'))
-      ),
-      // Muscle volume bars
-      Object.keys(muscleVol).length>0&&React.createElement(React.Fragment,null,
-        React.createElement('div',{className:'section-t'},'Muscle Group Volume (This Week)'),
-        React.createElement('div',{className:'card',style:{padding:16}},
-          Object.entries(muscleVol).sort((a,b)=>b[1]-a[1]).map(([m,v])=>
-            React.createElement('div',{key:m,className:'vol-bar-wrap'},
-              React.createElement('div',{className:'vol-bar-label'},m),
-              React.createElement('div',{className:'vol-bar-track'},
-                React.createElement('div',{className:'vol-bar-fill',style:{width:(v/maxVol*100)+'%',background:'var(--grn)'}})
-              ),
-              React.createElement('div',{className:'vol-bar-val'},v+' sets')
-            )
-          )
-        )
-      ),
-      // Strength charts
-      Object.keys(strengthData).length>0&&React.createElement(React.Fragment,null,
-        React.createElement('div',{className:'section-t'},'Strength Progression'),
-        Object.entries(strengthData).map(([dayName,data])=>
-          React.createElement('div',{key:dayName,className:'card',style:{padding:16}},
-            React.createElement('div',{style:{fontSize:14,fontWeight:600,marginBottom:8}},dayName+' Volume'),
-            React.createElement('div',{className:'mini-chart'},
-              (()=>{
-                const mx=Math.max(1,...data.map(d=>d.vol));
-                return data.map((d,i)=>React.createElement('div',{key:i,className:'mini-bar',
-                  style:{height:Math.max(2,(d.vol/mx)*38)+'px',background:i===data.length-1?'var(--grn)':'var(--c3)'},
-                  title:d.date+': '+d.vol}));
-              })()
-            )
-          )
-        )
-      ),
-      // Recent history
-      React.createElement('div',{className:'section-t'},'Recent Workouts'),
-      history.slice(0,15).map((h,i)=>React.createElement('div',{key:i,className:'hist-item'},
-        React.createElement('div',null,
-          React.createElement('div',{style:{fontWeight:600,fontSize:15}},h.day),
-          React.createElement('div',{style:{fontSize:12,color:'var(--t2)'}},fmtDate(h.date)+' · '+fmtTime(h.duration||0)+' · '+(h.calories||0)+' kcal')
-        ),
-        React.createElement('div',{style:{display:'flex',alignItems:'center',gap:8}},
-          React.createElement('span',{className:'badge badge-g'},h.pct+'%'),
-          React.createElement('button',{style:{background:'none',border:'none',color:'var(--red)',fontSize:16,cursor:'pointer',padding:4},
-            onClick:e=>{e.stopPropagation();if(confirm('Delete this entry?'))deleteHist(i)}},'X')
-        )
-      )),
-      // PRs
-      prList.length>0&&React.createElement(React.Fragment,null,
-        React.createElement('div',{className:'section-t'},'Personal Records'),
-        prList.map((pr,i)=>React.createElement('div',{key:i,className:'hist-item'},
-          React.createElement('div',null,
-            React.createElement('div',{style:{fontWeight:600}},pr.name),
-            React.createElement('div',{style:{fontSize:12,color:'var(--t2)'}},pr.w+'kg x'+pr.r+' · 1RM: '+pr.e1rm+'kg')
-          ),
-          React.createElement('span',{className:'badge badge-p'},fmtDate(pr.date))
-        ))
-      )
-    )
+  return (
+    <>
+      <div className="hdr"><h1>Progress</h1></div>
+      <div className="scroll">
+        <div className="stat-grid">
+          <div className="stat-card"><div className="val">{totalWorkouts}</div><div className="lbl">Total Workouts</div></div>
+          <div className="stat-card"><div className="val">{thisWeek}</div><div className="lbl">This Week</div></div>
+          <div className="stat-card"><div className="val">{streak}</div><div className="lbl">Day Streak</div></div>
+          <div className="stat-card"><div className="val">{totalKcal.toLocaleString()}</div><div className="lbl">Total kcal</div></div>
+        </div>
+
+        {weightLog.length>1 && (
+          <div className="wt-chart">
+            <div style={{fontSize:14,fontWeight:600,marginBottom:8}}>Body Weight Trend</div>
+            <div className="wt-spark">
+              {(()=>{
+                const last20=weightLog.slice(-20);
+                const mn=Math.min(...last20.map(w=>w.kg));
+                const mx=Math.max(...last20.map(w=>w.kg));
+                const range=mx-mn||1;
+                return last20.map((w,i)=>(
+                  <div key={i} className="wt-bar"
+                    style={{height:Math.max(4,((w.kg-mn)/range)*56)+'px',background:i===last20.length-1?'var(--grn)':'var(--c3)'}}
+                    title={w.kg+'kg '+w.date} />
+                ));
+              })()}
+            </div>
+            <div style={{display:'flex',justifyContent:'space-between',fontSize:11,color:'var(--t3)',marginTop:4}}>
+              <span>{weightLog[weightLog.length-1]?.kg}kg</span>
+              <span>{weightLog.length} entries</span>
+            </div>
+          </div>
+        )}
+
+        <div className="section-t">Activity (8 weeks)</div>
+        <div className="card" style={{padding:12}}>
+          <div style={{display:'grid',gridTemplateColumns:'repeat(7,1fr)',gap:2,marginBottom:4}}>
+            {['M','T','W','T','F','S','S'].map((d,i)=><div key={i} className="cal-label">{d}</div>)}
+          </div>
+          <div className="cal-grid">
+            {calDays.map((d,i)=>(
+              <div key={i} className="cal-cell"
+                style={{background:d.count>0?'var(--grn)':'var(--c2)',color:d.count>0?'#000':'var(--t3)',opacity:d.count>1?1:d.count>0?0.7:0.3}}>
+                {d.count>0?d.count:''}
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="section-t">Weekly Summary</div>
+        <div className="card" style={{padding:16}}>
+          <div style={{display:'flex',justifyContent:'space-between',marginBottom:8}}>
+            <span style={{color:'var(--t2)'}}>This week</span>
+            <span style={{fontWeight:600}}>{thisWeek} workouts</span>
+          </div>
+          <div style={{display:'flex',justifyContent:'space-between',marginBottom:8}}>
+            <span style={{color:'var(--t2)'}}>Last week</span>
+            <span style={{fontWeight:600}}>{lastWeek} workouts</span>
+          </div>
+          <div style={{display:'flex',justifyContent:'space-between'}}>
+            <span style={{color:'var(--t2)'}}>Trend</span>
+            <span style={{fontWeight:600,color:thisWeek>=lastWeek?'var(--grn)':'var(--red)'}}>{thisWeek>=lastWeek?'Up':'Down'}</span>
+          </div>
+        </div>
+
+        <div className="section-t">ACWR Gauge</div>
+        <div className="card" style={{padding:16}}>
+          <div style={{display:'flex',justifyContent:'space-between',marginBottom:4}}>
+            <span style={{fontSize:13,color:'var(--t2)'}}>Acute:Chronic Workload</span>
+            <span style={{fontSize:15,fontWeight:700,color:parseFloat(acwr)>1.5?'var(--red)':parseFloat(acwr)>0.8?'var(--grn)':'var(--org)'}}>{acwr}</span>
+          </div>
+          <div className="acwr-gauge">
+            <div className="acwr-fill" style={{width:acwrPct+'%',background:parseFloat(acwr)>1.5?'var(--red)':parseFloat(acwr)>0.8?'var(--grn)':'var(--org)',borderRadius:12}} />
+            <div className="acwr-marker" style={{left:'calc('+acwrPct+'% - 1.5px)'}} />
+          </div>
+          <div style={{display:'flex',justifyContent:'space-between',fontSize:10,color:'var(--t3)'}}>
+            <span>Under</span><span>Sweet Spot</span><span>Overreach</span>
+          </div>
+        </div>
+
+        {Object.keys(muscleVol).length>0 && (
+          <>
+            <div className="section-t">Muscle Group Volume (This Week)</div>
+            <div className="card" style={{padding:16}}>
+              {Object.entries(muscleVol).sort((a,b)=>b[1]-a[1]).map(([m,v])=>(
+                <div key={m} className="vol-bar-wrap">
+                  <div className="vol-bar-label">{m}</div>
+                  <div className="vol-bar-track">
+                    <div className="vol-bar-fill" style={{width:(v/maxVol*100)+'%',background:'var(--grn)'}} />
+                  </div>
+                  <div className="vol-bar-val">{v} sets</div>
+                </div>
+              ))}
+            </div>
+          </>
+        )}
+
+        {Object.keys(strengthData).length>0 && (
+          <>
+            <div className="section-t">Strength Progression</div>
+            {Object.entries(strengthData).map(([dayName,data])=>(
+              <div key={dayName} className="card" style={{padding:16}}>
+                <div style={{fontSize:14,fontWeight:600,marginBottom:8}}>{dayName} Volume</div>
+                <div className="mini-chart">
+                  {(()=>{
+                    const mx=Math.max(1,...data.map(d=>d.vol));
+                    return data.map((d,i)=>(
+                      <div key={i} className="mini-bar"
+                        style={{height:Math.max(2,(d.vol/mx)*38)+'px',background:i===data.length-1?'var(--grn)':'var(--c3)'}}
+                        title={d.date+': '+d.vol} />
+                    ));
+                  })()}
+                </div>
+              </div>
+            ))}
+          </>
+        )}
+
+        <div className="section-t">Recent Workouts</div>
+        {history.slice(0,15).map((h,i)=>(
+          <div key={i} className="hist-item">
+            <div>
+              <div style={{fontWeight:600,fontSize:15}}>{h.day}</div>
+              <div style={{fontSize:12,color:'var(--t2)'}}>{fmtDate(h.date)} · {fmtTime(h.duration||0)} · {h.calories||0} kcal</div>
+            </div>
+            <div style={{display:'flex',alignItems:'center',gap:8}}>
+              <span className="badge badge-g">{h.pct}%</span>
+              <button style={{background:'none',border:'none',color:'var(--red)',fontSize:16,cursor:'pointer',padding:4}}
+                onClick={e=>{e.stopPropagation();if(confirm('Delete this entry?'))deleteHist(i)}}>X</button>
+            </div>
+          </div>
+        ))}
+
+        {prList.length>0 && (
+          <>
+            <div className="section-t">Personal Records</div>
+            {prList.map((pr,i)=>(
+              <div key={i} className="hist-item">
+                <div>
+                  <div style={{fontWeight:600}}>{pr.name}</div>
+                  <div style={{fontSize:12,color:'var(--t2)'}}>{pr.w}kg x{pr.r} · 1RM: {pr.e1rm}kg</div>
+                </div>
+                <span className="badge badge-p">{fmtDate(pr.date)}</span>
+              </div>
+            ))}
+          </>
+        )}
+      </div>
+    </>
   );
 };
 
@@ -1116,6 +1199,7 @@ const LibraryTab=()=>{
   const[kneeSafe,setKneeSafe]=useState(false);
   const muscles=[...new Set(EXDB.map(e=>e.m))].sort();
   const equips=[...new Set(EXDB.map(e=>e.eq))].sort();
+  const tagLabels={k:'KS',e:'EC',p:'PW',b:'BL',t:'TR',f:'FT'};
   const filtered=EXDB.filter(e=>{
     if(search&&!e.n.toLowerCase().includes(search.toLowerCase())&&!e.m.toLowerCase().includes(search.toLowerCase()))return false;
     if(muscle&&e.m!==muscle)return false;
@@ -1123,34 +1207,40 @@ const LibraryTab=()=>{
     if(kneeSafe&&!e.tags.includes('k'))return false;
     return true;
   });
-  return React.createElement(React.Fragment,null,
-    React.createElement('div',{className:'hdr'},React.createElement('h1',null,'Library')),
-    React.createElement('div',{className:'scroll'},
-      React.createElement('input',{className:'inp',style:{width:'100%',marginBottom:12,textAlign:'left',paddingLeft:16},
-        placeholder:'Search exercises...',value:search,onChange:e=>setSearch(e.target.value)}),
-      React.createElement('div',{className:'filter-pills'},
-        React.createElement('button',{className:'filter-pill'+(kneeSafe?' on':''),onClick:()=>setKneeSafe(!kneeSafe)},'Knee-Safe'),
-        muscles.map(m=>React.createElement('button',{key:m,className:'filter-pill'+(muscle===m?' on':''),
-          onClick:()=>setMuscle(muscle===m?'':m)},m))
-      ),
-      React.createElement('div',{className:'filter-pills'},
-        equips.map(eq=>React.createElement('button',{key:eq,className:'filter-pill'+(equip===eq?' on':''),
-          onClick:()=>setEquip(equip===eq?'':eq)},eq))
-      ),
-      React.createElement('div',{style:{fontSize:13,color:'var(--t2)',marginBottom:8}},filtered.length+' exercises'),
-      filtered.map(ex=>React.createElement('div',{key:ex.id,className:'card',style:{padding:14}},
-        React.createElement('div',{style:{display:'flex',justifyContent:'space-between',alignItems:'center'}},
-          React.createElement('div',null,
-            React.createElement('div',{style:{fontSize:15,fontWeight:600}},ex.n),
-            React.createElement('div',{style:{fontSize:12,color:'var(--t2)',marginTop:2}},ex.m+' · '+ex.eq),
-            ex.note&&React.createElement('div',{style:{fontSize:12,color:'var(--t3)',marginTop:2}},ex.note)
-          ),
-          React.createElement('div',{style:{display:'flex',gap:3}},
-            ex.tags.map(t=>React.createElement('span',{key:t,className:'ex-tag tag-'+t},{k:'KS',e:'EC',p:'PW',b:'BL',t:'TR',f:'FT'}[t]||t))
-          )
-        )
-      ))
-    )
+  return (
+    <>
+      <div className="hdr"><h1>Library</h1></div>
+      <div className="scroll">
+        <input className="inp" style={{width:'100%',marginBottom:12,textAlign:'left',paddingLeft:16}}
+          placeholder="Search exercises..." value={search} onChange={e=>setSearch(e.target.value)} />
+        <div className="filter-pills">
+          <button className={'filter-pill'+(kneeSafe?' on':'')} onClick={()=>setKneeSafe(!kneeSafe)}>Knee-Safe</button>
+          {muscles.map(m=>(
+            <button key={m} className={'filter-pill'+(muscle===m?' on':'')} onClick={()=>setMuscle(muscle===m?'':m)}>{m}</button>
+          ))}
+        </div>
+        <div className="filter-pills">
+          {equips.map(eq=>(
+            <button key={eq} className={'filter-pill'+(equip===eq?' on':'')} onClick={()=>setEquip(equip===eq?'':eq)}>{eq}</button>
+          ))}
+        </div>
+        <div style={{fontSize:13,color:'var(--t2)',marginBottom:8}}>{filtered.length} exercises</div>
+        {filtered.map(ex=>(
+          <div key={ex.id} className="card" style={{padding:14}}>
+            <div style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}>
+              <div>
+                <div style={{fontSize:15,fontWeight:600}}>{ex.n}</div>
+                <div style={{fontSize:12,color:'var(--t2)',marginTop:2}}>{ex.m} · {ex.eq}</div>
+                {ex.note && <div style={{fontSize:12,color:'var(--t3)',marginTop:2}}>{ex.note}</div>}
+              </div>
+              <div style={{display:'flex',gap:3}}>
+                {ex.tags.map(t=><span key={t} className={'ex-tag tag-'+t}>{tagLabels[t]||t}</span>)}
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </>
   );
 };
 
@@ -1216,100 +1306,103 @@ const SettingsTab=({showToast})=>{
     }
   };
 
-  // Weight goal progress
   const startWeight=weightLog.length>0?weightLog[0].kg:bw;
   const totalChange=Math.abs(startWeight-goal);
   const currentChange=Math.abs(startWeight-bw);
   const goalPct=totalChange>0?Math.min(100,Math.round(currentChange/totalChange*100)):0;
 
-  return React.createElement(React.Fragment,null,
-    React.createElement('div',{className:'hdr'},React.createElement('h1',null,'Settings')),
-    React.createElement('div',{className:'scroll'},
-      // Weigh-in nudge
-      daysSinceWeighIn>7&&React.createElement('div',{className:'card',style:{padding:16,borderLeft:'3px solid var(--org)'}},
-        React.createElement('div',{style:{fontSize:14,fontWeight:600,color:'var(--org)'}},'Time to weigh in!'),
-        React.createElement('div',{style:{fontSize:12,color:'var(--t2)',marginTop:4}},daysSinceWeighIn===999?'No weigh-ins yet':'Last weigh-in: '+daysSinceWeighIn+' days ago')
-      ),
-      // Body weight
-      React.createElement('div',{className:'section-t'},'Body Weight'),
-      React.createElement('div',{className:'card',style:{padding:16}},
-        React.createElement('div',{style:{display:'flex',gap:8}},
-          React.createElement('input',{className:'inp',style:{flex:1},type:'number',inputMode:'decimal',placeholder:'kg',value:bwInput,onChange:e=>setBwInput(e.target.value)}),
-          React.createElement('button',{className:'btn btn-g',onClick:saveBw},'Save')
-        ),
-        lastWeighIn&&React.createElement('div',{style:{fontSize:12,color:'var(--t2)',marginTop:8}},'Last: '+lastWeighIn.kg+'kg on '+fmtDate(lastWeighIn.date))
-      ),
-      // Weight goal
-      React.createElement('div',{className:'section-t'},'Weight Goal'),
-      React.createElement('div',{className:'card',style:{padding:16}},
-        React.createElement('div',{style:{display:'flex',gap:8,marginBottom:12}},
-          React.createElement('input',{className:'inp',style:{flex:1},type:'number',inputMode:'decimal',placeholder:'Target kg',value:goalInput,onChange:e=>setGoalInput(e.target.value)}),
-          React.createElement('button',{className:'btn btn-g',onClick:saveGoal},'Set')
-        ),
-        React.createElement('div',{style:{display:'flex',justifyContent:'space-between',fontSize:12,color:'var(--t2)',marginBottom:4}},
-          React.createElement('span',null,'Start: '+startWeight+'kg'),
-          React.createElement('span',null,'Current: '+bw+'kg'),
-          React.createElement('span',null,'Goal: '+goal+'kg')
-        ),
-        React.createElement('div',{className:'goal-bar'},
-          React.createElement('div',{className:'goal-fill',style:{width:goalPct+'%',background:'var(--grn)'}})
-        ),
-        React.createElement('div',{style:{fontSize:11,color:'var(--t3)',marginTop:4,textAlign:'center'}},goalPct+'% to goal')
-      ),
-      // Measurements
-      React.createElement('div',{className:'section-t'},'Body Measurements'),
-      React.createElement('div',{className:'card',style:{padding:16}},
-        ['Waist','Chest','Thigh'].map((label,i)=>{
-          const val=[waist,chest,thigh][i];
-          const setter=[setWaist,setChest,setThigh][i];
-          return React.createElement('div',{key:label,style:{display:'flex',alignItems:'center',gap:8,marginBottom:8}},
-            React.createElement('label',{style:{width:50,fontSize:13,color:'var(--t2)'}},label),
-            React.createElement('input',{className:'inp',style:{flex:1},type:'number',inputMode:'decimal',placeholder:'cm',value:val,onChange:e=>setter(e.target.value)})
-          );
-        }),
-        React.createElement('button',{className:'btn btn-g',style:{width:'100%',marginTop:4},onClick:saveMeasurements},'Save Measurements')
-      ),
-      // Rest timer
-      React.createElement('div',{className:'section-t'},'Rest Timer'),
-      React.createElement('div',{className:'card',style:{padding:16}},
-        React.createElement('div',{style:{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:12}},
-          React.createElement('span',{style:{fontSize:14}},'Auto Rest Timer'),
-          React.createElement('button',{className:'btn '+(restEnabled?'btn-g':'btn-s'),style:{padding:'6px 16px'},
-            onClick:()=>{const v=!restEnabled;setRestEnabled(v);sv('restEnabled',v)}},restEnabled?'ON':'OFF')
-        ),
-        React.createElement('div',{style:{display:'flex',gap:8,flexWrap:'wrap'}},
-          [30,45,60,90].map(t=>React.createElement('button',{key:t,className:'btn'+(restTime===t?' btn-g':' btn-s'),style:{padding:'8px 16px'},
-            onClick:()=>{setRestTime(t);sv('restTime',t)}},t+'s'))
-        ),
-        React.createElement('div',{style:{display:'flex',gap:8,marginTop:8,alignItems:'center'}},
-          React.createElement('span',{style:{fontSize:13,color:'var(--t2)'}},'Custom:'),
-          React.createElement('input',{className:'inp',style:{width:80},type:'number',inputMode:'numeric',value:restTime,
-            onChange:e=>{const v=parseInt(e.target.value)||45;setRestTime(v);sv('restTime',v)}})
-        )
-      ),
-      // Backup
-      React.createElement('div',{className:'section-t'},'Data'),
-      React.createElement('div',{className:'card',style:{padding:16}},
-        React.createElement('button',{className:'btn btn-s',style:{width:'100%',marginBottom:8},onClick:exportData},'Export JSON Backup'),
-        React.createElement('label',{className:'btn btn-s',style:{display:'block',textAlign:'center',width:'100%',marginBottom:8,cursor:'pointer'}},
-          'Import Backup',
-          React.createElement('input',{type:'file',accept:'.json',style:{display:'none'},onChange:importData})
-        ),
-        React.createElement('button',{className:'btn btn-d',style:{width:'100%'},onClick:clearAll},'Clear All Data')
-      ),
-      // Program info
-      React.createElement('div',{className:'section-t'},'Program Info'),
-      React.createElement('div',{className:'card',style:{padding:16}},
-        React.createElement('div',{style:{fontSize:14,fontWeight:600,marginBottom:8}},'IronClad Pro - Full Body Split'),
-        React.createElement('div',{style:{fontSize:12,color:'var(--t2)',lineHeight:1.5}},
-          '3-day full-body split with 4 progressive phases. Each day has 3 strength supersets + 1 metabolic finisher. '+
-          'Phase 1: Foundation (3x10-12), Phase 2: Build (4x8-10), Phase 3: Strength & Power (4x5-8), Phase 4: Maintain & Perform (3x6-10). '+
-          '7 trainer-prescribed knee-rehab exercises integrated across all phases. '+
-          'Equipment: Barbells, dumbbells, cables, kettlebells, rowing machine, SkiErg, bands, foam roller, bench, steps, bars.'
-        )
-      ),
-      React.createElement('div',{style:{textAlign:'center',padding:'16px 0',fontSize:12,color:'var(--t3)'}},'v17.0 IronClad Pro')
-    )
+  return (
+    <>
+      <div className="hdr"><h1>Settings</h1></div>
+      <div className="scroll">
+        {daysSinceWeighIn>7 && (
+          <div className="card" style={{padding:16,borderLeft:'3px solid var(--org)'}}>
+            <div style={{fontSize:14,fontWeight:600,color:'var(--org)'}}>Time to weigh in!</div>
+            <div style={{fontSize:12,color:'var(--t2)',marginTop:4}}>{daysSinceWeighIn===999?'No weigh-ins yet':'Last weigh-in: '+daysSinceWeighIn+' days ago'}</div>
+          </div>
+        )}
+
+        <div className="section-t">Body Weight</div>
+        <div className="card" style={{padding:16}}>
+          <div style={{display:'flex',gap:8}}>
+            <input className="inp" style={{flex:1}} type="number" inputMode="decimal" placeholder="kg" value={bwInput} onChange={e=>setBwInput(e.target.value)} />
+            <button className="btn btn-g" onClick={saveBw}>Save</button>
+          </div>
+          {lastWeighIn && <div style={{fontSize:12,color:'var(--t2)',marginTop:8}}>Last: {lastWeighIn.kg}kg on {fmtDate(lastWeighIn.date)}</div>}
+        </div>
+
+        <div className="section-t">Weight Goal</div>
+        <div className="card" style={{padding:16}}>
+          <div style={{display:'flex',gap:8,marginBottom:12}}>
+            <input className="inp" style={{flex:1}} type="number" inputMode="decimal" placeholder="Target kg" value={goalInput} onChange={e=>setGoalInput(e.target.value)} />
+            <button className="btn btn-g" onClick={saveGoal}>Set</button>
+          </div>
+          <div style={{display:'flex',justifyContent:'space-between',fontSize:12,color:'var(--t2)',marginBottom:4}}>
+            <span>Start: {startWeight}kg</span>
+            <span>Current: {bw}kg</span>
+            <span>Goal: {goal}kg</span>
+          </div>
+          <div className="goal-bar">
+            <div className="goal-fill" style={{width:goalPct+'%',background:'var(--grn)'}} />
+          </div>
+          <div style={{fontSize:11,color:'var(--t3)',marginTop:4,textAlign:'center'}}>{goalPct}% to goal</div>
+        </div>
+
+        <div className="section-t">Body Measurements</div>
+        <div className="card" style={{padding:16}}>
+          {['Waist','Chest','Thigh'].map((label,i)=>{
+            const val=[waist,chest,thigh][i];
+            const setter=[setWaist,setChest,setThigh][i];
+            return (
+              <div key={label} style={{display:'flex',alignItems:'center',gap:8,marginBottom:8}}>
+                <label style={{width:50,fontSize:13,color:'var(--t2)'}}>{label}</label>
+                <input className="inp" style={{flex:1}} type="number" inputMode="decimal" placeholder="cm" value={val} onChange={e=>setter(e.target.value)} />
+              </div>
+            );
+          })}
+          <button className="btn btn-g" style={{width:'100%',marginTop:4}} onClick={saveMeasurements}>Save Measurements</button>
+        </div>
+
+        <div className="section-t">Rest Timer</div>
+        <div className="card" style={{padding:16}}>
+          <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:12}}>
+            <span style={{fontSize:14}}>Auto Rest Timer</span>
+            <button className={'btn '+(restEnabled?'btn-g':'btn-s')} style={{padding:'6px 16px'}}
+              onClick={()=>{const v=!restEnabled;setRestEnabled(v);sv('restEnabled',v)}}>{restEnabled?'ON':'OFF'}</button>
+          </div>
+          <div style={{display:'flex',gap:8,flexWrap:'wrap'}}>
+            {[30,45,60,90].map(t=>(
+              <button key={t} className={'btn'+(restTime===t?' btn-g':' btn-s')} style={{padding:'8px 16px'}}
+                onClick={()=>{setRestTime(t);sv('restTime',t)}}>{t}s</button>
+            ))}
+          </div>
+          <div style={{display:'flex',gap:8,marginTop:8,alignItems:'center'}}>
+            <span style={{fontSize:13,color:'var(--t2)'}}>Custom:</span>
+            <input className="inp" style={{width:80}} type="number" inputMode="numeric" value={restTime}
+              onChange={e=>{const v=parseInt(e.target.value)||45;setRestTime(v);sv('restTime',v)}} />
+          </div>
+        </div>
+
+        <div className="section-t">Data</div>
+        <div className="card" style={{padding:16}}>
+          <button className="btn btn-s" style={{width:'100%',marginBottom:8}} onClick={exportData}>Export JSON Backup</button>
+          <label className="btn btn-s" style={{display:'block',textAlign:'center',width:'100%',marginBottom:8,cursor:'pointer'}}>
+            Import Backup
+            <input type="file" accept=".json" style={{display:'none'}} onChange={importData} />
+          </label>
+          <button className="btn btn-d" style={{width:'100%'}} onClick={clearAll}>Clear All Data</button>
+        </div>
+
+        <div className="section-t">Program Info</div>
+        <div className="card" style={{padding:16}}>
+          <div style={{fontSize:14,fontWeight:600,marginBottom:8}}>IronClad Pro - Full Body Split</div>
+          <div style={{fontSize:12,color:'var(--t2)',lineHeight:1.5}}>
+            3-day full-body split with 4 progressive phases. Each day has 3 strength supersets (grouped by equipment) + 1 metabolic finisher. Phase 1: Foundation (3x10-12), Phase 2: Build (4x8-10), Phase 3: Strength &amp; Power (4x5-8), Phase 4: Maintain &amp; Perform (3x6-10). 7 trainer-prescribed knee-rehab exercises integrated across all phases. Equipment: Barbells, dumbbells, cables, kettlebells, rowing machine, SkiErg, bands, foam roller, bench, steps, bars.
+          </div>
+        </div>
+        <div style={{textAlign:'center',padding:'16px 0',fontSize:12,color:'var(--t3)'}}>v17.1 IronClad Pro</div>
+      </div>
+    </>
   );
 };
 
@@ -1321,30 +1414,37 @@ const App=()=>{
 
   const showToast=(msg)=>{setToast(msg)};
 
-  if(dayView)return React.createElement(DayView,{day:dayView.day,phase:dayView.phase,onBack:()=>setDayView(null)});
+  if(dayView)return <DayView day={dayView.day} phase={dayView.phase} onBack={()=>setDayView(null)} />;
 
-  return React.createElement('div',{className:'app'},
-    tab==='workout'&&React.createElement(WorkoutTab,{onOpenDay:(day,phase)=>setDayView({day,phase})}),
-    tab==='progress'&&React.createElement(ProgressTab,null),
-    tab==='library'&&React.createElement(LibraryTab,null),
-    tab==='settings'&&React.createElement(SettingsTab,{showToast}),
-    // Tab bar
-    React.createElement('div',{className:'tabs'},
-      [{id:'workout',label:'Workout',icon:'M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-4 0h4'},
-       {id:'progress',label:'Progress',icon:'M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6m14 0v-10a2 2 0 00-2-2h-2a2 2 0 00-2 2v10m14 0H3'},
-       {id:'library',label:'Library',icon:'M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253'},
-       {id:'settings',label:'Settings',icon:'M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z M15 12a3 3 0 11-6 0 3 3 0 016 0z'}
-      ].map(t=>React.createElement('button',{key:t.id,className:'tab'+(tab===t.id?' on':''),onClick:()=>setTab(t.id)},
-        React.createElement('svg',{fill:'none',viewBox:'0 0 24 24',stroke:'currentColor',strokeWidth:1.5},
-          React.createElement('path',{strokeLinecap:'round',strokeLinejoin:'round',d:t.icon})),
-        t.label
-      ))
-    ),
-    toast&&React.createElement(Toast,{msg:toast,onDone:()=>setToast(null)})
+  const tabs=[
+    {id:'workout',label:'Workout',icon:'M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-4 0h4'},
+    {id:'progress',label:'Progress',icon:'M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6m14 0v-10a2 2 0 00-2-2h-2a2 2 0 00-2 2v10m14 0H3'},
+    {id:'library',label:'Library',icon:'M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253'},
+    {id:'settings',label:'Settings',icon:'M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z M15 12a3 3 0 11-6 0 3 3 0 016 0z'}
+  ];
+
+  return (
+    <div className="app">
+      {tab==='workout' && <WorkoutTab onOpenDay={(day,phase)=>setDayView({day,phase})} />}
+      {tab==='progress' && <ProgressTab />}
+      {tab==='library' && <LibraryTab />}
+      {tab==='settings' && <SettingsTab showToast={showToast} />}
+      <div className="tabs">
+        {tabs.map(t=>(
+          <button key={t.id} className={'tab'+(tab===t.id?' on':'')} onClick={()=>setTab(t.id)}>
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+              <path strokeLinecap="round" strokeLinejoin="round" d={t.icon} />
+            </svg>
+            {t.label}
+          </button>
+        ))}
+      </div>
+      {toast && <Toast msg={toast} onDone={()=>setToast(null)} />}
+    </div>
   );
 };
 
-ReactDOM.createRoot(document.getElementById('root')).render(React.createElement(App));
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
 </script>
 </body>
 </html>
