@@ -134,6 +134,18 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--t1);font-
 <body>
 <div id="root"></div>
 <script>
+(function(){
+  var VER='17.4.0';
+  var stored=localStorage.getItem('ic17_appVersion');
+  if(stored && stored!==VER){
+    if('caches' in window)caches.keys().then(function(ks){ks.forEach(function(k){caches.delete(k)})});
+    if('serviceWorker' in navigator)navigator.serviceWorker.getRegistrations().then(function(rs){rs.forEach(function(r){r.unregister()})});
+    localStorage.setItem('ic17_appVersion',VER);
+    location.reload(true);
+    return;
+  }
+  localStorage.setItem('ic17_appVersion',VER);
+})();
 if('serviceWorker' in navigator){
   const swCode=`
     const CACHE='ironclad-v17.4';
@@ -142,7 +154,7 @@ if('serviceWorker' in navigator){
     self.addEventListener('activate',e=>e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim())));
     self.addEventListener('fetch',e=>{
       if(e.request.method!=='GET')return;
-      e.respondWith(fetch(e.request).then(r=>{if(r.ok){const rc=r.clone();caches.open(CACHE).then(c=>c.put(e.request,rc))}return r}).catch(()=>caches.match(e.request)));
+      e.respondWith(fetch(e.request,{cache:'no-store'}).then(r=>{if(r.ok){const rc=r.clone();caches.open(CACHE).then(c=>c.put(e.request,rc))}return r}).catch(()=>caches.match(e.request)));
     });
   `;
   const blob=new Blob([swCode],{type:'application/javascript'});
