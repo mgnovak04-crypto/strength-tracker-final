@@ -7,14 +7,14 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="IronClad">
 <meta name="theme-color" content="#000">
-<meta name="version" content="16.0.0">
+<meta name="version" content="17.1.0">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <title>IronClad Pro</title>
-<script src="https://unpkg.com/react@18/umd/react.production.min.js?v=15"></script>
-<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js?v=15"></script>
-<script src="https://unpkg.com/@babel/standalone/babel.min.js?v=15"></script>
+<script src="https://unpkg.com/react@18/umd/react.production.min.js?v=17"></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js?v=17"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js?v=17"></script>
 <style>
 :root{--bg:#000;--c1:#1c1c1e;--c2:#2c2c2e;--c3:#3a3a3c;--sep:rgba(84,84,88,0.65);--t1:#fff;--t2:rgba(235,235,245,0.6);--t3:rgba(235,235,245,0.3);--grn:#30d158;--grn-d:rgba(48,209,88,0.15);--org:#ff9f0a;--org-d:rgba(255,159,10,0.15);--red:#ff453a;--red-d:rgba(255,69,58,0.15);--blu:#0a84ff;--pur:#bf5af2;--cyn:#64d2ff;--yel:#ffd60a;--safe-t:env(safe-area-inset-top);--safe-b:env(safe-area-inset-bottom)}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;margin:0;padding:0}
@@ -87,7 +87,6 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--t1);font-
 .phase-btn.on{border-color:var(--grn);background:var(--grn-d);color:var(--grn)}
 .section-t{font-size:20px;font-weight:700;margin:20px 0 12px;letter-spacing:-0.3px}
 .focus-tag{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:8px;font-size:12px;font-weight:600;margin-right:6px;margin-bottom:6px}
-/* REST TIMER */
 .rest-overlay{position:fixed;inset:0;z-index:2500;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.85);backdrop-filter:blur(12px)}
 .rest-ring{position:relative;width:200px;height:200px}
 .rest-ring svg{transform:rotate(-90deg)}
@@ -96,67 +95,48 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--t1);font-
 .rest-ring .time .small{font-size:14px;color:var(--t2);margin-top:4px}
 .rest-btns{display:flex;gap:12px;margin-top:32px}
 .rest-btn{padding:12px 24px;border-radius:12px;border:none;font-size:15px;font-weight:600;font-family:inherit;cursor:pointer}
-/* WEIGHT CHART */
 .wt-chart{background:var(--c1);border-radius:12px;padding:16px;margin-bottom:12px}
 .wt-spark{display:flex;align-items:flex-end;gap:3px;height:60px}
 .wt-bar{flex:1;border-radius:3px 3px 0 0;min-width:6px;transition:height .3s}
-/* SESSION TIMER */
 .session-timer{display:flex;align-items:center;gap:6px;font-variant-numeric:tabular-nums;font-size:14px;font-weight:600;color:var(--org)}
-/* COMPLETION OVERLAY */
 .complete-overlay{position:fixed;inset:0;z-index:2500;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.9);backdrop-filter:blur(16px);animation:fadeIn .4s ease-out}
 @keyframes fadeIn{from{opacity:0}}
 .complete-card{text-align:center;padding:32px;animation:scaleIn .5s ease-out}
 @keyframes scaleIn{from{transform:scale(0.8);opacity:0}to{transform:scale(1);opacity:1}}
 .complete-stat{display:inline-flex;flex-direction:column;align-items:center;padding:12px 16px;margin:6px;background:var(--c1);border-radius:12px;min-width:80px}
-/* COUNTDOWN TIMER */
 .cd-timer{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:8px;font-size:14px;font-weight:700;font-variant-numeric:tabular-nums;cursor:pointer}
-/* ACTIVITY CALENDAR */
 .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin-top:8px}
 .cal-cell{aspect-ratio:1;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600}
 .cal-label{font-size:10px;color:var(--t3);text-align:center;padding-bottom:2px}
-/* PAIN SCALE */
 .pain-row{display:flex;gap:4px;align-items:center}
 .pain-dot{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;cursor:pointer;border:2px solid transparent;transition:all .2s}
-/* RPE SELECTOR */
 .rpe-row{display:flex;gap:4px;margin:8px 0}
 .rpe-btn{width:32px;height:32px;border-radius:8px;border:1.5px solid var(--c3);background:none;color:var(--t2);font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .2s}
 .rpe-btn.on{border-color:var(--org);background:var(--org-d);color:var(--org)}
-/* MINI CHART */
 .mini-chart{display:flex;align-items:flex-end;gap:2px;height:40px}
 .mini-bar{flex:1;border-radius:2px 2px 0 0;min-width:4px;transition:height .3s}
-/* READINESS */
-.readiness-row{display:flex;gap:12px;margin:8px 0}
-.readiness-item{flex:1;text-align:center}
-.readiness-item .emoji-row{display:flex;justify-content:center;gap:4px;margin-top:4px}
-.readiness-emoji{font-size:20px;cursor:pointer;opacity:0.3;transition:opacity .2s}
-.readiness-emoji.on{opacity:1}
-/* RUNNING LOG */
-.run-stat{display:flex;flex-direction:column;align-items:center;padding:8px 0}
-.run-stat .val{font-size:18px;font-weight:700}
-.run-stat .lbl{font-size:11px;color:var(--t2)}
-/* GOAL PROGRESS */
 .goal-bar{height:12px;background:var(--c2);border-radius:6px;overflow:hidden;position:relative}
 .goal-fill{height:100%;border-radius:6px;transition:width .5s}
 .goal-marker{position:absolute;top:-2px;width:2px;height:16px;background:var(--t1);border-radius:1px}
-/* MILESTONE */
-.ms-item{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:0.5px solid var(--sep)}
-.ms-item:last-child{border-bottom:none}
-.ms-check{width:24px;height:24px;border-radius:12px;border:2px solid var(--c3);display:flex;align-items:center;justify-content:center;font-size:14px;cursor:pointer;flex-shrink:0;transition:all .2s}
-.ms-check.done{border-color:var(--grn);background:var(--grn);color:#000}
-/* CORRELATION CHART */
-.corr-chart{position:relative;height:80px;display:flex;align-items:flex-end;gap:2px}
-.corr-bar{display:flex;flex-direction:column;align-items:center;flex:1;gap:1px}
-.corr-bar .top{border-radius:2px 2px 0 0;width:100%;min-width:3px}
-.corr-bar .bot{border-radius:0 0 2px 2px;width:100%;min-width:3px}
+.filter-pills{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+.filter-pill{padding:6px 12px;border-radius:8px;border:1.5px solid var(--c3);background:none;color:var(--t2);font-size:12px;font-weight:600;font-family:inherit;cursor:pointer;transition:all .2s}
+.filter-pill.on{border-color:var(--grn);background:var(--grn-d);color:var(--grn)}
+.vol-bar-wrap{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.vol-bar-label{font-size:12px;color:var(--t2);width:80px;text-align:right}
+.vol-bar-track{flex:1;height:8px;background:var(--c2);border-radius:4px;overflow:hidden}
+.vol-bar-fill{height:100%;border-radius:4px;transition:width .3s}
+.vol-bar-val{font-size:12px;color:var(--t2);width:40px}
+.acwr-gauge{position:relative;height:24px;background:var(--c2);border-radius:12px;overflow:visible;margin:12px 0}
+.acwr-fill{height:100%;border-radius:12px;transition:width .3s}
+.acwr-marker{position:absolute;top:-4px;width:3px;height:32px;background:var(--t1);border-radius:2px;transition:left .3s}
 </style>
 </head>
 <body>
 <div id="root"></div>
 <script>
-// === SERVICE WORKER (inline registration for offline PWA) ===
 if('serviceWorker' in navigator){
   const swCode=`
-    const CACHE='ironclad-v16';
+    const CACHE='ironclad-v17';
     const ASSETS=['/'];
     self.addEventListener('install',e=>e.waitUntil(caches.open(CACHE).then(c=>c.addAll(ASSETS)).then(()=>self.skipWaiting())));
     self.addEventListener('activate',e=>e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim())));
@@ -173,1409 +153,37 @@ if('serviceWorker' in navigator){
 const{useState,useEffect,useRef,useCallback}=React;
 
 // === UTILITIES ===
-const ld=(k,d)=>{try{const v=localStorage.getItem('ic15_'+k);return v?JSON.parse(v):d}catch{return d}};
-const sv=(k,v)=>localStorage.setItem('ic15_'+k,JSON.stringify(v));
+const P='ic17_';
+const ld=(k,d)=>{try{const v=localStorage.getItem(P+k);return v?JSON.parse(v):d}catch{return d}};
+const sv=(k,v)=>localStorage.setItem(P+k,JSON.stringify(v));
 const vb=()=>{try{navigator.vibrate?.(10)}catch{}};
 const fmtDate=(d)=>new Date(d).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});
 const fmtTime=(s)=>{const m=Math.floor(s/60);const sec=s%60;return `${m}:${sec.toString().padStart(2,'0')}`};
+const today=()=>new Date().toISOString().slice(0,10);
 
-// === MIGRATE DATA from v14 ===
+// === DATA MIGRATION ===
 (()=>{
   try{
-    const migrated=localStorage.getItem('ic15_migrated');
-    if(!migrated){
-      const keys=Object.keys(localStorage).filter(k=>k.startsWith('ic13_'));
-      keys.forEach(k=>{
-        const newKey='ic15_'+k.replace('ic13_','');
-        if(!localStorage.getItem(newKey)){localStorage.setItem(newKey,localStorage.getItem(k))}
+    if(localStorage.getItem('ic17_migrated'))return;
+    const oldPrefixes=['ic13_','ic14_','ic15_','ic16_'];
+    const unprefixed=['history','prs','bodyweight','weightLog','exHistory','phase','restTime','restEnabled'];
+    oldPrefixes.forEach(op=>{
+      Object.keys(localStorage).filter(k=>k.startsWith(op)).forEach(k=>{
+        const newKey='ic17_'+k.replace(op,'');
+        if(!localStorage.getItem(newKey))localStorage.setItem(newKey,localStorage.getItem(k));
       });
-      localStorage.setItem('ic15_migrated','1');
-    }
+    });
+    unprefixed.forEach(k=>{
+      const v=localStorage.getItem(k);
+      if(v&&!localStorage.getItem('ic17_'+k))localStorage.setItem('ic17_'+k,v);
+    });
+    Object.keys(localStorage).filter(k=>k.startsWith('pr_')).forEach(k=>{
+      const newKey='ic17_'+k;
+      if(!localStorage.getItem(newKey))localStorage.setItem(newKey,localStorage.getItem(k));
+    });
+    localStorage.setItem('ic17_migrated','1');
   }catch(e){}
 })();
-
-// === EXERCISE DATABASE ===
-const EXDB=[
-  // TRAINER PRESCRIBED
-  {id:'trapbar',n:'Trapbar Deadlift',m:'Legs',t:'w',eq:'Barbell',tags:['k','t'],note:'Hip hinge focus, keep back neutral'},
-  {id:'foamquad',n:'Foam Rolling Quads',m:'Recovery',t:'d',eq:'Foam Roller',tags:['k','t'],note:'90s per quad, focus on tight spots'},
-  {id:'johnsoncalf',n:'BB Johnson Calf Raise',m:'Calves',t:'w',eq:'Barbell',tags:['k','t'],note:'Full ROM, 2s pause at top'},
-  {id:'copenadduct',n:'Copenhagen Adductor',m:'Adductors',t:'d',eq:'Bench',tags:['k','t'],note:'Side plank position, top leg on bench'},
-  {id:'starplank',n:'Star Plank',m:'Core',t:'d',eq:'Bodyweight',tags:['k','t'],note:'Extend opposite arm & leg from plank'},
-  {id:'staggerpallof',n:'Stagger Stance Pallof Pulses',m:'Core',t:'r',eq:'Cable',tags:['k','b','t'],note:'Split stance, pulse arms out'},
-  {id:'anklejump',n:'Ankle Jumps + Alt Skipping',m:'Legs',t:'r',eq:'Bodyweight',tags:['k','p','t'],note:'Quick reactive jumps, minimal knee bend'},
-
-  // ECCENTRIC KNEE REHAB
-  {id:'eccstepdown',n:'Eccentric Step-Down',m:'Quads',t:'r',eq:'Step',tags:['k','e'],note:'4s lowering, single leg, 15cm step'},
-  {id:'bulgsplit',n:'Bulgarian Split Squat',m:'Quads',t:'w',eq:'Dumbbell',tags:['k','e','b','t'],note:'Rear foot elevated, 4s eccentric lowering, shallow depth initially'},
-  {id:'slraise',n:'Straight Leg Raise',m:'Quads',t:'r',eq:'Bodyweight',tags:['k','e'],note:'Lock knee, lift to 45°, 3s hold'},
-
-  // LOWER BODY
-  {id:'hipthrust',n:'Barbell Hip Thrust',m:'Glutes',t:'w',eq:'Barbell',tags:['k'],note:'Drive through heels, squeeze at top'},
-  {id:'rdl',n:'Romanian Deadlift',m:'Hamstrings',t:'w',eq:'Barbell',tags:['k'],note:'Hinge at hips, soft knee bend'},
-  {id:'slrdl',n:'Single-Leg RDL',m:'Hamstrings',t:'w',eq:'Dumbbell',tags:['k','b'],note:'Balance challenge + hamstring'},
-  {id:'legcurl',n:'Lying Leg Curl',m:'Hamstrings',t:'w',eq:'Machine',tags:['k'],note:'Control the eccentric'},
-  {id:'cablekick',n:'Cable Kickback',m:'Glutes',t:'w',eq:'Cable',tags:['k'],note:'Squeeze glute at top'},
-  {id:'glutebridge',n:'Glute Bridge',m:'Glutes',t:'r',eq:'Bodyweight',tags:['k'],note:'Pause 2s at top'},
-  {id:'clamshell',n:'Clamshell',m:'Glutes',t:'r',eq:'Band',tags:['k'],note:'Band above knees, control motion'},
-  {id:'tke',n:'Terminal Knee Extension',m:'VMO',t:'r',eq:'Band',tags:['k','e'],note:'Band behind knee, squeeze to full extension'},
-  {id:'calfstand',n:'Standing Calf Raise',m:'Calves',t:'w',eq:'Machine',tags:['k'],note:'Full ROM, slow eccentric'},
-  {id:'eccheeldrop',n:'Eccentric Heel Drop',m:'Calves',t:'r',eq:'Step',tags:['k','e'],note:'Rise on both feet, lower slowly on one — 4s eccentric'},
-  {id:'seatedcalf',n:'Seated Calf Raise',m:'Calves',t:'w',eq:'Machine',tags:['k'],note:'Targets soleus — deep calf loading for achilles'},
-  {id:'kbswing',n:'Kettlebell Swing',m:'Glutes',t:'w',eq:'Kettlebell',tags:['k','p'],note:'Power from hips, not arms'},
-
-  // UPPER PUSH
-  {id:'dbbench',n:'Dumbbell Bench Press',m:'Chest',t:'w',eq:'Dumbbell',tags:['k'],note:''},
-  {id:'dbincbench',n:'Incline DB Press',m:'Chest',t:'w',eq:'Dumbbell',tags:['k'],note:'30° incline'},
-  {id:'cablefly',n:'Cable Fly',m:'Chest',t:'w',eq:'Cable',tags:['k'],note:'Squeeze at center'},
-  {id:'pushup',n:'Push-ups',m:'Chest',t:'r',eq:'Bodyweight',tags:['k'],note:''},
-  {id:'dbohp',n:'DB Shoulder Press',m:'Shoulders',t:'w',eq:'Dumbbell',tags:['k'],note:''},
-  {id:'latraise',n:'Lateral Raise',m:'Shoulders',t:'w',eq:'Dumbbell',tags:['k'],note:''},
-  {id:'ropepush',n:'Rope Pushdown',m:'Triceps',t:'w',eq:'Cable',tags:['k'],note:''},
-  {id:'chestpress',n:'Machine Chest Press',m:'Chest',t:'w',eq:'Machine',tags:['k'],note:''},
-  {id:'dip',n:'Dips',m:'Chest',t:'r',eq:'Bodyweight',tags:['k'],note:''},
-
-  // UPPER PULL
-  {id:'pullup',n:'Pull-ups',m:'Back',t:'r',eq:'Bodyweight',tags:['k'],note:''},
-  {id:'latpd',n:'Lat Pulldown',m:'Back',t:'w',eq:'Cable',tags:['k'],note:''},
-  {id:'cablerow',n:'Seated Cable Row',m:'Back',t:'w',eq:'Cable',tags:['k'],note:''},
-  {id:'dbrow',n:'Dumbbell Row',m:'Back',t:'w',eq:'Dumbbell',tags:['k'],note:''},
-  {id:'facepull',n:'Face Pull',m:'Back',t:'w',eq:'Cable',tags:['k'],note:'External rotation at top'},
-  {id:'invrow',n:'Inverted Row',m:'Back',t:'r',eq:'Bodyweight',tags:['k'],note:''},
-  {id:'dbcurl',n:'Dumbbell Curl',m:'Biceps',t:'w',eq:'Dumbbell',tags:['k'],note:''},
-  {id:'hammercurl',n:'Hammer Curl',m:'Biceps',t:'w',eq:'Dumbbell',tags:['k'],note:''},
-
-  // CORE
-  {id:'deadbug',n:'Dead Bug',m:'Core',t:'r',eq:'Bodyweight',tags:['k'],note:'Opposite arm/leg, press low back down'},
-  {id:'pallof',n:'Pallof Press',m:'Core',t:'r',eq:'Cable',tags:['k','b'],note:'Anti-rotation hold'},
-  {id:'plank',n:'Plank',m:'Core',t:'d',eq:'Bodyweight',tags:['k'],note:''},
-  {id:'sideplank',n:'Side Plank',m:'Core',t:'d',eq:'Bodyweight',tags:['k','b'],note:'Stack feet or stagger'},
-  {id:'birddog',n:'Bird Dog',m:'Core',t:'r',eq:'Bodyweight',tags:['k','b'],note:'Opposite arm/leg, hold 3s'},
-  {id:'hangknee',n:'Hanging Knee Raise',m:'Core',t:'r',eq:'Bar',tags:['k'],note:'Control the swing'},
-  {id:'bearcrwl',n:'Bear Crawl',m:'Core',t:'d',eq:'Bodyweight',tags:['k','b'],note:'Knees 1 inch off ground'},
-  {id:'mtclimb',n:'Mountain Climbers',m:'Core',t:'d',eq:'Bodyweight',tags:['k','p'],note:'Quick but controlled'},
-
-  // BALANCE / POWER
-  {id:'bosusquat',n:'BOSU Balance Squat',m:'Legs',t:'r',eq:'BOSU',tags:['k','b'],note:'Shallow squat, focus on stability'},
-  {id:'slstand',n:'Single-Leg Balance Hold',m:'Balance',t:'d',eq:'Bodyweight',tags:['k','b'],note:'30-60s, eyes closed to progress'},
-  {id:'boxstep',n:'Low Box Step-Up',m:'Quads',t:'r',eq:'Step',tags:['k','b'],note:'Low step, controlled, no push-off'},
-
-  // CARDIO / CONDITIONING
-  {id:'rowing',n:'Rowing Machine',m:'Cardio',t:'c',eq:'Machine',tags:['k','f'],note:'500m intervals or steady state'},
-  {id:'skierg',n:'SkiErg',m:'Cardio',t:'c',eq:'Machine',tags:['k','f'],note:'Full-body pull, 30s on / 30s off intervals'},
-  {id:'jumpingjack',n:'Jumping Jacks',m:'Cardio',t:'d',eq:'Bodyweight',tags:['k','f'],note:'Low-impact option: step-out jacks'},
-  {id:'rowinterval',n:'Row Intervals (500m)',m:'Cardio',t:'c',eq:'Machine',tags:['k','f'],note:'Max effort 500m, rest 90s, repeat'},
-
-  // PHASE 2+ PROGRESSIONS
-  {id:'bbench',n:'Barbell Bench Press',m:'Chest',t:'w',eq:'Barbell',tags:['k'],note:'Progression from DB bench'},
-  {id:'wtpullup',n:'Weighted Pull-up',m:'Back',t:'w',eq:'Bodyweight',tags:['k'],note:'Add plate via belt or DB between feet'},
-  {id:'bbohp',n:'Barbell Overhead Press',m:'Shoulders',t:'w',eq:'Barbell',tags:['k'],note:'Standing, strict press'},
-  {id:'hipthrusthvy',n:'Heavy Hip Thrust',m:'Glutes',t:'w',eq:'Barbell',tags:['k'],note:'Progressive overload — 3s pause at top'},
-  {id:'lowboxjump',n:'Low Box Jump',m:'Legs',t:'r',eq:'Box',tags:['k','p'],note:'Soft landing, step down — do NOT jump down'},
-  {id:'gobsquat',n:'Goblet Squat',m:'Quads',t:'w',eq:'Dumbbell',tags:['k'],note:'Only when physio clears deeper flexion'},
-  {id:'skierswing',n:'KB Skier Swing',m:'Glutes',t:'w',eq:'Kettlebell',tags:['k','p'],note:'Double arm ski-pole motion, explosive hips'},
-  {id:'sledpush',n:'Sled Push',m:'Legs',t:'d',eq:'Sled',tags:['k','p','f'],note:'Low handle, drive through toes — great knee-safe conditioning'},
-  {id:'tbarrow',n:'T-Bar Row',m:'Back',t:'w',eq:'Barbell',tags:['k'],note:'Chest-supported if available'},
-  {id:'dblunge',n:'Walking DB Lunge',m:'Quads',t:'w',eq:'Dumbbell',tags:['k','b'],note:'Only Phase 3+ — controlled stride, upright torso'},
-  {id:'hanglegraise',n:'Hanging Leg Raise',m:'Core',t:'r',eq:'Bar',tags:['k'],note:'Full leg raise — progression from knee raise'},
-  {id:'slhop',n:'Single-Leg Forward Hop',m:'Legs',t:'r',eq:'Bodyweight',tags:['k','p','b'],note:'Stick the landing, 2s hold — sport-specific power'},
-  {id:'suitcasecarry',n:'Suitcase Carry',m:'Core',t:'d',eq:'Dumbbell',tags:['k','b'],note:'Heavy DB one side, walk — anti-lateral flexion'},
-  {id:'farmerwalk',n:'Farmer Walk',m:'Full Body',t:'d',eq:'Dumbbell',tags:['k','f'],note:'Heavy DBs both hands, walk 40m — metabolic + grip'}
-];
-
-const getEx=(eid)=>EXDB.find(e=>e.id===eid)||{id:eid,n:'Unknown',m:'Other',t:'w',eq:'None',tags:[],note:''};
-
-// === TAG DISPLAY ===
-const tagMap={k:{l:'Knee-Safe',c:'tag-k'},e:{l:'Eccentric',c:'tag-e'},p:{l:'Power',c:'tag-p'},b:{l:'Balance',c:'tag-b'},t:{l:'Trainer Rx',c:'tag-t'},f:{l:'Fat Burn',c:'tag-f'}};
-
-// === REST TIMER CONFIG ===
-const REST_OPTIONS=[30,45,60,90];
-
-// === PHASE-AWARE PROGRAM ===
-const PHASES_META=[
-  {id:1,n:'Foundation',wks:'Weeks 1-4',d:'Build base strength, learn movements, begin knee rehab. Lighter loads, higher reps for calorie burn. Short rests between supersets.',icon:'🌱',restDefault:45},
-  {id:2,n:'Build',wks:'Weeks 5-8',d:'Progressive overload. Add sets & load. Introduce barbell work. Metabolic finishers increase in intensity for fat loss.',icon:'🔨',restDefault:60},
-  {id:3,n:'Strength & Power',wks:'Weeks 9-12',d:'Peak intensity. Heavier loads, explosive movements. Conditioning finishers maximize calorie burn.',icon:'🔥',restDefault:60},
-  {id:4,n:'Maintain & Perform',wks:'Weeks 13+',d:'Sustain strength while running volume increases. High-intensity conditioning circuits for continued fat loss.',icon:'🏔',restDefault:45}
-];
-
-const getProgramDays=(phase)=>{
-  if(phase===1) return [
-    {id:1,n:'Legs & Core',icon:'🦵',
-      focus:['Knee Recovery','Eccentric Strength','Core Stability','Trainer Rx'],
-      supersets:[
-        {label:'Strength & Mobility',type:'Circuit',color:'var(--grn)',rest:60,
-         ex:[{eid:'trapbar',s:3,r:'8-10'},{eid:'foamquad',s:1,r:'90s/side'},{eid:'johnsoncalf',s:3,r:'12-15'}]},
-        {label:'Stability & Anti-Rotation',type:'Superset',color:'var(--blu)',rest:45,
-         ex:[{eid:'copenadduct',s:3,r:'20-30s/side'},{eid:'starplank',s:3,r:'8ea'},{eid:'staggerpallof',s:3,r:'10ea'}]},
-        {label:'Power & Eccentric',type:'Circuit',color:'var(--org)',rest:45,
-         ex:[{eid:'anklejump',s:3,r:'15+15'},{eid:'eccstepdown',s:3,r:'10ea'},{eid:'bulgsplit',s:3,r:'8-10ea'}]},
-        {label:'Metabolic Finisher',type:'AMRAP 8min',color:'var(--red)',rest:0,
-         ex:[{eid:'kbswing',s:3,r:'15'},{eid:'bearcrwl',s:3,r:'20s'},{eid:'glutebridge',s:3,r:'15'}]}
-      ]},
-    {id:2,n:'Upper Body & Core',icon:'💪',
-      focus:['Push/Pull Balance','Core Strength','Calorie Burn','Posture'],
-      supersets:[
-        {label:'Push & Pull',type:'Superset',color:'var(--pur)',rest:60,
-         ex:[{eid:'dbbench',s:3,r:'10-12'},{eid:'cablerow',s:3,r:'10-12'},{eid:'deadbug',s:3,r:'10ea'}]},
-        {label:'Shoulders & Back',type:'Superset',color:'var(--cyn)',rest:60,
-         ex:[{eid:'dbohp',s:3,r:'10-12'},{eid:'latpd',s:3,r:'10-12'},{eid:'pallof',s:3,r:'12ea'}]},
-        {label:'Arms & Core Finisher',type:'Circuit',color:'var(--yel)',rest:45,
-         ex:[{eid:'cablefly',s:3,r:'12-15'},{eid:'facepull',s:3,r:'15-20'},{eid:'hangknee',s:3,r:'10-15'}]},
-        {label:'Metabolic Finisher',type:'EMOM 6min',color:'var(--red)',rest:0,
-         ex:[{eid:'skierg',s:3,r:'20s'},{eid:'mtclimb',s:3,r:'20s'},{eid:'jumpingjack',s:3,r:'30s'}]}
-      ]},
-    {id:3,n:'Power, Balance & Core',icon:'⚡',
-      focus:['Explosive Power','Balance Training','Landing Mechanics','Fat Burn'],
-      supersets:[
-        {label:'Power & Hinge',type:'Circuit',color:'var(--red)',rest:60,
-         ex:[{eid:'kbswing',s:3,r:'12-15'},{eid:'slrdl',s:3,r:'10ea'},{eid:'birddog',s:3,r:'10ea'}]},
-        {label:'Upper Strength & Stability',type:'Superset',color:'var(--grn)',rest:45,
-         ex:[{eid:'pushup',s:3,r:'12-20'},{eid:'invrow',s:3,r:'8-12'},{eid:'sideplank',s:3,r:'30-45s/side'}]},
-        {label:'Lower Leg Resilience',type:'Circuit',color:'var(--org)',rest:45,
-         ex:[{eid:'boxstep',s:3,r:'10ea'},{eid:'eccheeldrop',s:3,r:'12ea'},{eid:'seatedcalf',s:3,r:'15'}]},
-        {label:'Metabolic Finisher',type:'Intervals',color:'var(--red)',rest:0,
-         ex:[{eid:'rowing',s:4,r:'250m max'},{eid:'farmerwalk',s:3,r:'40s'}]}
-      ]}
-  ];
-
-  if(phase===2) return [
-    {id:1,n:'Legs & Core',icon:'🦵',
-      focus:['Progressive Overload','Eccentric Depth','Hip Strength','Trainer Rx'],
-      supersets:[
-        {label:'Heavy Hinge & Calf',type:'Circuit',color:'var(--grn)',rest:75,
-         ex:[{eid:'trapbar',s:4,r:'6-8'},{eid:'foamquad',s:1,r:'90s/side'},{eid:'johnsoncalf',s:4,r:'10-12'}]},
-        {label:'Stability & Anti-Rotation',type:'Superset',color:'var(--blu)',rest:45,
-         ex:[{eid:'copenadduct',s:3,r:'30-40s/side'},{eid:'starplank',s:3,r:'10ea'},{eid:'staggerpallof',s:3,r:'12ea'}]},
-        {label:'Power, Eccentric & Glute',type:'Circuit',color:'var(--org)',rest:60,
-         ex:[{eid:'anklejump',s:3,r:'20+20'},{eid:'bulgsplit',s:4,r:'8ea'},{eid:'hipthrust',s:4,r:'8-10'}]},
-        {label:'Metabolic Finisher',type:'AMRAP 10min',color:'var(--red)',rest:0,
-         ex:[{eid:'kbswing',s:4,r:'15'},{eid:'bearcrwl',s:3,r:'25s'},{eid:'mtclimb',s:3,r:'25s'}]}
-      ]},
-    {id:2,n:'Upper Body & Core',icon:'💪',
-      focus:['Barbell Intro','Volume Increase','Core Strength','Fat Burn'],
-      supersets:[
-        {label:'Heavy Push & Pull',type:'Superset',color:'var(--pur)',rest:75,
-         ex:[{eid:'bbench',s:4,r:'8-10'},{eid:'cablerow',s:4,r:'8-10'},{eid:'deadbug',s:3,r:'12ea'}]},
-        {label:'Vertical Push & Pull',type:'Superset',color:'var(--cyn)',rest:60,
-         ex:[{eid:'dbohp',s:4,r:'8-10'},{eid:'latpd',s:4,r:'8-10'},{eid:'pallof',s:3,r:'12ea'}]},
-        {label:'Accessory & Core',type:'Circuit',color:'var(--yel)',rest:45,
-         ex:[{eid:'dbincbench',s:3,r:'10-12'},{eid:'facepull',s:3,r:'15-20'},{eid:'hangknee',s:3,r:'12-15'}]},
-        {label:'Metabolic Finisher',type:'EMOM 8min',color:'var(--red)',rest:0,
-         ex:[{eid:'skierg',s:4,r:'25s'},{eid:'farmerwalk',s:3,r:'40s'},{eid:'jumpingjack',s:3,r:'30s'}]}
-      ]},
-    {id:3,n:'Power, Balance & Core',icon:'⚡',
-      focus:['Explosive Hinge','Weighted Balance','Achilles Build','Conditioning'],
-      supersets:[
-        {label:'Power & Single-Leg',type:'Circuit',color:'var(--red)',rest:60,
-         ex:[{eid:'kbswing',s:4,r:'12-15'},{eid:'slrdl',s:3,r:'10ea'},{eid:'lowboxjump',s:3,r:'6-8'}]},
-        {label:'Upper Strength',type:'Superset',color:'var(--grn)',rest:60,
-         ex:[{eid:'pushup',s:3,r:'15-25'},{eid:'pullup',s:3,r:'6-10'},{eid:'suitcasecarry',s:3,r:'30s/side'}]},
-        {label:'Lower Leg Resilience',type:'Circuit',color:'var(--org)',rest:45,
-         ex:[{eid:'boxstep',s:3,r:'12ea'},{eid:'eccheeldrop',s:3,r:'15ea'},{eid:'seatedcalf',s:4,r:'12-15'}]},
-        {label:'Metabolic Finisher',type:'Intervals',color:'var(--red)',rest:0,
-         ex:[{eid:'rowinterval',s:4,r:'500m max'},{eid:'skierg',s:3,r:'30s on/30s off'}]}
-      ]}
-  ];
-
-  if(phase===3) return [
-    {id:1,n:'Legs & Core',icon:'🦵',
-      focus:['Peak Strength','Explosive Power','Deep Eccentric','Trainer Rx'],
-      supersets:[
-        {label:'Heavy Strength',type:'Circuit',color:'var(--grn)',rest:90,
-         ex:[{eid:'trapbar',s:4,r:'5-6'},{eid:'foamquad',s:1,r:'90s/side'},{eid:'johnsoncalf',s:4,r:'8-10'}]},
-        {label:'Stability & Power',type:'Superset',color:'var(--blu)',rest:45,
-         ex:[{eid:'copenadduct',s:3,r:'30-40s/side'},{eid:'starplank',s:3,r:'12ea'},{eid:'staggerpallof',s:4,r:'12ea'}]},
-        {label:'Explosive & Eccentric',type:'Circuit',color:'var(--org)',rest:60,
-         ex:[{eid:'anklejump',s:4,r:'20+20'},{eid:'bulgsplit',s:4,r:'6-8ea'},{eid:'hipthrusthvy',s:4,r:'6-8'}]},
-        {label:'Metabolic Finisher',type:'AMRAP 12min',color:'var(--red)',rest:0,
-         ex:[{eid:'sledpush',s:4,r:'30s'},{eid:'kbswing',s:4,r:'20'},{eid:'bearcrwl',s:3,r:'30s'}]}
-      ]},
-    {id:2,n:'Upper Body & Core',icon:'💪',
-      focus:['Heavy Compounds','Upper Power','Core Anti-Rotation','Fat Burn'],
-      supersets:[
-        {label:'Heavy Compounds',type:'Superset',color:'var(--pur)',rest:90,
-         ex:[{eid:'bbench',s:4,r:'6-8'},{eid:'wtpullup',s:4,r:'5-8'},{eid:'hanglegraise',s:3,r:'10-12'}]},
-        {label:'Vertical Power',type:'Superset',color:'var(--cyn)',rest:75,
-         ex:[{eid:'bbohp',s:4,r:'6-8'},{eid:'tbarrow',s:4,r:'8-10'},{eid:'staggerpallof',s:3,r:'12ea'}]},
-        {label:'Volume & Core',type:'Circuit',color:'var(--yel)',rest:45,
-         ex:[{eid:'dip',s:3,r:'10-15'},{eid:'dbrow',s:3,r:'10-12'},{eid:'skierg',s:3,r:'30s'}]},
-        {label:'Metabolic Finisher',type:'EMOM 10min',color:'var(--red)',rest:0,
-         ex:[{eid:'skierg',s:4,r:'30s max'},{eid:'farmerwalk',s:3,r:'40s'},{eid:'mtclimb',s:3,r:'30s'}]}
-      ]},
-    {id:3,n:'Power, Balance & Core',icon:'⚡',
-      focus:['Sport-Specific Power','Single-Leg Strength','Trail Conditioning','Achilles'],
-      supersets:[
-        {label:'Explosive & Hinge',type:'Circuit',color:'var(--red)',rest:60,
-         ex:[{eid:'skierswing',s:4,r:'10-12'},{eid:'lowboxjump',s:4,r:'6-8'},{eid:'slhop',s:3,r:'6ea'}]},
-        {label:'Single-Leg & Upper',type:'Superset',color:'var(--grn)',rest:60,
-         ex:[{eid:'dblunge',s:3,r:'8ea'},{eid:'pullup',s:4,r:'8-12'},{eid:'sideplank',s:3,r:'40-60s/side'}]},
-        {label:'Calf, Achilles & Conditioning',type:'Circuit',color:'var(--org)',rest:45,
-         ex:[{eid:'eccheeldrop',s:3,r:'15ea'},{eid:'seatedcalf',s:4,r:'12'},{eid:'sledpush',s:3,r:'30-40s'}]},
-        {label:'Metabolic Finisher',type:'Intervals',color:'var(--red)',rest:0,
-         ex:[{eid:'rowinterval',s:5,r:'500m max'},{eid:'skierg',s:4,r:'30s'}]}
-      ]}
-  ];
-
-  // Phase 4: Maintain & Perform
-  return [
-    {id:1,n:'Legs & Core',icon:'🦵',
-      focus:['Strength Maintenance','Knee Protection','Running Support','Trainer Rx'],
-      supersets:[
-        {label:'Maintain Strength',type:'Circuit',color:'var(--grn)',rest:60,
-         ex:[{eid:'trapbar',s:3,r:'6-8'},{eid:'foamquad',s:1,r:'90s/side'},{eid:'johnsoncalf',s:3,r:'10-12'}]},
-        {label:'Stability (Constant)',type:'Superset',color:'var(--blu)',rest:45,
-         ex:[{eid:'copenadduct',s:3,r:'30s/side'},{eid:'starplank',s:3,r:'10ea'},{eid:'staggerpallof',s:3,r:'10ea'}]},
-        {label:'Maintain & Protect',type:'Circuit',color:'var(--org)',rest:45,
-         ex:[{eid:'bulgsplit',s:3,r:'8ea'},{eid:'hipthrust',s:3,r:'8-10'},{eid:'tke',s:3,r:'15-20'}]},
-        {label:'Metabolic Finisher',type:'AMRAP 10min',color:'var(--red)',rest:0,
-         ex:[{eid:'kbswing',s:3,r:'20'},{eid:'mtclimb',s:3,r:'30s'},{eid:'farmerwalk',s:3,r:'40s'}]}
-      ]},
-    {id:2,n:'Upper Body & Core',icon:'💪',
-      focus:['Maintain Upper','Posture','Core Endurance','Fat Burn'],
-      supersets:[
-        {label:'Push & Pull Maintain',type:'Superset',color:'var(--pur)',rest:60,
-         ex:[{eid:'bbench',s:3,r:'8-10'},{eid:'cablerow',s:3,r:'8-10'},{eid:'deadbug',s:3,r:'12ea'}]},
-        {label:'Vertical & Accessory',type:'Superset',color:'var(--cyn)',rest:60,
-         ex:[{eid:'dbohp',s:3,r:'10-12'},{eid:'pullup',s:3,r:'8-12'},{eid:'pallof',s:3,r:'12ea'}]},
-        {label:'Prehab & Posture',type:'Circuit',color:'var(--yel)',rest:45,
-         ex:[{eid:'facepull',s:3,r:'15-20'},{eid:'latraise',s:3,r:'12-15'},{eid:'suitcasecarry',s:3,r:'30s/side'}]},
-        {label:'Metabolic Finisher',type:'EMOM 8min',color:'var(--red)',rest:0,
-         ex:[{eid:'skierg',s:4,r:'30s on/30s off'},{eid:'rowing',s:3,r:'500m'},{eid:'bearcrwl',s:3,r:'25s'}]}
-      ]},
-    {id:3,n:'Conditioning & Balance',icon:'⚡',
-      focus:['Running-Integrated','Metabolic Conditioning','Achilles Maintenance','Balance'],
-      supersets:[
-        {label:'Running Power Maintenance',type:'Circuit',color:'var(--red)',rest:45,
-         ex:[{eid:'kbswing',s:3,r:'15-20'},{eid:'slrdl',s:3,r:'10ea'},{eid:'anklejump',s:3,r:'15+15'}]},
-        {label:'Metabolic Conditioning',type:'Circuit',color:'var(--grn)',rest:30,
-         ex:[{eid:'skierg',s:3,r:'30s on/off'},{eid:'bearcrwl',s:3,r:'30s'},{eid:'mtclimb',s:3,r:'30s'}]},
-        {label:'Lower Leg & Balance',type:'Circuit',color:'var(--org)',rest:45,
-         ex:[{eid:'eccheeldrop',s:3,r:'12ea'},{eid:'seatedcalf',s:3,r:'15'},{eid:'slstand',s:3,r:'45s/side'}]},
-        {label:'Metabolic Finisher',type:'Intervals',color:'var(--red)',rest:0,
-         ex:[{eid:'rowinterval',s:5,r:'500m max'},{eid:'jumpingjack',s:3,r:'60s'}]}
-      ]}
-  ];
-};
-
-// === TOAST ===
-const Toast=({msg,onClose})=>{
-  useEffect(()=>{const t=setTimeout(onClose,2500);return()=>clearTimeout(t)},[onClose]);
-  return <div className="toast">{msg}</div>;
-};
-
-// === REST TIMER ===
-const RestTimer=({seconds,onDone,onSkip})=>{
-  const[left,setLeft]=useState(seconds);
-  const total=seconds;
-  useEffect(()=>{
-    if(left<=0){vb();vb();onDone();return}
-    const t=setTimeout(()=>setLeft(l=>l-1),1000);
-    return()=>clearTimeout(t);
-  },[left,onDone]);
-
-  const pct=(left/total)*100;
-  const r=90;const circ=2*Math.PI*r;const offset=circ*(1-left/total);
-  const color=left<=5?'var(--red)':left<=15?'var(--org)':'var(--grn)';
-
-  return(
-    <div className="rest-overlay" onClick={e=>e.target===e.currentTarget&&onSkip()}>
-      <div style={{display:'flex',flexDirection:'column',alignItems:'center'}}>
-        <div style={{fontSize:14,color:'var(--t2)',marginBottom:16,fontWeight:600,textTransform:'uppercase',letterSpacing:1}}>Rest</div>
-        <div className="rest-ring">
-          <svg width="200" height="200" viewBox="0 0 200 200">
-            <circle cx="100" cy="100" r={r} fill="none" stroke="var(--c2)" strokeWidth="8"/>
-            <circle cx="100" cy="100" r={r} fill="none" stroke={color} strokeWidth="8"
-              strokeLinecap="round" strokeDasharray={circ} strokeDashoffset={offset}
-              style={{transition:'stroke-dashoffset 1s linear, stroke 0.3s'}}/>
-          </svg>
-          <div className="time">
-            <div className="big" style={{color}}>{left}</div>
-            <div className="small">seconds</div>
-          </div>
-        </div>
-        <div className="rest-btns">
-          <button className="rest-btn" style={{background:'var(--c2)',color:'var(--t1)'}} onClick={onSkip}>Skip</button>
-          <button className="rest-btn" style={{background:color,color:'#000'}} onClick={()=>setLeft(l=>l+15)}>+15s</button>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-// === SESSION TIMER ===
-const useSessionTimer=()=>{
-  const[elapsed,setElapsed]=useState(0);
-  const[running,setRunning]=useState(false);
-  const startRef=useRef(null);
-  const intervalRef=useRef(null);
-
-  const start=useCallback(()=>{
-    if(!running){
-      startRef.current=Date.now()-elapsed*1000;
-      setRunning(true);
-    }
-  },[running,elapsed]);
-
-  const stop=useCallback(()=>{setRunning(false)},[]);
-
-  useEffect(()=>{
-    if(running){
-      intervalRef.current=setInterval(()=>{
-        setElapsed(Math.floor((Date.now()-startRef.current)/1000));
-      },1000);
-    }
-    return()=>clearInterval(intervalRef.current);
-  },[running]);
-
-  return{elapsed,running,start,stop,fmtElapsed:fmtTime(elapsed)};
-};
-
-// === PAIN SCALE ===
-const painColor=(v)=>v<=2?'var(--grn)':v<=4?'var(--yel)':v<=6?'var(--org)':'var(--red)';
-const PainScale=({value,onChange,label})=>(
-  <div>
-    <div style={{fontSize:13,color:'var(--t2)',marginBottom:6}}>{label||'Knee Pain'} <span style={{fontWeight:600,color:value!=null?painColor(value):'var(--t3)'}}>{value!=null?value+'/10':'—'}</span></div>
-    <div className="pain-row">
-      {[0,1,2,3,4,5,6,7,8,9,10].map(v=>(
-        <div key={v} className="pain-dot" onClick={()=>{onChange(v);vb()}} style={{
-          background:value===v?painColor(v)+'25':'var(--c2)',
-          color:value===v?painColor(v):'var(--t3)',
-          borderColor:value===v?painColor(v):'transparent',
-          fontSize:v===0||v===10?10:12
-        }}>{v}</div>
-      ))}
-    </div>
-  </div>
-);
-
-// === RPE SELECTOR ===
-const RPESelector=({value,onChange})=>(
-  <div>
-    <div style={{fontSize:13,color:'var(--t2)',marginBottom:4}}>How hard did this feel? <span style={{fontWeight:600,color:value?'var(--org)':'var(--t3)'}}>{value?`RPE ${value}`:''}</span></div>
-    <div className="rpe-row">
-      {[1,2,3,4,5,6,7,8,9,10].map(v=>(
-        <button key={v} className={`rpe-btn${value===v?' on':''}`} onClick={()=>{onChange(v);vb()}}>{v}</button>
-      ))}
-    </div>
-    <div style={{fontSize:11,color:'var(--t3)',display:'flex',justifyContent:'space-between'}}>
-      <span>Easy</span><span>Max effort</span>
-    </div>
-  </div>
-);
-
-// === RECOVERY READINESS CHECK-IN ===
-const ReadinessCheckIn=({onSave})=>{
-  const today=new Date().toISOString().slice(0,10);
-  const[todayData,setTodayData]=useState(()=>ld('readiness',{})[today]||null);
-  const[sleep,setSleep]=useState(null);
-  const[soreness,setSoreness]=useState(null);
-  const[energy,setEnergy]=useState(null);
-  const[mood,setMood]=useState(null);
-  const[err,setErr]=useState('');
-
-  const sleepOpts=['😴','😐','😊','🌟'];
-  const sorenessOpts=['🔥','😣','😌','💪'];
-  const energyOpts=['🪫','😮‍💨','⚡','🚀'];
-  const moodOpts=['😞','😐','😊','🔥'];
-
-  const save=()=>{
-    if(sleep===null||soreness===null||energy===null||mood===null){
-      setErr('Please tap one emoji in each row');
-      return;
-    }
-    const entry={
-      sleep:sleepOpts[sleep],soreness:sorenessOpts[soreness],energy:energyOpts[energy],mood:moodOpts[mood],
-      sleepVal:sleep/3,sorenessVal:soreness/3,energyVal:energy/3,moodVal:mood/3,date:today
-    };
-    const existing=ld('readiness',{});
-    const data={...existing,[today]:entry};
-    sv('readiness',data);
-    setTodayData(entry);
-    setErr('');
-    if(onSave)onSave();
-    vb();
-  };
-
-  const reset=()=>{
-    const existing=ld('readiness',{});
-    delete existing[today];
-    sv('readiness',existing);
-    setTodayData(null);
-    setSleep(null);setSoreness(null);setEnergy(null);setMood(null);
-    if(onSave)onSave();
-  };
-
-  if(todayData)return(
-    <div className="card" style={{padding:14}}>
-      <div style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}>
-        <span style={{fontSize:13,fontWeight:600}}>Today's Check-In ✓</span>
-        <span style={{fontSize:20}}>{todayData.sleep}{todayData.soreness}{todayData.energy}{todayData.mood}</span>
-      </div>
-      <div style={{fontSize:12,color:'var(--t2)',marginTop:4,display:'flex',justifyContent:'space-between',alignItems:'center'}}>
-        <span>Readiness: {Math.round(((todayData.sleepVal+todayData.sorenessVal+todayData.energyVal+todayData.moodVal)/4)*100)}%</span>
-        <span onClick={reset} style={{fontSize:11,color:'var(--t3)',cursor:'pointer',textDecoration:'underline'}}>Edit</span>
-      </div>
-    </div>
-  );
-
-  return(
-    <div className="card" style={{padding:14}}>
-      <div style={{fontSize:14,fontWeight:600,marginBottom:10}}>Daily Check-In</div>
-      <div className="readiness-row">
-        {[{label:'Sleep',opts:sleepOpts,val:sleep,set:setSleep},{label:'Soreness',opts:sorenessOpts,val:soreness,set:setSoreness},{label:'Energy',opts:energyOpts,val:energy,set:setEnergy},{label:'Mood',opts:moodOpts,val:mood,set:setMood}].map(item=>(
-          <div key={item.label} className="readiness-item">
-            <div style={{fontSize:11,color:'var(--t2)',fontWeight:600}}>{item.label}</div>
-            <div className="emoji-row">
-              {item.opts.map((e,i)=><span key={i} className={`readiness-emoji${item.val===i?' on':''}`} onClick={()=>{item.set(i);setErr('')}}>{e}</span>)}
-            </div>
-          </div>
-        ))}
-      </div>
-      {err&&<div style={{fontSize:12,color:'var(--red)',textAlign:'center',marginTop:6}}>{err}</div>}
-      <button className="btn btn-g" style={{width:'100%',marginTop:8,padding:10}} onClick={save}>Save Check-In</button>
-    </div>
-  );
-};
-
-// === RUNNING LOG ===
-const RunningLog=({onToast})=>{
-  const[dist,setDist]=useState('');
-  const[time,setTime]=useState('');
-  const[terrain,setTerrain]=useState('road');
-  const[kneeFeel,setKneeFeel]=useState(null);
-  const[runNote,setRunNote]=useState('');
-  const[runs,setRuns]=useState(()=>ld('runLog',[]));
-  const[err,setErr]=useState('');
-
-  const saveRun=()=>{
-    const d=parseFloat(dist)||0;
-    const t=parseInt(time)||0;
-    if(d<=0&&t<=0){
-      setErr('Enter distance or time');
-      return;
-    }
-    const entry={date:new Date().toISOString(),dist:d,time:t,terrain,kneeFeel,note:runNote||undefined};
-    if(d>0&&t>0)entry.pace=Math.round(t/d*10)/10;
-    const newRuns=[...runs,entry];
-    sv('runLog',newRuns);
-    setRuns(newRuns);
-    setDist('');setTime('');setRunNote('');setKneeFeel(null);setErr('');
-    if(onToast)onToast('Run logged');
-    vb();
-  };
-
-  const recentRuns=runs.slice(-5).reverse();
-  const totalDist=runs.reduce((a,r)=>a+(r.dist||0),0);
-  const weekRuns=runs.filter(r=>{const d=new Date(r.date);return(new Date()-d)/(1000*60*60*24)<=7});
-  const weekDist=weekRuns.reduce((a,r)=>a+(r.dist||0),0);
-
-  return(
-    <div>
-      <div className="card" style={{padding:14}}>
-        <div style={{fontSize:14,fontWeight:600,marginBottom:10}}>Log a Run</div>
-        <div style={{display:'flex',gap:8,marginBottom:8}}>
-          <input className="inp" type="number" inputMode="decimal" placeholder="km" value={dist} onChange={e=>setDist(e.target.value)} style={{textAlign:'center'}}/>
-          <input className="inp" type="number" inputMode="numeric" placeholder="min" value={time} onChange={e=>setTime(e.target.value)} style={{textAlign:'center'}}/>
-        </div>
-        <div style={{display:'flex',gap:6,marginBottom:8}}>
-          {['road','trail','track','treadmill'].map(t=>(
-            <button key={t} className={`phase-btn${terrain===t?' on':''}`} style={{flex:1,padding:'6px 0',fontSize:12}} onClick={()=>setTerrain(t)}>{t}</button>
-          ))}
-        </div>
-        <PainScale value={kneeFeel} onChange={setKneeFeel} label="Knee feel after"/>
-        <input className="inp" placeholder="Run notes (optional)" value={runNote} onChange={e=>setRunNote(e.target.value)} style={{width:'100%',marginTop:8,textAlign:'left',padding:'0 14px',height:36}}/>
-        {err&&<div style={{fontSize:12,color:'var(--red)',textAlign:'center',marginTop:6}}>{err}</div>}
-        <button className="btn btn-g" style={{width:'100%',marginTop:8,padding:10}} onClick={saveRun}>Save Run</button>
-      </div>
-
-      {runs.length>0&&<div className="card" style={{padding:14,marginTop:12}}>
-        <div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:8,marginBottom:12}}>
-          <div className="run-stat"><span className="val" style={{color:'var(--grn)'}}>{totalDist.toFixed(1)}</span><span className="lbl">Total km</span></div>
-          <div className="run-stat"><span className="val" style={{color:'var(--blu)'}}>{weekDist.toFixed(1)}</span><span className="lbl">This Week km</span></div>
-          <div className="run-stat"><span className="val" style={{color:'var(--org)'}}>{runs.length}</span><span className="lbl">Total Runs</span></div>
-        </div>
-        {recentRuns.map((r,i)=>(
-          <div key={i} style={{padding:'8px 0',borderTop:i>0?'0.5px solid var(--sep)':'none',display:'flex',justifyContent:'space-between',alignItems:'center'}}>
-            <div>
-              <div style={{fontWeight:600,fontSize:14}}>{r.dist}km · {r.time}min{r.pace?` · ${r.pace}min/km`:''}</div>
-              <div style={{fontSize:12,color:'var(--t2)'}}>{fmtDate(r.date)} · {r.terrain}{r.kneeFeel!=null?` · Knee: ${r.kneeFeel}/10`:''}</div>
-              {r.note&&<div style={{fontSize:11,color:'var(--t3)',fontStyle:'italic'}}>{r.note}</div>}
-            </div>
-            {r.kneeFeel!=null&&<span style={{fontSize:11,fontWeight:700,color:painColor(r.kneeFeel)}}>{r.kneeFeel}/10</span>}
-          </div>
-        ))}
-      </div>}
-    </div>
-  );
-};
-
-// === 1RM ESTIMATOR (Brzycki formula) ===
-const est1RM=(weight,reps)=>{
-  const w=parseFloat(weight);const r=parseInt(reps);
-  if(!w||!r||r<1||r>30)return null;
-  if(r===1)return w;
-  return Math.round(w*(36/(37-r)));
-};
-
-// === COUNTDOWN TIMER (for duration exercises) ===
-const CountdownTimer=({targetSec})=>{
-  const[left,setLeft]=useState(targetSec||0);
-  const[active,setActive]=useState(false);
-  const[started,setStarted]=useState(false);
-
-  useEffect(()=>{
-    if(!active||left<=0){if(left<=0&&started){vb();vb();setActive(false)}return}
-    const t=setTimeout(()=>setLeft(l=>l-1),1000);
-    return()=>clearTimeout(t);
-  },[active,left,started]);
-
-  const toggle=()=>{
-    if(!started){setLeft(targetSec);setStarted(true);setActive(true)}
-    else if(active){setActive(false)}
-    else{setActive(true)}
-  };
-  const reset=()=>{setLeft(targetSec);setActive(false);setStarted(false)};
-  const done=left<=0&&started;
-
-  return(
-    <div style={{display:'flex',alignItems:'center',gap:6}}>
-      <div className="cd-timer" onClick={toggle} style={{background:done?'var(--grn-d)':active?'var(--org-d)':'var(--c2)',color:done?'var(--grn)':active?'var(--org)':'var(--t2)'}}>
-        {done?'Done':active?fmtTime(left):started?fmtTime(left):`${targetSec}s`}
-        {!done&&<span style={{fontSize:10}}>{active?'⏸':'▶'}</span>}
-      </div>
-      {started&&<span onClick={reset} style={{fontSize:12,color:'var(--t3)',cursor:'pointer'}}>↺</span>}
-    </div>
-  );
-};
-
-// === WORKOUT COMPLETION SUMMARY ===
-const CompletionSummary=({day,completed,total,duration,calories,onClose})=>{
-  const pct=Math.round((completed/total)*100);
-  const exHist=ld('exHistory',{});
-  const prs=ld('prs',{});
-
-  // Count PRs hit this session (approximate - PRs logged today)
-  const today=new Date().toISOString().slice(0,10);
-  let prCount=0;
-  day.supersets.forEach(ss=>ss.ex.forEach(e=>{
-    const h=exHist[e.eid];
-    if(h){const last=h[h.length-1];if(last&&last.date.slice(0,10)===today){
-      last.sets.forEach(s=>{if(s.w&&parseFloat(s.w)===prs[e.eid])prCount++});
-    }}
-  }));
-
-  return(
-    <div className="complete-overlay" onClick={e=>e.target===e.currentTarget&&onClose()}>
-      <div className="complete-card">
-        <div style={{fontSize:64,marginBottom:12}}>{pct===100?'🏆':pct>=75?'💪':'👍'}</div>
-        <div style={{fontSize:28,fontWeight:700,marginBottom:4}}>Workout Complete!</div>
-        <div style={{fontSize:15,color:'var(--t2)',marginBottom:24}}>{day.n}</div>
-        <div style={{display:'flex',justifyContent:'center',flexWrap:'wrap',marginBottom:24}}>
-          <div className="complete-stat"><span style={{fontSize:22,fontWeight:700,color:'var(--grn)'}}>{pct}%</span><span style={{fontSize:11,color:'var(--t2)'}}>Completed</span></div>
-          <div className="complete-stat"><span style={{fontSize:22,fontWeight:700,color:'var(--blu)'}}>{completed}/{total}</span><span style={{fontSize:11,color:'var(--t2)'}}>Exercises</span></div>
-          <div className="complete-stat"><span style={{fontSize:22,fontWeight:700,color:'var(--org)'}}>{fmtTime(duration)}</span><span style={{fontSize:11,color:'var(--t2)'}}>Duration</span></div>
-          {calories>0&&<div className="complete-stat"><span style={{fontSize:22,fontWeight:700,color:'var(--red)'}}>{calories}</span><span style={{fontSize:11,color:'var(--t2)'}}>Est. kcal</span></div>}
-          {prCount>0&&<div className="complete-stat"><span style={{fontSize:22,fontWeight:700,color:'var(--yel)'}}>{prCount}</span><span style={{fontSize:11,color:'var(--t2)'}}>New PRs</span></div>}
-        </div>
-        <button className="btn btn-g" onClick={onClose} style={{padding:'12px 40px'}}>Done</button>
-      </div>
-    </div>
-  );
-};
-
-// === PR TRACKER ===
-const getPR=(eid)=>{
-  const prs=ld('prs',{});
-  return prs[eid]||null;
-};
-const checkAndSavePR=(eid,weight)=>{
-  if(!weight||isNaN(parseFloat(weight)))return false;
-  const w=parseFloat(weight);
-  const prs=ld('prs',{});
-  const prev=prs[eid]||0;
-  if(w>prev){prs[eid]=w;sv('prs',prs);return true}
-  return false;
-};
-
-// === EXERCISE HISTORY ===
-const getExHistory=(eid)=>{
-  const hist=ld('exHistory',{});
-  return(hist[eid]||[]).slice(-10);
-};
-const saveExHistory=(eid,sets)=>{
-  const hist=ld('exHistory',{});
-  if(!hist[eid])hist[eid]=[];
-  const entry={date:new Date().toISOString(),sets:sets.filter(s=>s.done).map(s=>({w:s.w,r:s.r}))};
-  if(entry.sets.length>0){hist[eid].push(entry);if(hist[eid].length>20)hist[eid]=hist[eid].slice(-20);sv('exHistory',hist)}
-};
-
-// === SET LOGGER ===
-const SetLogger=({exDef,dayId,ssIdx,exIdx,phase,onSetDone,onPR})=>{
-  const ex=getEx(exDef.eid);
-  const sets=exDef.s||3;
-  const isWeight=ex.t==='w';
-  const isDuration=ex.t==='d';
-  const logKey=`log_p${phase||1}_${dayId}_${ssIdx}_${exIdx}`;
-  const prevHistory=getExHistory(exDef.eid);
-  const lastSession=prevHistory.length>0?prevHistory[prevHistory.length-1]:null;
-  const currentPR=getPR(exDef.eid);
-  const[vals,setVals]=useState(()=>{
-    const saved=ld(logKey,[]);
-    return Array.from({length:sets},(_,i)=>saved[i]||{w:'',r:'',done:false});
-  });
-
-  const update=(si,field,val)=>{
-    const nv=[...vals];
-    nv[si]={...nv[si],[field]:val};
-    setVals(nv);
-    sv(logKey,nv);
-  };
-
-  const markDone=(si)=>{
-    const nv=[...vals];
-    const wasDone=nv[si].done;
-    nv[si]={...nv[si],done:!nv[si].done};
-    setVals(nv);
-    sv(logKey,nv);
-    vb();
-    if(!wasDone){
-      if(isWeight&&!nv[si].warmup&&checkAndSavePR(exDef.eid,nv[si].w)&&onPR){onPR(ex.n,nv[si].w)}
-      saveExHistory(exDef.eid,nv.filter(s=>!s.warmup));
-      if(onSetDone) onSetDone();
-    }
-  };
-
-  const quickFill=()=>{
-    if(!lastSession)return;
-    const nv=[...vals];
-    lastSession.sets.forEach((s,i)=>{if(i<nv.length&&!nv[i].done){nv[i]={...nv[i],w:s.w||'',r:s.r||''}}});
-    setVals(nv);sv(logKey,nv);vb();
-  };
-
-  const toggleWarmup=(si)=>{
-    const nv=[...vals];
-    nv[si]={...nv[si],warmup:!nv[si].warmup};
-    setVals(nv);sv(logKey,nv);vb();
-  };
-
-  const completed=vals.filter(v=>v.done).length;
-  const workingSets=vals.filter(v=>!v.warmup);
-  const best1RM=isWeight?workingSets.reduce((best,v)=>{if(!v.w||!v.r)return best;const e=est1RM(v.w,parseInt(v.r)||0);return e&&e>best?e:best},0):0;
-
-  return(
-    <div className="log-area">
-      <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:10}}>
-        <div style={{display:'flex',alignItems:'center',gap:8}}>
-          <span style={{fontSize:13,color:'var(--t2)'}}>{completed}/{sets} sets</span>
-          {isWeight&&currentPR&&<span style={{fontSize:11,color:'var(--yel)',fontWeight:600}}>PR: {currentPR}kg</span>}
-          {isWeight&&best1RM>0&&<span style={{fontSize:11,color:'var(--cyn)',fontWeight:600}}>~1RM: {best1RM}kg</span>}
-        </div>
-        {ex.note&&<div style={{fontSize:11,color:'var(--t3)',maxWidth:'50%',textAlign:'right'}}>{ex.note}</div>}
-      </div>
-      {lastSession&&<div style={{fontSize:11,color:'var(--t3)',marginBottom:8,padding:'6px 8px',background:'var(--c2)',borderRadius:6,display:'flex',justifyContent:'space-between',alignItems:'center'}}>
-        <span>Last: {lastSession.sets.map((s,i)=>`${s.w?s.w+'kg×':''}${s.r}`).join(' / ')}</span>
-        <button onClick={quickFill} style={{background:'none',border:'1px solid var(--c3)',borderRadius:6,color:'var(--grn)',fontSize:10,fontWeight:600,padding:'2px 8px',cursor:'pointer',fontFamily:'inherit',whiteSpace:'nowrap',marginLeft:8}}>Fill</button>
-      </div>}
-      {vals.map((v,si)=>(
-        <div key={si} className="set-row">
-          <div className="set-num" onClick={()=>{if(isWeight)toggleWarmup(si)}} style={v.done?{background:'var(--grn-d)',color:'var(--grn)'}:v.warmup?{background:'var(--org-d)',color:'var(--org)',fontSize:9,cursor:'pointer'}:{cursor:isWeight?'pointer':'default'}} title={isWeight?'Tap to toggle warm-up':''}>{v.warmup?'W':si+1}</div>
-          {isWeight&&<input className={`inp${v.w?' done':''}`} placeholder={lastSession?.sets[si]?.w?`${lastSession.sets[si].w}`:'kg'} type="number" inputMode="decimal" value={v.w} onChange={e=>update(si,'w',e.target.value)} style={{maxWidth:80,opacity:v.warmup?0.6:1}}/>}
-          <input className={`inp${v.r?' done':''}`} placeholder={lastSession?.sets[si]?.r?`${lastSession.sets[si].r}`:(isDuration?'sec':'reps')} type={isDuration?'number':'text'} inputMode={isDuration?'numeric':'text'} value={v.r} onChange={e=>update(si,'r',e.target.value)} style={{maxWidth:isWeight?80:120,opacity:v.warmup?0.6:1}}/>
-          {isDuration&&<CountdownTimer targetSec={parseInt(exDef.r)||30}/>}
-          <button onClick={()=>markDone(si)} style={{width:40,height:40,borderRadius:10,border:'none',background:v.done?v.warmup?'var(--org)':'var(--grn)':'var(--c2)',color:v.done?'#000':'var(--t3)',fontSize:18,cursor:'pointer',flexShrink:0}}>✓</button>
-        </div>
-      ))}
-    </div>
-  );
-};
-
-// === EXERCISE CARD ===
-const ExCard=({exDef,dayId,ssIdx,exIdx,phase,onSetDone,onPR})=>{
-  const[open,setOpen]=useState(false);
-  const[showSwap,setShowSwap]=useState(false);
-  const[currentEid,setCurrentEid]=useState(exDef.eid);
-  const ex=getEx(currentEid);
-  const activeExDef={...exDef,eid:currentEid};
-
-  const alternatives=EXDB.filter(e=>e.m===ex.m&&e.id!==currentEid&&e.t===ex.t).slice(0,8);
-
-  const swapEx=(newEid)=>{
-    setCurrentEid(newEid);
-    setShowSwap(false);
-    vb();
-  };
-
-  return(
-    <div>
-      <div className="ex-row" onClick={()=>{setOpen(!open);vb()}} style={{cursor:'pointer'}}>
-        <div style={{flex:1}}>
-          <div className="ex-name">{ex.n}{currentEid!==exDef.eid?<span style={{fontSize:10,color:'var(--org)',marginLeft:6}}>swapped</span>:null}</div>
-          <div className="ex-info">{exDef.s} sets × {exDef.r} · {ex.eq}</div>
-        </div>
-        <div style={{display:'flex',alignItems:'center',gap:4,flexWrap:'wrap',justifyContent:'flex-end',maxWidth:160}}>
-          {ex.tags?.map(t=>tagMap[t]?<span key={t} className={`ex-tag ${tagMap[t].c}`}>{tagMap[t].l}</span>:null)}
-          {alternatives.length>0&&<span onClick={(e)=>{e.stopPropagation();setShowSwap(!showSwap);vb()}} style={{color:'var(--blu)',fontSize:12,cursor:'pointer',padding:'2px 4px'}}>⇄</span>}
-          <span style={{color:'var(--t3)',fontSize:16,marginLeft:2}}>{open?'▼':'▶'}</span>
-        </div>
-      </div>
-      {showSwap&&<div style={{padding:'8px 16px',background:'var(--c2)',borderTop:'0.5px solid var(--sep)'}}>
-        <div style={{fontSize:12,fontWeight:600,color:'var(--t2)',marginBottom:6}}>Swap with ({ex.m}):</div>
-        <div style={{display:'flex',flexWrap:'wrap',gap:4}}>
-          {currentEid!==exDef.eid&&<button onClick={()=>swapEx(exDef.eid)} style={{padding:'4px 10px',borderRadius:6,border:'1px solid var(--grn)',background:'var(--grn-d)',color:'var(--grn)',fontSize:11,fontWeight:600,cursor:'pointer',fontFamily:'inherit'}}>↩ Original</button>}
-          {alternatives.map(alt=>(
-            <button key={alt.id} onClick={()=>swapEx(alt.id)} style={{padding:'4px 10px',borderRadius:6,border:'1px solid var(--c3)',background:'none',color:'var(--t1)',fontSize:11,cursor:'pointer',fontFamily:'inherit'}}>{alt.n}</button>
-          ))}
-        </div>
-      </div>}
-      {open&&<SetLogger exDef={activeExDef} dayId={dayId} ssIdx={ssIdx} exIdx={exIdx} phase={phase} onSetDone={onSetDone} onPR={onPR}/>}
-    </div>
-  );
-};
-
-// === DAY VIEW ===
-const DayView=({day,phase,onBack})=>{
-  const[showRest,setShowRest]=useState(null);
-  const[restTime,setRestTime]=useState(()=>ld('restTime',PHASES_META.find(p=>p.id===phase)?.restDefault||60));
-  const[restEnabled,setRestEnabled]=useState(()=>ld('restEnabled',true));
-  const[toast,setToast]=useState('');
-  const[note,setNote]=useState('');
-  const[kneePain,setKneePain]=useState(null);
-  const[rpe,setRpe]=useState(null);
-  const[showComplete,setShowComplete]=useState(false);
-  const[tick,setTick]=useState(0);
-  const session=useSessionTimer();
-
-  useEffect(()=>{session.start()},[]);
-
-  const totalEx=day.supersets.reduce((a,ss)=>a+ss.ex.length,0);
-  const completed=day.supersets.reduce((a,ss,si)=>a+ss.ex.reduce((b,ex,ei)=>{
-    const saved=ld(`log_p${phase}_${day.id}_${si}_${ei}`,[]);
-    return b+(saved.filter(s=>s.done).length>0?1:0);
-  },0),0);
-  const pct=Math.round((completed/totalEx)*100);
-  const pMeta=PHASES_META.find(p=>p.id===phase);
-
-  // Per-superset completion
-  const ssCompletion=day.supersets.map((ss,si)=>{
-    const done=ss.ex.reduce((b,ex,ei)=>{
-      const saved=ld(`log_p${phase}_${day.id}_${si}_${ei}`,[]);
-      return b+(saved.filter(s=>s.done).length>0?1:0);
-    },0);
-    return{done,total:ss.ex.length};
-  });
-
-  // Volume calculation
-  const totalVolume=day.supersets.reduce((vol,ss,si)=>vol+ss.ex.reduce((v,exDef,ei)=>{
-    const saved=ld(`log_p${phase}_${day.id}_${si}_${ei}`,[]);
-    return v+saved.filter(s=>s.done&&s.w&&s.r).reduce((sv2,s)=>sv2+(parseFloat(s.w)||0)*(parseInt(s.r)||0),0);
-  },0),0);
-
-  const handleSetDone=(ssRest)=>{
-    session.start();
-    setTick(t=>t+1);
-    const t=ssRest||restTime;
-    if(restEnabled&&t>0) setShowRest(t);
-  };
-
-  const handlePR=(name,weight)=>{
-    setToast(`New PR! ${name}: ${weight}kg`);
-    vb();vb();
-  };
-
-  const toggleRest=()=>{
-    const next=!restEnabled;
-    setRestEnabled(next);
-    sv('restEnabled',next);
-    setToast(next?'Rest timer ON':'Rest timer OFF');
-    vb();
-  };
-
-  const[lastCalories,setLastCalories]=useState(0);
-  const saveWorkout=()=>{
-    session.stop();
-    const ts=new Date().toISOString();
-    const bw=ld('bodyweight',80);
-    const calories=estCalories(session.elapsed,totalVolume,parseFloat(bw)||80);
-    setLastCalories(calories);
-    const hist=ld('history',[]);
-    hist.push({day:day.n,date:ts,completed,total:totalEx,duration:session.elapsed,note:note||undefined,volume:totalVolume||undefined,kneePain:kneePain!=null?kneePain:undefined,rpe:rpe||undefined,calories});
-    sv('history',hist);
-    vb();
-    setShowComplete(true);
-  };
-
-  return(
-    <div className="app">
-      <div className="hdr">
-        <div style={{display:'flex',alignItems:'center',gap:12}}>
-          <button onClick={()=>{session.stop();onBack()}} style={{background:'none',border:'none',color:'var(--grn)',fontSize:16,fontWeight:600,fontFamily:'inherit',cursor:'pointer'}}>← Back</button>
-          <div style={{flex:1}}>
-            <h1>{day.icon} {day.n}</h1>
-            <p>{pMeta?.icon} {pMeta?.n} · {pct}% · {session.fmtElapsed}{totalVolume>0?` · ${(totalVolume/1000).toFixed(1)}t`:''}</p>
-          </div>
-          <button onClick={toggleRest} style={{background:restEnabled?'var(--grn-d)':'var(--c2)',border:'none',borderRadius:8,padding:'6px 10px',fontSize:12,fontWeight:600,color:restEnabled?'var(--grn)':'var(--t3)',cursor:'pointer',fontFamily:'inherit',whiteSpace:'nowrap'}}>
-            {restEnabled?`⏱ ${restTime}s`:'⏱ Off'}
-          </button>
-        </div>
-        <div className="prg" style={{marginTop:8}}><div className="prg-f" style={{width:`${pct}%`}}/></div>
-      </div>
-      <div className="scroll">
-        <div style={{display:'flex',flexWrap:'wrap',margin:'16px 0 8px'}}>
-          {day.focus.map(f=><span key={f} className="focus-tag" style={{background:'var(--c1)',color:'var(--t2)'}}>{f}</span>)}
-        </div>
-        {day.supersets.map((ss,si)=>{
-          const sc=ssCompletion[si];
-          const ssDone=sc.done===sc.total;
-          return(
-          <div key={si} className="card" style={ssDone?{border:'1px solid var(--grn)',borderRadius:14}:{}}>
-            <div style={{padding:'12px 16px',borderBottom:'0.5px solid var(--sep)'}}>
-              <div className="ss-h">
-                <span className="ss-label">Superset {si+1}</span>
-                <span className="ss-type" style={{background:`${ss.color}22`,color:ss.color}}>{ss.type}</span>
-                <span style={{fontSize:11,color:ssDone?'var(--grn)':'var(--t3)',fontWeight:600,marginLeft:'auto'}}>{sc.done}/{sc.total}{ssDone?' ✓':''}</span>
-              </div>
-              <div style={{fontSize:15,fontWeight:600}}>{ss.label}</div>
-            </div>
-            {ss.ex.map((exDef,ei)=>(
-              <ExCard key={ei} exDef={exDef} dayId={day.id} ssIdx={si} exIdx={ei} phase={phase} onSetDone={()=>handleSetDone(ss.rest)} onPR={handlePR}/>
-            ))}
-          </div>
-        )})}
-        <div className="card" style={{padding:16,marginTop:16}}>
-          <div style={{fontSize:16,fontWeight:700,marginBottom:12}}>Finish Workout</div>
-          <PainScale value={kneePain} onChange={setKneePain} label="Knee pain/discomfort"/>
-          <div style={{marginTop:12}}><RPESelector value={rpe} onChange={setRpe}/></div>
-          <input className="inp" placeholder="Notes (optional)" value={note} onChange={e=>setNote(e.target.value)} style={{width:'100%',marginTop:12,textAlign:'left',padding:'0 14px',height:44}}/>
-          <button className="btn btn-g" style={{width:'100%',padding:14,marginTop:12}} onClick={saveWorkout}>💾 Save Workout ({session.fmtElapsed})</button>
-        </div>
-        <div style={{height:24}}/>
-      </div>
-      {showRest&&<RestTimer seconds={showRest} onDone={()=>setShowRest(null)} onSkip={()=>setShowRest(null)}/>}
-      {showComplete&&<CompletionSummary day={day} completed={completed} total={totalEx} duration={session.elapsed} calories={lastCalories} onClose={()=>{setShowComplete(false);onBack()}}/>}
-      {toast&&<Toast msg={toast} onClose={()=>setToast('')}/>}
-    </div>
-  );
-};
-
-// === WORKOUT TAB ===
-const WorkoutTab=()=>{
-  const[activeDay,setActiveDay]=useState(null);
-  const[phase,setPhase]=useState(ld('phase',1));
-  const[toast,setToast]=useState('');
-  const[tick,setTick]=useState(0);
-  const days=getProgramDays(phase);
-  const pMeta=PHASES_META.find(p=>p.id===phase);
-
-  const resetDay=(dayId,e)=>{
-    e.stopPropagation();
-    if(!confirm(`Reset Day ${dayId} for a new week? This clears all logged sets for this day.`))return;
-    const day=days.find(d=>d.id===dayId);
-    if(!day)return;
-    day.supersets.forEach((ss,si)=>ss.ex.forEach((ex,ei)=>{
-      localStorage.removeItem('ic15_log_p'+phase+'_'+dayId+'_'+si+'_'+ei);
-    }));
-    setTick(t=>t+1);
-    setToast(`Day ${dayId} reset`);
-    vb();
-  };
-
-  const resetAllDays=()=>{
-    if(!confirm('Reset ALL days for a new week? This clears all logged sets for the current phase.'))return;
-    days.forEach(day=>day.supersets.forEach((ss,si)=>ss.ex.forEach((ex,ei)=>{
-      localStorage.removeItem('ic15_log_p'+phase+'_'+day.id+'_'+si+'_'+ei);
-    })));
-    setTick(t=>t+1);
-    setToast('All days reset for new week');
-    vb();
-  };
-
-  if(activeDay) return <DayView day={activeDay} phase={phase} onBack={()=>setActiveDay(null)}/>;
-
-  return(
-    <>
-      <div className="hdr">
-        <h1>IronClad Pro</h1>
-        <p>v16.0 · Trail Runner Recovery · 3-Day Program</p>
-      </div>
-      <div className="scroll">
-        <div className="section-t">Phase</div>
-        <div className="phase-sel">
-          {PHASES_META.map(p=>(
-            <button key={p.id} className={`phase-btn${phase===p.id?' on':''}`} onClick={()=>{setPhase(p.id);sv('phase',p.id);vb()}}>
-              {p.icon} {p.n}
-            </button>
-          ))}
-        </div>
-        {pMeta&&<div className="card" style={{padding:14,marginBottom:16}}>
-          <div style={{fontWeight:700,fontSize:15,marginBottom:4}}>{pMeta.icon} {pMeta.n} <span style={{fontWeight:400,color:'var(--t2)',fontSize:13}}>— {pMeta.wks}</span></div>
-          <div style={{fontSize:13,color:'var(--t2)',lineHeight:1.5}}>{pMeta.d}</div>
-        </div>}
-
-        <div style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}>
-          <div className="section-t">Workouts</div>
-          <button onClick={resetAllDays} style={{background:'none',border:'1px solid var(--c3)',borderRadius:8,color:'var(--org)',fontSize:12,fontWeight:600,padding:'4px 10px',cursor:'pointer',fontFamily:'inherit'}}>↺ New Week</button>
-        </div>
-        {days.map(day=>{
-          const totalEx=day.supersets.reduce((a,ss)=>a+ss.ex.length,0);
-          const completed=day.supersets.reduce((a,ss,si)=>a+ss.ex.reduce((b,ex,ei)=>{
-            const saved=ld(`log_p${phase}_${day.id}_${si}_${ei}`,[]);
-            return b+(saved.filter(s=>s.done).length>0?1:0);
-          },0),0);
-          const pct=Math.round((completed/totalEx)*100);
-          return(
-            <div key={day.id} className="card" onClick={()=>{setActiveDay(day);vb()}} style={{cursor:'pointer'}}>
-              <div className="card-h">
-                <div style={{display:'flex',alignItems:'center'}}>
-                  <span className="icon">{day.icon}</span>
-                  <div>
-                    <h3>Day {day.id}: {day.n}</h3>
-                    <div className="sub">{day.supersets.length} supersets · {totalEx} exercises</div>
-                  </div>
-                </div>
-                <div style={{display:'flex',alignItems:'center',gap:8}}>
-                  {pct>0&&<button onClick={(e)=>resetDay(day.id,e)} style={{background:'none',border:'none',color:'var(--t3)',fontSize:14,cursor:'pointer',padding:4}} title="Reset day">↺</button>}
-                  <span className={`badge ${pct===100?'badge-g':pct>0?'badge-o':'badge-b'}`}>{pct}%</span>
-                </div>
-              </div>
-              <div style={{padding:'0 16px 12px'}}><div className="prg"><div className="prg-f" style={{width:`${pct}%`}}/></div></div>
-            </div>
-          );
-        })}
-
-        <div className="section-t" style={{marginTop:24}}>Program Focus</div>
-        <div className="card" style={{padding:16}}>
-          <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:12}}>
-            <div><span className="ex-tag tag-t" style={{fontSize:12}}>Trainer Rx</span><div style={{fontSize:13,color:'var(--t2)',marginTop:4}}>Your trainer's prescribed exercises on Leg Day</div></div>
-            <div><span className="ex-tag tag-e" style={{fontSize:12}}>Eccentric</span><div style={{fontSize:13,color:'var(--t2)',marginTop:4}}>Slow lowering to rebuild knee cartilage tolerance</div></div>
-            <div><span className="ex-tag tag-p" style={{fontSize:12}}>Power</span><div style={{fontSize:13,color:'var(--t2)',marginTop:4}}>Explosive movements for trail running</div></div>
-            <div><span className="ex-tag tag-b" style={{fontSize:12}}>Balance</span><div style={{fontSize:13,color:'var(--t2)',marginTop:4}}>Single-leg & stability for better landing</div></div>
-          </div>
-        </div>
-      </div>
-      {toast&&<Toast msg={toast} onClose={()=>setToast('')}/>}
-    </>
-  );
-};
-
-// === PROGRESS TAB ===
-const ProgressTab=()=>{
-  const[hist,setHist]=useState(()=>ld('history',[]));
-  const[showAll,setShowAll]=useState(false);
-  const[prView,setPrView]=useState(false);
-  const[showLiftChart,setShowLiftChart]=useState(null);
-  const[tick,setTick]=useState(0);
-  const weightLog=ld('weightLog',[]);
-  const prs=ld('prs',{});
-  const exHistory=ld('exHistory',{});
-  const runs=ld('runLog',[]);
-  const totalWorkouts=hist.length;
-  const thisWeek=hist.filter(h=>{const d=new Date(h.date);const now=new Date();const diff=(now-d)/(1000*60*60*24);return diff<=7}).length;
-  const streak=(()=>{let s=0;const sorted=[...hist].sort((a,b)=>new Date(b.date)-new Date(a.date));let lastDate=new Date();for(const h of sorted){const d=new Date(h.date);const diff=Math.floor((lastDate-d)/(1000*60*60*24));if(diff<=1){s++;lastDate=d}else break}return s})();
-  const avgDuration=hist.length>0?Math.round(hist.filter(h=>h.duration).reduce((a,h)=>a+(h.duration||0),0)/Math.max(1,hist.filter(h=>h.duration).length)):0;
-  const lastWeight=weightLog.length>0?weightLog[weightLog.length-1].w:'—';
-  const firstWeight=weightLog.length>1?weightLog[0].w:null;
-  const weightDiff=firstWeight&&lastWeight!=='—'?(lastWeight-firstWeight).toFixed(1):null;
-
-  const deleteHistEntry=(idx)=>{
-    const realIdx=hist.length-1-idx;
-    if(!confirm('Delete this workout entry?'))return;
-    const nh=[...hist];nh.splice(realIdx,1);setHist(nh);sv('history',nh);
-  };
-
-  // Knee pain trend
-  const painData=hist.filter(h=>h.kneePain!=null).slice(-15);
-  const avgPain=painData.length>0?Math.round(painData.reduce((a,h)=>a+h.kneePain,0)/painData.length*10)/10:null;
-  const recentPain=painData.length>0?painData[painData.length-1].kneePain:null;
-  const painTrend=painData.length>=3?(painData.slice(-3).reduce((a,h)=>a+h.kneePain,0)/3-painData.slice(0,3).reduce((a,h)=>a+h.kneePain,0)/3):null;
-
-  // RPE trend
-  const rpeData=hist.filter(h=>h.rpe).slice(-10);
-  const avgRpe=rpeData.length>0?Math.round(rpeData.reduce((a,h)=>a+h.rpe,0)/rpeData.length*10)/10:null;
-
-  // Running stats
-  const weekRuns=runs.filter(r=>(new Date()-new Date(r.date))/(1000*60*60*24)<=7);
-  const weekRunDist=weekRuns.reduce((a,r)=>a+(r.dist||0),0);
-  const totalRunDist=runs.reduce((a,r)=>a+(r.dist||0),0);
-
-  // Key lift progression (exercises with history)
-  const liftProgressions=Object.entries(exHistory).filter(([eid,h])=>{
-    const ex=getEx(eid);return ex.t==='w'&&h.length>=2;
-  }).map(([eid,h])=>{
-    const ex=getEx(eid);
-    const entries=h.slice(-12).map(e=>{const maxW=Math.max(...e.sets.map(s=>parseFloat(s.w)||0));return{date:e.date,w:maxW}}).filter(e=>e.w>0);
-    return{eid,ex,entries};
-  }).filter(l=>l.entries.length>=2).sort((a,b)=>b.entries.length-a.entries.length);
-
-  // Muscle group volume from exercise history
-  const weekHist=hist.filter(h=>(new Date()-new Date(h.date))/(1000*60*60*24)<=7);
-  const muscleVolume={};
-  Object.entries(exHistory).forEach(([eid,sessions])=>{
-    const ex=getEx(eid);
-    const weekSessions=sessions.filter(s=>(new Date()-new Date(s.date))/(1000*60*60*24)<=7);
-    weekSessions.forEach(s=>{
-      const vol=s.sets.reduce((a,set)=>a+(parseFloat(set.w)||0)*(parseInt(set.r)||1),0);
-      const sets=s.sets.length;
-      if(!muscleVolume[ex.m])muscleVolume[ex.m]={volume:0,sets:0};
-      muscleVolume[ex.m].volume+=vol;
-      muscleVolume[ex.m].sets+=sets;
-    });
-  });
-  const mvEntries=Object.entries(muscleVolume).sort((a,b)=>b[1].volume-a[1].volume);
-  const maxMV=mvEntries.length>0?mvEntries[0][1].volume:1;
-
-  // PR list
-  const prList=Object.entries(prs).map(([eid,w])=>({ex:getEx(eid),w})).filter(p=>p.ex.n!=='Unknown').sort((a,b)=>b.w-a.w);
-
-  // Sparkline
-  const sparkData=weightLog.slice(-20);
-  const sparkMin=sparkData.length?Math.min(...sparkData.map(d=>d.w)):0;
-  const sparkMax=sparkData.length?Math.max(...sparkData.map(d=>d.w)):100;
-  const sparkRange=sparkMax-sparkMin||1;
-
-  // Readiness data
-  const readiness=ld('readiness',{});
-  const readinessEntries=Object.values(readiness).sort((a,b)=>a.date>b.date?1:-1).slice(-14);
-  const avgReadiness=readinessEntries.length>0?Math.round(readinessEntries.reduce((a,r)=>a+((r.sleepVal+r.sorenessVal+r.energyVal+r.moodVal)/4),0)/readinessEntries.length*100):null;
-
-  // ACWR (Acute:Chronic Workload Ratio)
-  const acuteVolume=hist.filter(h=>(new Date()-new Date(h.date))/(1000*60*60*24)<=7).reduce((a,h)=>a+(h.volume||0),0);
-  const chronicVolume=hist.filter(h=>{const d=(new Date()-new Date(h.date))/(1000*60*60*24);return d<=28}).reduce((a,h)=>a+(h.volume||0),0)/4;
-  const acwr=chronicVolume>0?Math.round((acuteVolume/chronicVolume)*100)/100:null;
-  const acwrColor=acwr?acwr<0.8?'var(--blu)':acwr<=1.3?'var(--grn)':acwr<=1.5?'var(--org)':'var(--red)':'var(--t3)';
-  const acwrLabel=acwr?acwr<0.8?'Detraining zone':acwr<=1.3?'Sweet spot':acwr<=1.5?'Caution — high ramp':'Danger — injury risk':'—';
-
-  // Weekly summary (this week vs last week)
-  const lastWeekHist=hist.filter(h=>{const d=(new Date()-new Date(h.date))/(1000*60*60*24);return d>7&&d<=14});
-  const thisWeekVol=hist.filter(h=>(new Date()-new Date(h.date))/(1000*60*60*24)<=7).reduce((a,h)=>a+(h.volume||0),0);
-  const lastWeekVol=lastWeekHist.reduce((a,h)=>a+(h.volume||0),0);
-  const lastWeekCount=lastWeekHist.length;
-  const thisWeekRunKm=runs.filter(r=>(new Date()-new Date(r.date))/(1000*60*60*24)<=7).reduce((a,r)=>a+(r.dist||0),0);
-  const lastWeekRunKm=runs.filter(r=>{const d=(new Date()-new Date(r.date))/(1000*60*60*24);return d>7&&d<=14}).reduce((a,r)=>a+(r.dist||0),0);
-  const thisWeekAvgPain=painData.filter(h=>(new Date()-new Date(h.date))/(1000*60*60*24)<=7);
-  const lastWeekAvgPain=painData.filter(h=>{const d=(new Date()-new Date(h.date))/(1000*60*60*24);return d>7&&d<=14});
-  const twPain=thisWeekAvgPain.length>0?Math.round(thisWeekAvgPain.reduce((a,h)=>a+h.kneePain,0)/thisWeekAvgPain.length*10)/10:null;
-  const lwPain=lastWeekAvgPain.length>0?Math.round(lastWeekAvgPain.reduce((a,h)=>a+h.kneePain,0)/lastWeekAvgPain.length*10)/10:null;
-
-  // Phase progression recommendation
-  const currentPhase=ld('phase',1);
-  const phaseWeeksKey=`phaseStart_${currentPhase}`;
-  const phaseStart=ld(phaseWeeksKey,null);
-  if(!phaseStart&&hist.length>0){sv(phaseWeeksKey,new Date().toISOString())}
-  const weeksInPhase=phaseStart?Math.floor((new Date()-new Date(phaseStart))/(1000*60*60*24*7)):0;
-  const phaseMinWeeks=PHASES_META.find(p=>p.id===currentPhase)?.id===4?99:4;
-  const recentCompletion=hist.slice(-6).length>0?Math.round(hist.slice(-6).reduce((a,h)=>a+(h.completed/h.total),0)/Math.min(6,hist.slice(-6).length)*100):0;
-  const readyToProgress=currentPhase<4&&weeksInPhase>=phaseMinWeeks&&recentCompletion>=75&&(twPain===null||twPain<=4)&&(avgRpe===null||avgRpe<=7);
-
-  const displayed=showAll?[...hist].reverse():[...hist].reverse().slice(0,20);
-
-  return(
-    <>
-      <div className="hdr"><h1>Progress</h1><p>Track your recovery journey</p></div>
-      <div className="scroll">
-        <ReadinessCheckIn onSave={()=>setTick(t=>t+1)}/>
-
-        {/* WEEKLY SUMMARY */}
-        {(thisWeek>0||lastWeekCount>0)&&<>
-          <div className="section-t">This Week vs Last</div>
-          <div className="card" style={{padding:14}}>
-            <div style={{display:'grid',gridTemplateColumns:'1fr auto 1fr',gap:8,fontSize:13,textAlign:'center'}}>
-              <div style={{textAlign:'left',fontWeight:600,color:'var(--t2)'}}>This Week</div>
-              <div></div>
-              <div style={{textAlign:'right',fontWeight:600,color:'var(--t3)'}}>Last Week</div>
-
-              <div style={{textAlign:'left'}}><span style={{fontWeight:700,color:'var(--grn)'}}>{thisWeek}</span> workouts</div>
-              <div style={{color:'var(--t3)',fontSize:11}}>🏋️</div>
-              <div style={{textAlign:'right'}}><span style={{fontWeight:700,color:'var(--t3)'}}>{lastWeekCount}</span> workouts</div>
-
-              {(thisWeekVol>0||lastWeekVol>0)&&<>
-                <div style={{textAlign:'left'}}><span style={{fontWeight:700,color:'var(--grn)'}}>{(thisWeekVol/1000).toFixed(1)}t</span></div>
-                <div style={{color:'var(--t3)',fontSize:11}}>📊</div>
-                <div style={{textAlign:'right'}}><span style={{fontWeight:700,color:'var(--t3)'}}>{(lastWeekVol/1000).toFixed(1)}t</span></div>
-              </>}
-
-              {(thisWeekRunKm>0||lastWeekRunKm>0)&&<>
-                <div style={{textAlign:'left'}}><span style={{fontWeight:700,color:'var(--cyn)'}}>{thisWeekRunKm.toFixed(1)}km</span></div>
-                <div style={{color:'var(--t3)',fontSize:11}}>🏃</div>
-                <div style={{textAlign:'right'}}><span style={{fontWeight:700,color:'var(--t3)'}}>{lastWeekRunKm.toFixed(1)}km</span></div>
-              </>}
-
-              {(twPain!==null||lwPain!==null)&&<>
-                <div style={{textAlign:'left'}}><span style={{fontWeight:700,color:twPain!==null?painColor(twPain):'var(--t3)'}}>{twPain!==null?twPain+'/10':'—'}</span></div>
-                <div style={{color:'var(--t3)',fontSize:11}}>🦵</div>
-                <div style={{textAlign:'right'}}><span style={{fontWeight:700,color:'var(--t3)'}}>{lwPain!==null?lwPain+'/10':'—'}</span></div>
-              </>}
-            </div>
-          </div>
-        </>}
-
-        <div className="stat-grid" style={{marginTop:12}}>
-          <div className="stat-card"><div className="val" style={{color:'var(--grn)'}}>{totalWorkouts}</div><div className="lbl">Total Workouts</div></div>
-          <div className="stat-card"><div className="val" style={{color:'var(--blu)'}}>{thisWeek}</div><div className="lbl">This Week</div></div>
-          <div className="stat-card"><div className="val" style={{color:'var(--org)'}}>{streak}🔥</div><div className="lbl">Day Streak</div></div>
-          <div className="stat-card"><div className="val" style={{color:'var(--pur)'}}>{avgDuration?fmtTime(avgDuration):'—'}</div><div className="lbl">Avg Duration</div></div>
-        </div>
-
-        {/* ACWR + PHASE PROGRESSION */}
-        {(acwr||readyToProgress)&&<>
-          <div className="section-t">Training Load</div>
-          <div className="card" style={{padding:14}}>
-            {acwr&&<div style={{marginBottom:readyToProgress?12:0}}>
-              <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:6}}>
-                <span style={{fontSize:13,color:'var(--t2)'}}>Acute:Chronic Workload</span>
-                <span style={{fontWeight:700,color:acwrColor}}>{acwr}</span>
-              </div>
-              <div style={{height:8,background:'var(--c2)',borderRadius:4,overflow:'hidden',position:'relative'}}>
-                <div style={{position:'absolute',left:'26.6%',width:'33.3%',height:'100%',background:'var(--grn)',opacity:0.15,borderRadius:4}}/>
-                <div style={{position:'absolute',left:`${Math.min(95,Math.max(2,acwr/2*100))}%`,width:6,height:'100%',background:acwrColor,borderRadius:3,transform:'translateX(-50%)'}}/>
-              </div>
-              <div style={{display:'flex',justifyContent:'space-between',fontSize:9,color:'var(--t3)',marginTop:3}}>
-                <span>0</span><span>0.8</span><span style={{color:'var(--grn)'}}>sweet spot</span><span>1.3</span><span>2.0</span>
-              </div>
-              <div style={{fontSize:11,color:acwrColor,marginTop:4,fontWeight:600}}>{acwrLabel}</div>
-            </div>}
-            {readyToProgress&&<div style={{padding:10,background:'var(--grn-d)',borderRadius:8,border:'1px solid var(--grn)'}}>
-              <div style={{fontWeight:700,color:'var(--grn)',fontSize:14,marginBottom:4}}>Ready to progress!</div>
-              <div style={{fontSize:12,color:'var(--t2)'}}>
-                {weeksInPhase} weeks in {PHASES_META.find(p=>p.id===currentPhase)?.n} · {recentCompletion}% completion · {twPain!==null?`Pain ${twPain}/10`:'No pain data'} · {avgRpe?`RPE ${avgRpe}`:''}
-              </div>
-              <div style={{fontSize:11,color:'var(--t3)',marginTop:4}}>Consider moving to {PHASES_META.find(p=>p.id===currentPhase+1)?.n} phase</div>
-            </div>}
-          </div>
-        </>}
-
-        {/* RECOVERY INSIGHTS */}
-        {(painData.length>0||avgRpe||avgReadiness||runs.length>0)&&<>
-          <div className="section-t">Recovery & Load</div>
-          <div className="card" style={{padding:14}}>
-            {recentPain!=null&&<div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:8}}>
-              <span style={{fontSize:13,color:'var(--t2)'}}>Knee Pain (last)</span>
-              <div style={{display:'flex',alignItems:'center',gap:6}}>
-                <span style={{fontWeight:700,color:painColor(recentPain)}}>{recentPain}/10</span>
-                {painTrend!=null&&<span style={{fontSize:11,fontWeight:600,color:painTrend<0?'var(--grn)':painTrend>0?'var(--red)':'var(--t3)'}}>
-                  {painTrend<-0.5?'↓ improving':painTrend>0.5?'↑ worsening':'→ stable'}
-                </span>}
-              </div>
-            </div>}
-            {painData.length>=3&&<div style={{marginBottom:10}}>
-              <div className="mini-chart">
-                {painData.map((p,i)=>(
-                  <div key={i} className="mini-bar" style={{height:`${Math.max(4,(p.kneePain/10)*40)}px`,background:painColor(p.kneePain)+'90'}}/>
-                ))}
-              </div>
-              <div style={{display:'flex',justifyContent:'space-between',fontSize:10,color:'var(--t3)',marginTop:2}}>
-                <span>{fmtDate(painData[0].date).split(' ').slice(0,2).join(' ')}</span>
-                <span>now</span>
-              </div>
-            </div>}
-            {avgRpe&&<div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:8}}>
-              <span style={{fontSize:13,color:'var(--t2)'}}>Avg RPE (last {rpeData.length})</span>
-              <span style={{fontWeight:700,color:avgRpe<=5?'var(--grn)':avgRpe<=7?'var(--org)':'var(--red)'}}>{avgRpe}/10</span>
-            </div>}
-            {avgReadiness&&<div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:8}}>
-              <span style={{fontSize:13,color:'var(--t2)'}}>Avg Readiness</span>
-              <span style={{fontWeight:700,color:avgReadiness>=70?'var(--grn)':avgReadiness>=40?'var(--org)':'var(--red)'}}>{avgReadiness}%</span>
-            </div>}
-            {runs.length>0&&<div style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}>
-              <span style={{fontSize:13,color:'var(--t2)'}}>Running (this week)</span>
-              <span style={{fontWeight:700,color:'var(--cyn)'}}>{weekRunDist.toFixed(1)}km / {weekRuns.length} runs</span>
-            </div>}
-          </div>
-        </>}
-
-        {/* MUSCLE GROUP VOLUME */}
-        {mvEntries.length>0&&<>
-          <div className="section-t">Weekly Muscle Volume</div>
-          <div className="card" style={{padding:14}}>
-            {mvEntries.slice(0,8).map(([mg,data],i)=>(
-              <div key={mg} style={{marginBottom:i<mvEntries.length-1?8:0}}>
-                <div style={{display:'flex',justifyContent:'space-between',fontSize:12,marginBottom:3}}>
-                  <span style={{fontWeight:600}}>{mg}</span>
-                  <span style={{color:'var(--t2)'}}>{data.sets} sets · {(data.volume/1000).toFixed(1)}t</span>
-                </div>
-                <div style={{height:6,background:'var(--c2)',borderRadius:3,overflow:'hidden'}}>
-                  <div style={{height:'100%',width:`${(data.volume/maxMV)*100}%`,background:'var(--grn)',borderRadius:3,transition:'width .3s'}}/>
-                </div>
-              </div>
-            ))}
-          </div>
-        </>}
-
-        {/* STRENGTH PROGRESSION */}
-        {liftProgressions.length>0&&<>
-          <div className="section-t">Strength Progression</div>
-          <div style={{display:'flex',gap:6,overflowX:'auto',paddingBottom:8,marginBottom:4}}>
-            {liftProgressions.slice(0,10).map(l=>(
-              <button key={l.eid} className={`phase-btn${showLiftChart===l.eid?' on':''}`} style={{fontSize:11,padding:'5px 10px'}} onClick={()=>setShowLiftChart(showLiftChart===l.eid?null:l.eid)}>{l.ex.n}</button>
-            ))}
-          </div>
-          {showLiftChart&&(()=>{
-            const lift=liftProgressions.find(l=>l.eid===showLiftChart);
-            if(!lift)return null;
-            const entries=lift.entries;
-            const min=Math.min(...entries.map(e=>e.w));
-            const max=Math.max(...entries.map(e=>e.w));
-            const range=max-min||1;
-            const first=entries[0].w;const last=entries[entries.length-1].w;
-            const change=last-first;
-            return(
-              <div className="card" style={{padding:14}}>
-                <div style={{display:'flex',justifyContent:'space-between',alignItems:'baseline',marginBottom:8}}>
-                  <span style={{fontWeight:600,fontSize:14}}>{lift.ex.n}</span>
-                  <span style={{fontSize:13,fontWeight:600,color:change>=0?'var(--grn)':'var(--red)'}}>{change>=0?'+':''}{change}kg</span>
-                </div>
-                <div className="mini-chart" style={{height:50}}>
-                  {entries.map((e,i)=>(
-                    <div key={i} className="mini-bar" style={{height:`${Math.max(6,((e.w-min)/range)*46)}px`,background:i===entries.length-1?'var(--grn)':'var(--grn-d)'}} title={`${e.w}kg`}/>
-                  ))}
-                </div>
-                <div style={{display:'flex',justifyContent:'space-between',fontSize:10,color:'var(--t3)',marginTop:4}}>
-                  <span>{first}kg</span><span>{last}kg (current)</span>
-                </div>
-              </div>
-            );
-          })()}
-        </>}
-
-        {hist.length>0&&<>
-        <div className="section-t">Activity (Last 8 Weeks)</div>
-        <div className="card" style={{padding:14}}>
-          <div className="cal-grid">
-            {['M','T','W','T','F','S','S'].map((d,i)=><div key={i} className="cal-label">{d}</div>)}
-            {(()=>{
-              const cells=[];const today=new Date();
-              // Start from 8 weeks ago, aligned to Monday
-              const start=new Date(today);start.setDate(start.getDate()-55-(start.getDay()||7)+1);
-              for(let i=0;i<56;i++){
-                const d=new Date(start);d.setDate(start.getDate()+i);
-                const ds=d.toISOString().slice(0,10);
-                const count=hist.filter(h=>h.date.slice(0,10)===ds).length;
-                const isToday=ds===today.toISOString().slice(0,10);
-                const isFuture=d>today;
-                cells.push(<div key={i} className="cal-cell" style={{
-                  background:isFuture?'transparent':count>=2?'var(--grn)':count===1?'var(--grn-d)':'var(--c2)',
-                  color:count>=2?'#000':count===1?'var(--grn)':'var(--t3)',
-                  border:isToday?'1.5px solid var(--grn)':'none',
-                  opacity:isFuture?0.2:1
-                }}>{d.getDate()}</div>);
-              }
-              return cells;
-            })()}
-          </div>
-        </div>
-        </>}
-
-        {weightLog.length>1&&<>
-        <div className="section-t">Body Weight Trend</div>
-        <div className="card" style={{padding:16}}>
-          <div style={{display:'flex',justifyContent:'space-between',alignItems:'baseline',marginBottom:12}}>
-            <div>
-              <span style={{fontSize:24,fontWeight:700}}>{lastWeight}</span>
-              <span style={{fontSize:13,color:'var(--t2)',marginLeft:4}}>kg</span>
-            </div>
-            {weightDiff&&<div style={{fontSize:13,fontWeight:600,color:parseFloat(weightDiff)<0?'var(--grn)':'var(--red)'}}>
-              {parseFloat(weightDiff)<0?'↓':'↑'} {Math.abs(weightDiff)} kg
-            </div>}
-          </div>
-          <div className="wt-spark">
-            {sparkData.map((d,i)=>{
-              const h=Math.max(8,((d.w-sparkMin)/sparkRange)*52);
-              const isLast=i===sparkData.length-1;
-              return <div key={i} className="wt-bar" style={{height:h,background:isLast?'var(--grn)':parseFloat(d.w)<=parseFloat(sparkData[0].w)?'var(--grn-d)':'var(--red-d)'}} title={`${d.w}kg`}/>;
-            })}
-          </div>
-        </div>
-        </>}
-
-        {prList.length>0&&<>
-          <div style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}>
-            <div className="section-t">Personal Records</div>
-            <button style={{background:'none',border:'none',color:'var(--grn)',fontSize:13,fontWeight:600,cursor:'pointer',fontFamily:'inherit'}} onClick={()=>setPrView(!prView)}>{prView?'Hide':'Show All'}</button>
-          </div>
-          {prView?prList.map((p,i)=>(
-            <div key={i} className="hist-item">
-              <div>
-                <div style={{fontWeight:600}}>{p.ex.n}</div>
-                <div style={{fontSize:13,color:'var(--t2)'}}>{p.ex.m} · {p.ex.eq}</div>
-              </div>
-              <span className="badge badge-o" style={{fontSize:14,fontWeight:700}}>{p.w}kg</span>
-            </div>
-          )):<div className="card" style={{padding:14}}>
-            <div style={{display:'flex',gap:12,flexWrap:'wrap'}}>
-              {prList.slice(0,5).map((p,i)=>(
-                <div key={i} style={{fontSize:13}}>
-                  <span style={{fontWeight:600}}>{p.ex.n}</span>
-                  <span style={{color:'var(--yel)',marginLeft:4,fontWeight:700}}>{p.w}kg</span>
-                </div>
-              ))}
-              {prList.length>5&&<span style={{fontSize:12,color:'var(--t3)'}}>+{prList.length-5} more</span>}
-            </div>
-          </div>}
-        </>}
-
-        <div style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}>
-          <div className="section-t">Recent Workouts</div>
-          {hist.length>20&&<button style={{background:'none',border:'none',color:'var(--grn)',fontSize:13,fontWeight:600,cursor:'pointer',fontFamily:'inherit'}} onClick={()=>setShowAll(!showAll)}>{showAll?'Show Less':'Show All'}</button>}
-        </div>
-        {hist.length===0&&<div style={{color:'var(--t3)',textAlign:'center',padding:40}}>No workouts logged yet. Get after it!</div>}
-        {displayed.map((h,i)=>(
-          <div key={i} className="hist-item" style={{position:'relative'}}>
-            <div style={{flex:1}}>
-              <div style={{fontWeight:600}}>{h.day}</div>
-              <div style={{fontSize:13,color:'var(--t2)'}}>{fmtDate(h.date)}{h.duration?` · ${fmtTime(h.duration)}`:''}{h.volume?` · ${(h.volume/1000).toFixed(1)}t`:''}</div>
-              {h.note&&<div style={{fontSize:12,color:'var(--t3)',marginTop:3,fontStyle:'italic'}}>{h.note}</div>}
-            </div>
-            <div style={{display:'flex',alignItems:'center',gap:6,flexWrap:'wrap',justifyContent:'flex-end'}}>
-              {h.kneePain!=null&&<span style={{fontSize:10,fontWeight:700,color:painColor(h.kneePain),background:painColor(h.kneePain)+'20',padding:'2px 6px',borderRadius:4}}>🦵{h.kneePain}</span>}
-              {h.rpe&&<span style={{fontSize:10,fontWeight:700,color:'var(--org)',background:'var(--org-d)',padding:'2px 6px',borderRadius:4}}>RPE {h.rpe}</span>}
-              <span className="badge badge-g">{h.completed}/{h.total}</span>
-              <button onClick={()=>deleteHistEntry(i)} style={{background:'none',border:'none',color:'var(--t3)',fontSize:16,cursor:'pointer',padding:4}}>×</button>
-            </div>
-          </div>
-        ))}
-      </div>
-    </>
-  );
-};
-
-// === LIBRARY TAB ===
-const LibraryTab=()=>{
-  const[search,setSearch]=useState('');
-  const[filter,setFilter]=useState('All');
-  const muscles=[...new Set(EXDB.map(e=>e.m))].sort();
-  const filtered=EXDB.filter(e=>{
-    const matchSearch=!search||e.n.toLowerCase().includes(search.toLowerCase());
-    const matchFilter=filter==='All'||e.m===filter;
-    return matchSearch&&matchFilter;
-  });
-
-  return(
-    <>
-      <div className="hdr"><h1>Exercise Library</h1><p>{EXDB.length} exercises</p></div>
-      <div className="scroll">
-        <input className="inp" placeholder="Search exercises..." value={search} onChange={e=>setSearch(e.target.value)} style={{width:'100%',marginBottom:12,textAlign:'left',padding:'0 14px'}}/>
-        <div style={{display:'flex',gap:6,overflowX:'auto',paddingBottom:12,marginBottom:8}}>
-          <button className={`phase-btn${filter==='All'?' on':''}`} onClick={()=>setFilter('All')}>All</button>
-          {muscles.map(m=><button key={m} className={`phase-btn${filter===m?' on':''}`} onClick={()=>setFilter(m)}>{m}</button>)}
-        </div>
-        {filtered.map(ex=>(
-          <div key={ex.id} className="card" style={{padding:'12px 16px',marginBottom:8}}>
-            <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start'}}>
-              <div>
-                <div style={{fontWeight:600,fontSize:15}}>{ex.n}</div>
-                <div style={{fontSize:13,color:'var(--t2)',marginTop:2}}>{ex.m} · {ex.eq}</div>
-                {ex.note&&<div style={{fontSize:12,color:'var(--t3)',marginTop:4}}>{ex.note}</div>}
-              </div>
-              <div style={{display:'flex',gap:4,flexShrink:0,flexWrap:'wrap',justifyContent:'flex-end',maxWidth:140}}>
-                {ex.tags?.map(t=>tagMap[t]?<span key={t} className={`ex-tag ${tagMap[t].c}`}>{tagMap[t].l}</span>:null)}
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
-    </>
-  );
-};
 
 // === CALORIE ESTIMATE ===
 const estCalories=(duration,volume,bodyweight)=>{
@@ -1587,442 +195,1256 @@ const estCalories=(duration,volume,bodyweight)=>{
   return Math.round(baseCalories+volumeBonus);
 };
 
-// === SETTINGS TAB ===
-const SettingsTab=()=>{
-  const[bw,setBw]=useState('');
-  const[toast,setToast]=useState('');
-  const[customRest,setCustomRest]=useState('');
-  const[goalW,setGoalW]=useState(()=>ld('weightGoal',''));
-  const[mWaist,setMWaist]=useState('');
-  const[mChest,setMChest]=useState('');
-  const[mThigh,setMThigh]=useState('');
-  const weightLog=ld('weightLog',[]);
-  const measurements=ld('measurements',[]);
+// === est1RM ===
+const est1RM=(w,r)=>{if(!w||!r||r<1)return 0;if(r===1)return w;return Math.round(w*(1+r/30))};
 
-  // Weigh-in nudge
-  const lastWeighIn=weightLog.length>0?weightLog[weightLog.length-1]:null;
-  const daysSinceWeighIn=lastWeighIn?Math.floor((new Date()-new Date(lastWeighIn.date))/(1000*60*60*24)):99;
-  const needsWeighIn=daysSinceWeighIn>=7;
+// === EXERCISE DATABASE ===
+const EXDB=[
+{id:'trapbar',n:'Trapbar Deadlift',m:'Legs',t:'w',eq:'Barbell',tags:['k','t'],note:'Hip hinge focus, keep back neutral'},
+{id:'foamquad',n:'Foam Rolling Quads',m:'Recovery',t:'d',eq:'Foam Roller',tags:['k','t'],note:'90s per quad, focus on tight spots'},
+{id:'johnsoncalf',n:'BB Johnson Calf Raise',m:'Calves',t:'w',eq:'Barbell',tags:['k','t'],note:'Full ROM, 2s pause at top'},
+{id:'copenadduct',n:'Copenhagen Adductor',m:'Adductors',t:'d',eq:'Bench',tags:['k','t'],note:'Side plank position, top leg on bench'},
+{id:'starplank',n:'Star Plank',m:'Core',t:'d',eq:'Bodyweight',tags:['k','t'],note:'Extend opposite arm & leg from plank'},
+{id:'staggerpallof',n:'Stagger Stance Pallof Pulses',m:'Core',t:'r',eq:'Cable',tags:['k','b','t'],note:'Split stance, pulse arms out'},
+{id:'anklejump',n:'Ankle Jumps + Alt Skipping',m:'Legs',t:'r',eq:'Bodyweight',tags:['k','p','t'],note:'Quick reactive jumps, minimal knee bend'},
+{id:'eccstepdown',n:'Eccentric Step-Down',m:'Quads',t:'r',eq:'Step',tags:['k','e'],note:'4s lowering, single leg, 15cm step'},
+{id:'bulgsplit',n:'Bulgarian Split Squat',m:'Quads',t:'w',eq:'Dumbbell',tags:['k','e','b','t'],note:'Rear foot elevated, 4s eccentric lowering, shallow depth initially'},
+{id:'slraise',n:'Straight Leg Raise',m:'Quads',t:'r',eq:'Bodyweight',tags:['k','e'],note:'Lock knee, lift to 45deg, 3s hold'},
+{id:'hipthrust',n:'Barbell Hip Thrust',m:'Glutes',t:'w',eq:'Barbell',tags:['k'],note:'Drive through heels, squeeze at top'},
+{id:'rdl',n:'Romanian Deadlift',m:'Hamstrings',t:'w',eq:'Barbell',tags:['k'],note:'Hinge at hips, soft knee bend'},
+{id:'slrdl',n:'Single-Leg RDL',m:'Hamstrings',t:'w',eq:'Dumbbell',tags:['k','b'],note:'Balance challenge + hamstring'},
+{id:'legcurl',n:'Lying Leg Curl',m:'Hamstrings',t:'w',eq:'Machine',tags:['k'],note:'Control the eccentric'},
+{id:'cablekick',n:'Cable Kickback',m:'Glutes',t:'w',eq:'Cable',tags:['k'],note:'Squeeze glute at top'},
+{id:'glutebridge',n:'Glute Bridge',m:'Glutes',t:'r',eq:'Bodyweight',tags:['k'],note:'Pause 2s at top'},
+{id:'clamshell',n:'Clamshell',m:'Glutes',t:'r',eq:'Band',tags:['k'],note:'Band above knees, control motion'},
+{id:'tke',n:'Terminal Knee Extension',m:'VMO',t:'r',eq:'Band',tags:['k','e'],note:'Band behind knee, squeeze to full extension'},
+{id:'calfstand',n:'Standing Calf Raise',m:'Calves',t:'w',eq:'Machine',tags:['k'],note:'Full ROM, slow eccentric'},
+{id:'eccheeldrop',n:'Eccentric Heel Drop',m:'Calves',t:'r',eq:'Step',tags:['k','e'],note:'Rise on both feet, lower slowly on one - 4s eccentric'},
+{id:'seatedcalf',n:'Seated Calf Raise',m:'Calves',t:'w',eq:'Machine',tags:['k'],note:'Targets soleus - deep calf loading for achilles'},
+{id:'kbswing',n:'Kettlebell Swing',m:'Glutes',t:'w',eq:'Kettlebell',tags:['k','p'],note:'Power from hips, not arms'},
+{id:'dbbench',n:'Dumbbell Bench Press',m:'Chest',t:'w',eq:'Dumbbell',tags:['k'],note:''},
+{id:'dbincbench',n:'Incline DB Press',m:'Chest',t:'w',eq:'Dumbbell',tags:['k'],note:'30deg incline'},
+{id:'cablefly',n:'Cable Fly',m:'Chest',t:'w',eq:'Cable',tags:['k'],note:'Squeeze at center'},
+{id:'pushup',n:'Push-ups',m:'Chest',t:'r',eq:'Bodyweight',tags:['k'],note:''},
+{id:'dbohp',n:'DB Shoulder Press',m:'Shoulders',t:'w',eq:'Dumbbell',tags:['k'],note:''},
+{id:'latraise',n:'Lateral Raise',m:'Shoulders',t:'w',eq:'Dumbbell',tags:['k'],note:''},
+{id:'ropepush',n:'Rope Pushdown',m:'Triceps',t:'w',eq:'Cable',tags:['k'],note:''},
+{id:'chestpress',n:'Machine Chest Press',m:'Chest',t:'w',eq:'Machine',tags:['k'],note:''},
+{id:'dip',n:'Dips',m:'Chest',t:'r',eq:'Bodyweight',tags:['k'],note:''},
+{id:'pullup',n:'Pull-ups',m:'Back',t:'r',eq:'Bodyweight',tags:['k'],note:''},
+{id:'latpd',n:'Lat Pulldown',m:'Back',t:'w',eq:'Cable',tags:['k'],note:''},
+{id:'cablerow',n:'Seated Cable Row',m:'Back',t:'w',eq:'Cable',tags:['k'],note:''},
+{id:'dbrow',n:'Dumbbell Row',m:'Back',t:'w',eq:'Dumbbell',tags:['k'],note:''},
+{id:'facepull',n:'Face Pull',m:'Back',t:'w',eq:'Cable',tags:['k'],note:'External rotation at top'},
+{id:'invrow',n:'Inverted Row',m:'Back',t:'r',eq:'Bodyweight',tags:['k'],note:''},
+{id:'dbcurl',n:'Dumbbell Curl',m:'Biceps',t:'w',eq:'Dumbbell',tags:['k'],note:''},
+{id:'hammercurl',n:'Hammer Curl',m:'Biceps',t:'w',eq:'Dumbbell',tags:['k'],note:''},
+{id:'deadbug',n:'Dead Bug',m:'Core',t:'r',eq:'Bodyweight',tags:['k'],note:'Opposite arm/leg, press low back down'},
+{id:'pallof',n:'Pallof Press',m:'Core',t:'r',eq:'Cable',tags:['k','b'],note:'Anti-rotation hold'},
+{id:'plank',n:'Plank',m:'Core',t:'d',eq:'Bodyweight',tags:['k'],note:''},
+{id:'sideplank',n:'Side Plank',m:'Core',t:'d',eq:'Bodyweight',tags:['k','b'],note:'Stack feet or stagger'},
+{id:'birddog',n:'Bird Dog',m:'Core',t:'r',eq:'Bodyweight',tags:['k','b'],note:'Opposite arm/leg, hold 3s'},
+{id:'hangknee',n:'Hanging Knee Raise',m:'Core',t:'r',eq:'Bar',tags:['k'],note:'Control the swing'},
+{id:'bearcrwl',n:'Bear Crawl',m:'Core',t:'d',eq:'Bodyweight',tags:['k','b'],note:'Knees 1 inch off ground'},
+{id:'mtclimb',n:'Mountain Climbers',m:'Core',t:'d',eq:'Bodyweight',tags:['k','p'],note:'Quick but controlled'},
+{id:'bosusquat',n:'BOSU Balance Squat',m:'Legs',t:'r',eq:'BOSU',tags:['k','b'],note:'Shallow squat, focus on stability'},
+{id:'slstand',n:'Single-Leg Balance Hold',m:'Balance',t:'d',eq:'Bodyweight',tags:['k','b'],note:'30-60s, eyes closed to progress'},
+{id:'boxstep',n:'Low Box Step-Up',m:'Quads',t:'r',eq:'Step',tags:['k','b'],note:'Low step, controlled, no push-off'},
+{id:'rowing',n:'Rowing Machine',m:'Cardio',t:'c',eq:'Machine',tags:['k','f'],note:'500m intervals or steady state'},
+{id:'skierg',n:'SkiErg',m:'Cardio',t:'c',eq:'Machine',tags:['k','f'],note:'Full-body pull, 30s on / 30s off intervals'},
+{id:'jumpingjack',n:'Jumping Jacks',m:'Cardio',t:'d',eq:'Bodyweight',tags:['k','f'],note:'Low-impact option: step-out jacks'},
+{id:'rowinterval',n:'Row Intervals (500m)',m:'Cardio',t:'c',eq:'Machine',tags:['k','f'],note:'Max effort 500m, rest 90s, repeat'},
+{id:'bbench',n:'Barbell Bench Press',m:'Chest',t:'w',eq:'Barbell',tags:['k'],note:'Progression from DB bench'},
+{id:'wtpullup',n:'Weighted Pull-up',m:'Back',t:'w',eq:'Bodyweight',tags:['k'],note:'Add plate via belt or DB between feet'},
+{id:'bbohp',n:'Barbell Overhead Press',m:'Shoulders',t:'w',eq:'Barbell',tags:['k'],note:'Standing, strict press'},
+{id:'hipthrusthvy',n:'Heavy Hip Thrust',m:'Glutes',t:'w',eq:'Barbell',tags:['k'],note:'Progressive overload - 3s pause at top'},
+{id:'lowboxjump',n:'Low Box Jump',m:'Legs',t:'r',eq:'Box',tags:['k','p'],note:'Soft landing, step down - do NOT jump down'},
+{id:'gobsquat',n:'Goblet Squat',m:'Quads',t:'w',eq:'Dumbbell',tags:['k'],note:'Only when physio clears deeper flexion'},
+{id:'skierswing',n:'KB Skier Swing',m:'Glutes',t:'w',eq:'Kettlebell',tags:['k','p'],note:'Double arm ski-pole motion, explosive hips'},
+{id:'sledpush',n:'Sled Push',m:'Legs',t:'d',eq:'Sled',tags:['k','p','f'],note:'Low handle, drive through toes - great knee-safe conditioning'},
+{id:'tbarrow',n:'T-Bar Row',m:'Back',t:'w',eq:'Barbell',tags:['k'],note:'Chest-supported if available'},
+{id:'dblunge',n:'Walking DB Lunge',m:'Quads',t:'w',eq:'Dumbbell',tags:['k','b'],note:'Only Phase 3+ - controlled stride, upright torso'},
+{id:'hanglegraise',n:'Hanging Leg Raise',m:'Core',t:'r',eq:'Bar',tags:['k'],note:'Full leg raise - progression from knee raise'},
+{id:'slhop',n:'Single-Leg Forward Hop',m:'Legs',t:'r',eq:'Bodyweight',tags:['k','p','b'],note:'Stick the landing, 2s hold - sport-specific power'},
+{id:'suitcasecarry',n:'Suitcase Carry',m:'Core',t:'d',eq:'Dumbbell',tags:['k','b'],note:'Heavy DB one side, walk - anti-lateral flexion'},
+{id:'farmerwalk',n:'Farmer Walk',m:'Full Body',t:'d',eq:'Dumbbell',tags:['k','f'],note:'Heavy DBs both hands, walk 40m - metabolic + grip'}
+];
+const exMap=Object.fromEntries(EXDB.map(e=>[e.id,e]));
 
-  const saveWeight=()=>{
-    if(!bw||isNaN(parseFloat(bw)))return;
-    const log=[...weightLog,{date:new Date().toISOString(),w:parseFloat(bw)}];
-    sv('weightLog',log);
-    sv('bodyweight',bw);
-    setBw('');
-    setToast('Weight logged: '+bw+' kg');
-    vb();
-  };
+// === PROGRAM ===
+// Equipment grouping: Free Weights (Barbell/Dumbbell/Kettlebell), Bodyweight (Bodyweight/Band/Step/Box/Foam Roller/Bench/Bar), Cable/Machine
+// Every superset = exactly 3 exercises. Finishers can mix equipment.
+// Trainer exercises in ALL phases: trapbar(A), foamquad(A), staggerpallof(A), johnsoncalf(B), copenadduct(B), starplank(C), anklejump(C)
+const PHASE_NAMES=['Foundation','Build','Strength & Power','Maintain & Perform'];
+const getProgramDays=(phase)=>{
+  if(phase===1) return [
+    {name:'Full Body A',focus:['Lower','Push','Core'],supersets:[
+      {label:'Superset 1',type:'Free Weights',rest:45,exercises:[
+        {eid:'trapbar',sets:3,reps:'10-12',note:'Light load, form focus'},
+        {eid:'dbbench',sets:3,reps:'10-12'},
+        {eid:'kbswing',sets:3,reps:'10-12'}
+      ]},
+      {label:'Superset 2',type:'Cable / Machine',rest:45,exercises:[
+        {eid:'latpd',sets:3,reps:'10-12'},
+        {eid:'legcurl',sets:3,reps:'10-12'},
+        {eid:'staggerpallof',sets:3,reps:'10 each side'}
+      ]},
+      {label:'Superset 3',type:'Bodyweight + Rehab',rest:45,exercises:[
+        {eid:'foamquad',sets:2,reps:'90s each'},
+        {eid:'deadbug',sets:3,reps:'8 each side'},
+        {eid:'plank',sets:3,reps:'30s'}
+      ]},
+      {label:'Metabolic Finisher',type:'AMRAP 8min',rest:30,exercises:[
+        {eid:'rowing',sets:1,reps:'500m'},
+        {eid:'bearcrwl',sets:1,reps:'20m'},
+        {eid:'jumpingjack',sets:1,reps:'30'}
+      ]}
+    ]},
+    {name:'Full Body B',focus:['Lower','Pull','Arms'],supersets:[
+      {label:'Superset 1',type:'Free Weights',rest:45,exercises:[
+        {eid:'rdl',sets:3,reps:'10-12'},
+        {eid:'dbrow',sets:3,reps:'10-12'},
+        {eid:'johnsoncalf',sets:3,reps:'12-15'}
+      ]},
+      {label:'Superset 2',type:'Cable / Machine',rest:45,exercises:[
+        {eid:'cablerow',sets:3,reps:'10-12'},
+        {eid:'calfstand',sets:3,reps:'12-15'},
+        {eid:'ropepush',sets:3,reps:'10-12'}
+      ]},
+      {label:'Superset 3',type:'Bodyweight + Rehab',rest:45,exercises:[
+        {eid:'copenadduct',sets:2,reps:'8 each side'},
+        {eid:'birddog',sets:3,reps:'8 each side'},
+        {eid:'clamshell',sets:3,reps:'12 each'}
+      ]},
+      {label:'Metabolic Finisher',type:'Intervals',rest:30,exercises:[
+        {eid:'rowing',sets:1,reps:'5x 500m'},
+        {eid:'mtclimb',sets:1,reps:'30s'},
+        {eid:'jumpingjack',sets:1,reps:'30'}
+      ]}
+    ]},
+    {name:'Full Body C',focus:['Lower','Push','Pull'],supersets:[
+      {label:'Superset 1',type:'Free Weights',rest:45,exercises:[
+        {eid:'hipthrust',sets:3,reps:'10-12'},
+        {eid:'dbohp',sets:3,reps:'10-12'},
+        {eid:'dbcurl',sets:3,reps:'10-12'}
+      ]},
+      {label:'Superset 2',type:'Cable / Machine',rest:45,exercises:[
+        {eid:'facepull',sets:3,reps:'10-12'},
+        {eid:'cablefly',sets:3,reps:'10-12'},
+        {eid:'seatedcalf',sets:3,reps:'12-15'}
+      ]},
+      {label:'Superset 3',type:'Bodyweight + Rehab',rest:45,exercises:[
+        {eid:'starplank',sets:3,reps:'20s each side'},
+        {eid:'anklejump',sets:3,reps:'10 each'},
+        {eid:'tke',sets:3,reps:'15 each leg'}
+      ]},
+      {label:'Metabolic Finisher',type:'EMOM 6min',rest:30,exercises:[
+        {eid:'skierg',sets:1,reps:'30s max effort'},
+        {eid:'farmerwalk',sets:1,reps:'40m'},
+        {eid:'kbswing',sets:1,reps:'15'}
+      ]}
+    ]}
+  ];
+  if(phase===2) return [
+    {name:'Full Body A',focus:['Lower','Push','Core'],supersets:[
+      {label:'Superset 1',type:'Free Weights',rest:45,exercises:[
+        {eid:'trapbar',sets:4,reps:'8-10',note:'Progressive overload'},
+        {eid:'dbincbench',sets:4,reps:'8-10'},
+        {eid:'skierswing',sets:4,reps:'8-10'}
+      ]},
+      {label:'Superset 2',type:'Cable / Machine',rest:45,exercises:[
+        {eid:'latpd',sets:4,reps:'8-10'},
+        {eid:'legcurl',sets:4,reps:'8-10'},
+        {eid:'staggerpallof',sets:3,reps:'12 each side'}
+      ]},
+      {label:'Superset 3',type:'Bodyweight + Rehab',rest:45,exercises:[
+        {eid:'foamquad',sets:2,reps:'90s each'},
+        {eid:'hangknee',sets:3,reps:'10-12'},
+        {eid:'deadbug',sets:3,reps:'10 each side'}
+      ]},
+      {label:'Metabolic Finisher',type:'AMRAP 8min',rest:30,exercises:[
+        {eid:'kbswing',sets:1,reps:'20'},
+        {eid:'mtclimb',sets:1,reps:'30s'},
+        {eid:'jumpingjack',sets:1,reps:'40'}
+      ]}
+    ]},
+    {name:'Full Body B',focus:['Lower','Pull','Arms'],supersets:[
+      {label:'Superset 1',type:'Free Weights',rest:45,exercises:[
+        {eid:'rdl',sets:4,reps:'8-10'},
+        {eid:'dbrow',sets:4,reps:'8-10'},
+        {eid:'johnsoncalf',sets:4,reps:'10-12'}
+      ]},
+      {label:'Superset 2',type:'Cable / Machine',rest:45,exercises:[
+        {eid:'cablerow',sets:4,reps:'8-10'},
+        {eid:'calfstand',sets:4,reps:'10-12'},
+        {eid:'ropepush',sets:4,reps:'8-10'}
+      ]},
+      {label:'Superset 3',type:'Bodyweight + Rehab',rest:45,exercises:[
+        {eid:'copenadduct',sets:3,reps:'10 each side'},
+        {eid:'birddog',sets:3,reps:'10 each side'},
+        {eid:'clamshell',sets:3,reps:'15 each'}
+      ]},
+      {label:'Metabolic Finisher',type:'Intervals',rest:30,exercises:[
+        {eid:'rowinterval',sets:1,reps:'4x 500m'},
+        {eid:'bearcrwl',sets:1,reps:'20m x3'},
+        {eid:'jumpingjack',sets:1,reps:'30'}
+      ]}
+    ]},
+    {name:'Full Body C',focus:['Lower','Push','Pull'],supersets:[
+      {label:'Superset 1',type:'Free Weights',rest:45,exercises:[
+        {eid:'bulgsplit',sets:4,reps:'8-10 each'},
+        {eid:'dbohp',sets:4,reps:'8-10'},
+        {eid:'hammercurl',sets:4,reps:'8-10'}
+      ]},
+      {label:'Superset 2',type:'Cable / Machine',rest:45,exercises:[
+        {eid:'facepull',sets:4,reps:'10-12'},
+        {eid:'cablefly',sets:4,reps:'8-10'},
+        {eid:'seatedcalf',sets:4,reps:'12-15'}
+      ]},
+      {label:'Superset 3',type:'Bodyweight + Rehab',rest:45,exercises:[
+        {eid:'starplank',sets:3,reps:'25s each side'},
+        {eid:'anklejump',sets:3,reps:'12 each'},
+        {eid:'eccstepdown',sets:3,reps:'8 each leg'}
+      ]},
+      {label:'Metabolic Finisher',type:'EMOM 8min',rest:30,exercises:[
+        {eid:'skierg',sets:1,reps:'30s max effort'},
+        {eid:'kbswing',sets:1,reps:'15'},
+        {eid:'farmerwalk',sets:1,reps:'40m'}
+      ]}
+    ]}
+  ];
+  if(phase===3) return [
+    {name:'Full Body A',focus:['Lower','Push','Core'],supersets:[
+      {label:'Superset 1',type:'Free Weights - Heavy',rest:60,exercises:[
+        {eid:'trapbar',sets:4,reps:'5-6',note:'Heavy day'},
+        {eid:'bbench',sets:4,reps:'5-6'},
+        {eid:'skierswing',sets:4,reps:'6-8'}
+      ]},
+      {label:'Superset 2',type:'Cable / Machine',rest:60,exercises:[
+        {eid:'latpd',sets:4,reps:'6-8'},
+        {eid:'legcurl',sets:4,reps:'6-8'},
+        {eid:'staggerpallof',sets:3,reps:'12 each side'}
+      ]},
+      {label:'Superset 3',type:'Bodyweight + Rehab',rest:45,exercises:[
+        {eid:'foamquad',sets:2,reps:'90s each'},
+        {eid:'hanglegraise',sets:3,reps:'8-10'},
+        {eid:'deadbug',sets:3,reps:'10 each side'}
+      ]},
+      {label:'Metabolic Finisher',type:'Intervals',rest:30,exercises:[
+        {eid:'skierg',sets:1,reps:'6x 30s on/30s off'},
+        {eid:'farmerwalk',sets:1,reps:'3x 40m heavy'},
+        {eid:'kbswing',sets:1,reps:'20 heavy'}
+      ]}
+    ]},
+    {name:'Full Body B',focus:['Lower','Pull','Power'],supersets:[
+      {label:'Superset 1',type:'Free Weights - Heavy',rest:60,exercises:[
+        {eid:'rdl',sets:4,reps:'5-6'},
+        {eid:'tbarrow',sets:4,reps:'6-8'},
+        {eid:'johnsoncalf',sets:4,reps:'8-10'}
+      ]},
+      {label:'Superset 2',type:'Cable / Machine',rest:60,exercises:[
+        {eid:'cablerow',sets:4,reps:'6-8'},
+        {eid:'calfstand',sets:4,reps:'8-10'},
+        {eid:'pallof',sets:4,reps:'10 each side'}
+      ]},
+      {label:'Superset 3',type:'Bodyweight + Rehab',rest:45,exercises:[
+        {eid:'copenadduct',sets:3,reps:'10 each side'},
+        {eid:'lowboxjump',sets:3,reps:'5'},
+        {eid:'sideplank',sets:3,reps:'30s each side'}
+      ]},
+      {label:'Metabolic Finisher',type:'AMRAP 8min',rest:30,exercises:[
+        {eid:'kbswing',sets:1,reps:'20 heavy'},
+        {eid:'mtclimb',sets:1,reps:'30s'},
+        {eid:'jumpingjack',sets:1,reps:'30'}
+      ]}
+    ]},
+    {name:'Full Body C',focus:['Lower','Push','Pull'],supersets:[
+      {label:'Superset 1',type:'Free Weights - Heavy',rest:60,exercises:[
+        {eid:'hipthrusthvy',sets:4,reps:'6-8'},
+        {eid:'dblunge',sets:4,reps:'6-8 each'},
+        {eid:'hammercurl',sets:4,reps:'6-8'}
+      ]},
+      {label:'Superset 2',type:'Cable / Machine',rest:60,exercises:[
+        {eid:'facepull',sets:4,reps:'8-10'},
+        {eid:'cablefly',sets:4,reps:'6-8'},
+        {eid:'seatedcalf',sets:4,reps:'8-10'}
+      ]},
+      {label:'Superset 3',type:'Bodyweight + Rehab',rest:45,exercises:[
+        {eid:'starplank',sets:3,reps:'30s each side'},
+        {eid:'anklejump',sets:3,reps:'15 each'},
+        {eid:'slhop',sets:3,reps:'5 each leg'}
+      ]},
+      {label:'Metabolic Finisher',type:'EMOM 8min',rest:30,exercises:[
+        {eid:'rowinterval',sets:1,reps:'3x 500m max'},
+        {eid:'bearcrwl',sets:1,reps:'20m'},
+        {eid:'skierg',sets:1,reps:'30s max'}
+      ]}
+    ]}
+  ];
+  // Phase 4
+  return [
+    {name:'Full Body A',focus:['Lower','Push','Core'],supersets:[
+      {label:'Superset 1',type:'Free Weights',rest:45,exercises:[
+        {eid:'trapbar',sets:3,reps:'6-10'},
+        {eid:'dbbench',sets:3,reps:'6-10'},
+        {eid:'kbswing',sets:3,reps:'8-10'}
+      ]},
+      {label:'Superset 2',type:'Cable / Machine',rest:45,exercises:[
+        {eid:'latpd',sets:3,reps:'8-10'},
+        {eid:'legcurl',sets:3,reps:'8-10'},
+        {eid:'staggerpallof',sets:3,reps:'10 each side'}
+      ]},
+      {label:'Superset 3',type:'Bodyweight + Rehab',rest:45,exercises:[
+        {eid:'foamquad',sets:2,reps:'90s each'},
+        {eid:'deadbug',sets:3,reps:'10 each side'},
+        {eid:'plank',sets:3,reps:'40s'}
+      ]},
+      {label:'Metabolic Finisher',type:'AMRAP 8min',rest:30,exercises:[
+        {eid:'kbswing',sets:1,reps:'15'},
+        {eid:'farmerwalk',sets:1,reps:'40m'},
+        {eid:'jumpingjack',sets:1,reps:'30'}
+      ]}
+    ]},
+    {name:'Full Body B',focus:['Lower','Pull','Arms'],supersets:[
+      {label:'Superset 1',type:'Free Weights',rest:45,exercises:[
+        {eid:'rdl',sets:3,reps:'8-10'},
+        {eid:'dbrow',sets:3,reps:'8-10'},
+        {eid:'johnsoncalf',sets:3,reps:'10-12'}
+      ]},
+      {label:'Superset 2',type:'Cable / Machine',rest:45,exercises:[
+        {eid:'cablerow',sets:3,reps:'8-10'},
+        {eid:'calfstand',sets:3,reps:'10-12'},
+        {eid:'ropepush',sets:3,reps:'8-10'}
+      ]},
+      {label:'Superset 3',type:'Bodyweight + Rehab',rest:45,exercises:[
+        {eid:'copenadduct',sets:3,reps:'10 each side'},
+        {eid:'birddog',sets:3,reps:'10 each side'},
+        {eid:'clamshell',sets:3,reps:'15 each'}
+      ]},
+      {label:'Metabolic Finisher',type:'Intervals',rest:30,exercises:[
+        {eid:'rowing',sets:1,reps:'5x 500m'},
+        {eid:'mtclimb',sets:1,reps:'30s x4'},
+        {eid:'bearcrwl',sets:1,reps:'20m'}
+      ]}
+    ]},
+    {name:'Full Body C',focus:['Lower','Push','Pull'],supersets:[
+      {label:'Superset 1',type:'Free Weights',rest:45,exercises:[
+        {eid:'gobsquat',sets:3,reps:'8-10'},
+        {eid:'dbohp',sets:3,reps:'8-10'},
+        {eid:'hammercurl',sets:3,reps:'8-10'}
+      ]},
+      {label:'Superset 2',type:'Cable / Machine',rest:45,exercises:[
+        {eid:'facepull',sets:3,reps:'10-12'},
+        {eid:'cablefly',sets:3,reps:'10-12'},
+        {eid:'seatedcalf',sets:3,reps:'12-15'}
+      ]},
+      {label:'Superset 3',type:'Bodyweight + Rehab',rest:45,exercises:[
+        {eid:'starplank',sets:3,reps:'25s each side'},
+        {eid:'anklejump',sets:3,reps:'12 each'},
+        {eid:'eccheeldrop',sets:3,reps:'10 each'}
+      ]},
+      {label:'Metabolic Finisher',type:'EMOM 6min',rest:30,exercises:[
+        {eid:'skierg',sets:1,reps:'30s max'},
+        {eid:'kbswing',sets:1,reps:'15'},
+        {eid:'farmerwalk',sets:1,reps:'40m'}
+      ]}
+    ]}
+  ];
+};
 
-  const saveGoal=()=>{
-    if(!goalW||isNaN(parseFloat(goalW)))return;
-    sv('weightGoal',parseFloat(goalW));
-    setToast('Goal set: '+goalW+' kg');
-    vb();
-  };
+// === TOAST COMPONENT ===
+const Toast=({msg,onDone})=>{
+  useEffect(()=>{const t=setTimeout(onDone,2200);return()=>clearTimeout(t)},[onDone]);
+  return <div className="toast">{msg}</div>;
+};
 
-  const saveMeasurements=()=>{
-    if(!mWaist&&!mChest&&!mThigh)return;
-    const entry={date:new Date().toISOString(),waist:parseFloat(mWaist)||null,chest:parseFloat(mChest)||null,thigh:parseFloat(mThigh)||null};
-    const log=[...measurements,entry];
-    sv('measurements',log);
-    setMWaist('');setMChest('');setMThigh('');
-    setToast('Measurements saved');
-    vb();
-  };
-
-  const clearAll=()=>{
-    if(confirm('Clear all workout data? This cannot be undone.')){
-      const keys=Object.keys(localStorage).filter(k=>k.startsWith('ic15_'));
-      keys.forEach(k=>localStorage.removeItem(k));
-      setToast('All data cleared');
-    }
-  };
-
-  const exportData=()=>{
-    const keys=Object.keys(localStorage).filter(k=>k.startsWith('ic15_'));
-    const data={};
-    keys.forEach(k=>{try{data[k]=JSON.parse(localStorage.getItem(k))}catch{data[k]=localStorage.getItem(k)}});
-    const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
-    const url=URL.createObjectURL(blob);
-    const a=document.createElement('a');
-    a.href=url;a.download=`ironclad-backup-${new Date().toISOString().slice(0,10)}.json`;
-    a.click();URL.revokeObjectURL(url);
-    setToast('Backup exported');
-  };
-
-  const importData=()=>{
-    const input=document.createElement('input');
-    input.type='file';input.accept='.json';
-    input.onchange=(e)=>{
-      const file=e.target.files[0];
-      if(!file)return;
-      const reader=new FileReader();
-      reader.onload=(ev)=>{
-        try{
-          const data=JSON.parse(ev.target.result);
-          const keys=Object.keys(data).filter(k=>k.startsWith('ic15_'));
-          if(keys.length===0){setToast('Invalid backup file');return}
-          if(!confirm(`Restore ${keys.length} items from backup? This will overwrite current data.`))return;
-          keys.forEach(k=>localStorage.setItem(k,typeof data[k]==='string'?data[k]:JSON.stringify(data[k])));
-          setToast(`Restored ${keys.length} items`);
-          setTimeout(()=>location.reload(),1500);
-        }catch{setToast('Error reading backup file')}
-      };
-      reader.readAsText(file);
-    };
-    input.click();
-  };
-
-  return(
-    <>
-      <div className="hdr"><h1>Settings</h1><p>IronClad Pro v16.0</p></div>
-      <div className="scroll">
-        {needsWeighIn&&<div className="card" style={{padding:14,border:'1px solid var(--org)',marginBottom:12}}>
-          <div style={{display:'flex',alignItems:'center',gap:8}}>
-            <span style={{fontSize:20}}>⚖️</span>
-            <div>
-              <div style={{fontWeight:600,fontSize:14,color:'var(--org)'}}>Time to weigh in!</div>
-              <div style={{fontSize:12,color:'var(--t2)'}}>Last weigh-in was {daysSinceWeighIn} days ago. Weekly consistency = reliable trends.</div>
-            </div>
+// === REST TIMER ===
+const RestTimer=({seconds,onDone})=>{
+  const[left,setLeft]=useState(seconds);
+  useEffect(()=>{
+    setLeft(seconds);
+    const iv=setInterval(()=>setLeft(p=>{if(p<=1){clearInterval(iv);onDone();return 0}return p-1}),1000);
+    return()=>clearInterval(iv);
+  },[seconds,onDone]);
+  const pct=left/seconds;
+  const r=90,c=2*Math.PI*r;
+  return (
+    <div className="rest-overlay" onClick={onDone}>
+      <div style={{textAlign:'center'}}>
+        <div className="rest-ring">
+          <svg width={200} height={200}>
+            <circle cx={100} cy={100} r={r} fill="none" stroke="var(--c2)" strokeWidth={8} />
+            <circle cx={100} cy={100} r={r} fill="none" stroke="var(--grn)" strokeWidth={8} strokeLinecap="round" strokeDasharray={c} strokeDashoffset={c*(1-pct)} />
+          </svg>
+          <div className="time">
+            <div className="big">{left}</div>
+            <div className="small">REST</div>
           </div>
-        </div>}
-
-        <div className="section-t">Body Weight</div>
-        <div className="card" style={{padding:16}}>
-          <div style={{display:'flex',gap:8,marginBottom:8}}>
-            <input className="inp" type="number" inputMode="decimal" placeholder="Current weight (kg)" value={bw} onChange={e=>setBw(e.target.value)} style={{textAlign:'left',padding:'0 14px'}}/>
-            <button className="btn btn-g" onClick={saveWeight}>Save</button>
-          </div>
-          {weightLog.length>0&&<div style={{fontSize:13,color:'var(--t2)',marginBottom:8}}>
-            Current: {weightLog[weightLog.length-1].w} kg · {weightLog.length} entries · {daysSinceWeighIn===0?'today':daysSinceWeighIn+'d ago'}
-          </div>}
-          <div style={{display:'flex',gap:8,alignItems:'center'}}>
-            <input className="inp" type="number" inputMode="decimal" placeholder="Goal weight (kg)" value={goalW} onChange={e=>setGoalW(e.target.value)} style={{textAlign:'left',padding:'0 14px',maxWidth:160}}/>
-            <button className="btn btn-s" onClick={saveGoal}>Set Goal</button>
-          </div>
-          {(()=>{
-            const goal=ld('weightGoal',null);
-            const current=weightLog.length>0?weightLog[weightLog.length-1].w:null;
-            const start=weightLog.length>1?weightLog[0].w:null;
-            if(!goal||!current)return null;
-            const totalToLose=start?(start-goal):0;
-            const lost=start?(start-current):0;
-            const remaining=current-goal;
-            const pct=totalToLose>0?Math.min(100,Math.max(0,Math.round((lost/totalToLose)*100))):0;
-            return(
-              <div style={{marginTop:10}}>
-                <div style={{display:'flex',justifyContent:'space-between',fontSize:12,color:'var(--t2)',marginBottom:4}}>
-                  <span>{start||current}kg</span>
-                  <span style={{color:remaining<=0?'var(--grn)':'var(--t1)',fontWeight:600}}>{remaining<=0?'Goal reached!':remaining.toFixed(1)+'kg to go'}</span>
-                  <span>{goal}kg</span>
-                </div>
-                <div className="goal-bar">
-                  <div className="goal-fill" style={{width:`${pct}%`,background:pct>=100?'var(--grn)':pct>=50?'var(--blu)':'var(--org)'}}/>
-                </div>
-                <div style={{fontSize:11,color:'var(--t3)',marginTop:4,textAlign:'center'}}>{pct}% of the way there</div>
-              </div>
-            );
-          })()}
         </div>
-
-        <div className="section-t">Body Measurements</div>
-        <div className="card" style={{padding:16}}>
-          <div style={{fontSize:13,color:'var(--t2)',marginBottom:8}}>Track changes beyond the scale (cm)</div>
-          <div style={{display:'flex',gap:6,marginBottom:8}}>
-            <input className="inp" type="number" inputMode="decimal" placeholder="Waist" value={mWaist} onChange={e=>setMWaist(e.target.value)} style={{textAlign:'center'}}/>
-            <input className="inp" type="number" inputMode="decimal" placeholder="Chest" value={mChest} onChange={e=>setMChest(e.target.value)} style={{textAlign:'center'}}/>
-            <input className="inp" type="number" inputMode="decimal" placeholder="Thigh" value={mThigh} onChange={e=>setMThigh(e.target.value)} style={{textAlign:'center'}}/>
-          </div>
-          <button className="btn btn-g" style={{width:'100%'}} onClick={saveMeasurements}>Save Measurements</button>
-          {measurements.length>0&&(()=>{
-            const last=measurements[measurements.length-1];
-            const first=measurements[0];
-            return <div style={{marginTop:10,fontSize:12,color:'var(--t2)'}}>
-              <div style={{display:'flex',justifyContent:'space-between'}}>
-                {last.waist&&<span>Waist: {last.waist}cm{measurements.length>1&&first.waist?<span style={{color:last.waist<first.waist?'var(--grn)':'var(--red)',marginLeft:4}}>{(last.waist-first.waist)>0?'+':''}{(last.waist-first.waist).toFixed(1)}</span>:null}</span>}
-                {last.chest&&<span>Chest: {last.chest}cm{measurements.length>1&&first.chest?<span style={{color:last.chest>first.chest?'var(--grn)':'var(--red)',marginLeft:4}}>{(last.chest-first.chest)>0?'+':''}{(last.chest-first.chest).toFixed(1)}</span>:null}</span>}
-                {last.thigh&&<span>Thigh: {last.thigh}cm{measurements.length>1&&first.thigh?<span style={{color:last.thigh>first.thigh?'var(--grn)':'var(--red)',marginLeft:4}}>{(last.thigh-first.thigh)>0?'+':''}{(last.thigh-first.thigh).toFixed(1)}</span>:null}</span>}
-              </div>
-              <div style={{color:'var(--t3)',marginTop:4}}>{measurements.length} entries logged</div>
-            </div>;
-          })()}
-        </div>
-
-        <div className="section-t">Rest Timer</div>
-        <div className="card" style={{padding:16}}>
-          <div style={{fontSize:13,color:'var(--t2)',marginBottom:8}}>Auto-starts between sets. Shorter rest = more calorie burn.</div>
-          <div style={{display:'flex',gap:8,flexWrap:'wrap'}}>
-            {REST_OPTIONS.map(s=>{
-              const current=ld('restTime',60);
-              return <button key={s} className={`phase-btn${current===s?' on':''}`} onClick={()=>{sv('restTime',s);setToast(`Rest timer: ${s}s`);vb()}}>{s}s</button>;
-            })}
-          </div>
-          <div style={{display:'flex',gap:8,marginTop:10,alignItems:'center'}}>
-            <span style={{fontSize:13,color:'var(--t2)',whiteSpace:'nowrap'}}>Custom:</span>
-            <input className="inp" type="number" inputMode="numeric" placeholder="sec" value={customRest} onChange={e=>setCustomRest(e.target.value)} style={{maxWidth:80,textAlign:'center'}}/>
-            <button className="btn btn-s" onClick={()=>{const v=parseInt(customRest);if(v>0&&v<=300){sv('restTime',v);setToast(`Rest timer: ${v}s`);setCustomRest('');vb()}}}>Set</button>
-          </div>
-        </div>
-
-        <div className="section-t">Program Info</div>
-        <div className="card" style={{padding:16}}>
-          <div style={{fontWeight:600,fontSize:16,marginBottom:8}}>Trail Runner Recovery Program</div>
-          <div style={{fontSize:13,color:'var(--t2)',lineHeight:1.5}}>
-            3-day full body split with 4 progressive phases and metabolic finishers. Foundation builds base strength and begins knee rehab. Build adds progressive overload and barbell work. Strength & Power peaks with heavy loads and explosive movements. Maintain & Perform sustains your gains while running volume increases. Your trainer's prescribed exercises stay constant throughout all phases. Each phase tracks progress independently.
-          </div>
-        </div>
-
-        <div className="section-t">Data</div>
-        <div style={{display:'flex',flexDirection:'column',gap:8}}>
-          <button className="btn btn-s" onClick={exportData} style={{width:'100%'}}>📤 Export Backup</button>
-          <button className="btn btn-s" onClick={importData} style={{width:'100%'}}>📥 Restore from Backup</button>
-          <button className="btn btn-d" onClick={clearAll} style={{width:'100%'}}>🗑 Clear All Data</button>
-        </div>
-
-        <div style={{textAlign:'center',padding:'32px 0',color:'var(--t3)',fontSize:12}}>
-          IronClad Pro v16.0 · Trail Runner Recovery Edition<br/>
-          Built for Matt · Knee-safe · All exercises vetted
+        <div className="rest-btns">
+          <button className="rest-btn" style={{background:'var(--c2)',color:'var(--t1)'}} onClick={e=>{e.stopPropagation();onDone()}}>Skip</button>
+          <button className="rest-btn" style={{background:'var(--grn)',color:'#000'}} onClick={e=>{e.stopPropagation();onDone()}}>Done</button>
         </div>
       </div>
-      {toast&&<Toast msg={toast} onClose={()=>setToast('')}/>}
-    </>
+    </div>
   );
 };
 
-// === RECOVERY TAB ===
-const RecoveryTab=()=>{
-  const[toast,setToast]=useState('');
-  const[tick,setTick]=useState(0);
-  const[milestones,setMilestones]=useState(()=>ld('kneeMilestones',{}));
-  const hist=ld('history',[]);
-  const runs=ld('runLog',[]);
-  const readiness=ld('readiness',{});
-  const exHistory=ld('exHistory',{});
-
-  // Readiness trend (last 14 days)
-  const readinessEntries=Object.values(readiness).sort((a,b)=>a.date>b.date?1:-1).slice(-14);
-
-  // Knee pain from runs
-  const runPainData=runs.filter(r=>r.kneeFeel!=null).slice(-10);
-
-  // Rehab compliance: % of knee-tagged exercises done this week
-  const weekAgo=new Date();weekAgo.setDate(weekAgo.getDate()-7);
-  const kneeExIds=EXERCISES.filter(e=>e.tags&&e.tags.includes('k')).map(e=>e.id);
-  const kneeDoneThisWeek=kneeExIds.filter(eid=>{
-    const sessions=exHistory[eid]||[];
-    return sessions.some(s=>new Date(s.date)>=weekAgo);
-  }).length;
-  const totalKneeEx=kneeExIds.length;
-  const compliancePct=totalKneeEx>0?Math.round((kneeDoneThisWeek/totalKneeEx)*100):0;
-
-  // Knee recovery milestones
-  const MILESTONES=[
-    {id:'pain3',label:'Pain ≤ 3/10 during workouts'},
-    {id:'fullsquat',label:'Full bodyweight squat pain-free'},
-    {id:'singleleg',label:'Single-leg balance 30s each side'},
-    {id:'run5k',label:'Run 5k pain-free'},
-    {id:'jump',label:'Box jump 12" pain-free'},
-    {id:'split',label:'Bulgarian split squat with weight'},
-    {id:'trail',label:'Trail run 30+ minutes'},
-    {id:'noNSAID',label:'7 days without NSAIDs'},
-  ];
-  const toggleMs=(id)=>{
-    const next={...milestones,[id]:!milestones[id]};
-    setMilestones(next);
-    sv('kneeMilestones',next);
-    vb();
-  };
-  const msDoneCount=MILESTONES.filter(m=>milestones[m.id]).length;
-
-  // Pain vs training load correlation (last 8 weeks)
-  const corrWeeks=[];
-  for(let i=7;i>=0;i--){
-    const ws=new Date();ws.setDate(ws.getDate()-(i*7+6));ws.setHours(0,0,0,0);
-    const we=new Date();we.setDate(we.getDate()-(i*7));we.setHours(23,59,59,999);
-    const wHist=hist.filter(h=>{const d=new Date(h.date);return d>=ws&&d<=we});
-    const wRuns=runs.filter(r=>{const d=new Date(r.date);return d>=ws&&d<=we});
-    const load=wHist.reduce((a,h)=>a+(h.volume||0),0)/1000+wRuns.reduce((a,r)=>a+(r.dist||0),0);
-    const pains=[...wHist.filter(h=>h.kneePain!=null).map(h=>h.kneePain),...wRuns.filter(r=>r.kneeFeel!=null).map(r=>r.kneeFeel)];
-    const avgPain=pains.length>0?pains.reduce((a,p)=>a+p,0)/pains.length:null;
-    corrWeeks.push({load,avgPain,wkLabel:`${ws.getMonth()+1}/${ws.getDate()}`});
-  }
-  const maxLoad=Math.max(1,...corrWeeks.map(w=>w.load));
-
-  // Weekly km progression with 10% rule
-  const weekKm=[];
-  for(let i=7;i>=0;i--){
-    const ws=new Date();ws.setDate(ws.getDate()-(i*7+6));ws.setHours(0,0,0,0);
-    const we=new Date();we.setDate(we.getDate()-(i*7));we.setHours(23,59,59,999);
-    const km=runs.filter(r=>{const d=new Date(r.date);return d>=ws&&d<=we}).reduce((a,r)=>a+(r.dist||0),0);
-    weekKm.push(km);
-  }
-  const lastWk=weekKm[weekKm.length-2]||0;
-  const safeNext=lastWk*1.1;
-  const thisWk=weekKm[weekKm.length-1]||0;
-  const overTen=lastWk>0&&thisWk>safeNext;
-  const maxKm=Math.max(1,...weekKm,safeNext);
-
-  // Pace trend (last 10 runs with valid pace)
-  const paceRuns=runs.filter(r=>r.pace>0).slice(-10);
-  const maxPace=paceRuns.length>0?Math.max(...paceRuns.map(r=>r.pace)):0;
-  const minPace=paceRuns.length>0?Math.min(...paceRuns.map(r=>r.pace)):0;
-
-  return(
-    <>
-      <div className="hdr"><h1>Recovery</h1><p>Running, readiness & rehab tracking</p></div>
-      <div className="scroll">
-        <ReadinessCheckIn onSave={()=>setTick(t=>t+1)}/>
-
-        {readinessEntries.length>=3&&<>
-          <div className="section-t">Readiness Trend</div>
-          <div className="card" style={{padding:14}}>
-            <div className="mini-chart" style={{height:50}}>
-              {readinessEntries.map((r,i)=>{
-                const val=(r.sleepVal+r.sorenessVal+r.energyVal+r.moodVal)/4;
-                return <div key={i} className="mini-bar" style={{height:`${Math.max(4,val*46)}px`,background:val>=0.66?'var(--grn)':val>=0.33?'var(--org)':'var(--red)'}} title={`${Math.round(val*100)}%`}/>;
-              })}
-            </div>
-            <div style={{display:'flex',justifyContent:'space-between',fontSize:10,color:'var(--t3)',marginTop:4}}>
-              <span>{readinessEntries[0].date}</span><span>today</span>
-            </div>
-          </div>
-        </>}
-
-        <div className="section-t">Knee Rehab Compliance</div>
-        <div className="card" style={{padding:14}}>
-          <div style={{display:'flex',justifyContent:'space-between',marginBottom:6,fontSize:13}}>
-            <span style={{fontWeight:600}}>This week</span>
-            <span style={{color:compliancePct>=70?'var(--grn)':compliancePct>=40?'var(--org)':'var(--red)',fontWeight:700}}>{kneeDoneThisWeek}/{totalKneeEx} ({compliancePct}%)</span>
-          </div>
-          <div className="goal-bar">
-            <div className="goal-fill" style={{width:`${compliancePct}%`,background:compliancePct>=70?'var(--grn)':compliancePct>=40?'var(--org)':'var(--red)'}}/>
-          </div>
-          <div style={{fontSize:11,color:'var(--t3)',marginTop:6}}>{compliancePct>=70?'Excellent rehab consistency':compliancePct>=40?'Keep going — aim for 70%+':'Try to hit more knee-safe exercises this week'}</div>
-        </div>
-
-        <div className="section-t">Knee Recovery Milestones <span style={{color:'var(--t3)',fontWeight:400,fontSize:11}}>({msDoneCount}/{MILESTONES.length})</span></div>
-        <div className="card" style={{padding:'4px 14px'}}>
-          {MILESTONES.map(m=>(
-            <div key={m.id} className="ms-item" onClick={()=>toggleMs(m.id)} style={{cursor:'pointer'}}>
-              <div className={`ms-check${milestones[m.id]?' done':''}`}>{milestones[m.id]?'✓':''}</div>
-              <div style={{fontSize:13,color:milestones[m.id]?'var(--t3)':'var(--t1)',textDecoration:milestones[m.id]?'line-through':'none'}}>{m.label}</div>
-            </div>
-          ))}
-        </div>
-
-        <div className="section-t">Running</div>
-        <RunningLog onToast={(msg)=>{setToast(msg);setTick(t=>t+1)}}/>
-
-        {weekKm.some(k=>k>0)&&<>
-          <div className="section-t" style={{marginTop:16}}>Weekly km · 10% Rule</div>
-          <div className="card" style={{padding:14}}>
-            <div className="mini-chart" style={{height:60,alignItems:'flex-end'}}>
-              {weekKm.map((k,i)=>(
-                <div key={i} className="mini-bar" style={{height:`${Math.max(2,(k/maxKm)*56)}px`,background:i===weekKm.length-1&&overTen?'var(--red)':'var(--blu)'}} title={`${k.toFixed(1)}km`}/>
-              ))}
-            </div>
-            <div style={{display:'flex',justifyContent:'space-between',fontSize:11,color:'var(--t2)',marginTop:6}}>
-              <span>This wk: <b style={{color:overTen?'var(--red)':'var(--t1)'}}>{thisWk.toFixed(1)}km</b></span>
-              <span>Last wk: {lastWk.toFixed(1)}km</span>
-              <span>Safe max: {safeNext.toFixed(1)}km</span>
-            </div>
-            {overTen&&<div style={{fontSize:11,color:'var(--red)',marginTop:4,textAlign:'center'}}>⚠️ Volume jumped &gt;10% — injury risk</div>}
-          </div>
-        </>}
-
-        {paceRuns.length>=3&&<>
-          <div className="section-t" style={{marginTop:16}}>Pace Trend</div>
-          <div className="card" style={{padding:14}}>
-            <div className="mini-chart" style={{height:50,alignItems:'flex-end'}}>
-              {paceRuns.map((r,i)=>{
-                const range=maxPace-minPace||1;
-                const norm=1-((r.pace-minPace)/range);
-                return <div key={i} className="mini-bar" style={{height:`${Math.max(4,norm*46+4)}px`,background:'var(--grn)'}} title={`${r.pace}min/km`}/>;
-              })}
-            </div>
-            <div style={{display:'flex',justifyContent:'space-between',fontSize:11,color:'var(--t2)',marginTop:6}}>
-              <span>Best: {minPace.toFixed(1)}min/km</span>
-              <span>Avg: {(paceRuns.reduce((a,r)=>a+r.pace,0)/paceRuns.length).toFixed(1)}min/km</span>
-              <span>Slowest: {maxPace.toFixed(1)}min/km</span>
-            </div>
-          </div>
-        </>}
-
-        {corrWeeks.filter(w=>w.avgPain!=null).length>=3&&<>
-          <div className="section-t" style={{marginTop:16}}>Load vs Knee Pain</div>
-          <div className="card" style={{padding:14}}>
-            <div className="corr-chart">
-              {corrWeeks.map((w,i)=>(
-                <div key={i} className="corr-bar">
-                  <div className="top" style={{height:`${(w.load/maxLoad)*36}px`,background:'var(--blu)'}} title={`Load: ${w.load.toFixed(1)}`}/>
-                  <div className="bot" style={{height:`${w.avgPain!=null?(w.avgPain/10)*36:0}px`,background:w.avgPain!=null?painColor(w.avgPain):'transparent'}} title={w.avgPain!=null?`Pain: ${w.avgPain.toFixed(1)}/10`:''}/>
-                </div>
-              ))}
-            </div>
-            <div style={{display:'flex',justifyContent:'space-between',fontSize:10,color:'var(--t3)',marginTop:6}}>
-              <span style={{color:'var(--blu)'}}>■ Load (top)</span>
-              <span style={{color:'var(--red)'}}>■ Pain (bottom)</span>
-            </div>
-            <div style={{fontSize:11,color:'var(--t2)',marginTop:4,textAlign:'center'}}>8 weeks · spot if higher load = more pain</div>
-          </div>
-        </>}
-
-        {runPainData.length>=3&&<>
-          <div className="section-t" style={{marginTop:16}}>Knee Feel After Runs</div>
-          <div className="card" style={{padding:14}}>
-            <div className="mini-chart" style={{height:40}}>
-              {runPainData.map((r,i)=>(
-                <div key={i} className="mini-bar" style={{height:`${Math.max(4,(r.kneeFeel/10)*36)}px`,background:painColor(r.kneeFeel)+'90'}} title={`${r.kneeFeel}/10`}/>
-              ))}
-            </div>
-            <div style={{fontSize:11,color:'var(--t2)',marginTop:6,textAlign:'center'}}>
-              Avg: {(runPainData.reduce((a,r)=>a+r.kneeFeel,0)/runPainData.length).toFixed(1)}/10 · {runPainData.length<3?'Need more data':''}
-              {runPainData.length>=3&&(()=>{
-                const recent=runPainData.slice(-3).reduce((a,r)=>a+r.kneeFeel,0)/3;
-                const early=runPainData.slice(0,3).reduce((a,r)=>a+r.kneeFeel,0)/3;
-                return recent<early?' · Trending better':'';
-              })()}
-            </div>
-          </div>
-        </>}
-
-        {toast&&<Toast msg={toast} onClose={()=>setToast('')}/>}
-      </div>
-    </>
-  );
+// === SESSION TIMER HOOK ===
+const useSessionTimer=()=>{
+  const[elapsed,setElapsed]=useState(0);
+  const[running,setRunning]=useState(false);
+  const startRef=useRef(null);
+  const ivRef=useRef(null);
+  const start=useCallback(()=>{
+    if(!startRef.current)startRef.current=Date.now();
+    setRunning(true);
+    ivRef.current=setInterval(()=>{setElapsed(Math.floor((Date.now()-startRef.current)/1000))},1000);
+  },[]);
+  const stop=useCallback(()=>{setRunning(false);clearInterval(ivRef.current)},[]);
+  const reset=useCallback(()=>{stop();setElapsed(0);startRef.current=null},[stop]);
+  useEffect(()=>()=>clearInterval(ivRef.current),[]);
+  return{elapsed,running,start,stop,reset};
 };
 
-// === APP ===
-const App=()=>{
-  const[tab,setTab]=useState(0);
-  const tabs=[
-    {n:'Workout',icon:<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M6.5 6.5h11M4 12h16M6.5 17.5h11"/><circle cx="4" cy="6.5" r="2"/><circle cx="20" cy="12" r="2"/><circle cx="4" cy="17.5" r="2"/></svg>},
-    {n:'Progress',icon:<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 20h18M6 16V8M10 16V4M14 16v-5M18 16V9"/></svg>},
-    {n:'Recovery',icon:<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 21c-4.97 0-9-4.03-9-9s4.03-9 9-9 9 4.03 9 9"/><path d="M12 7v5l3 3"/><path d="M19 16v6M16 19h6"/></svg>},
-    {n:'Library',icon:<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M4 6h16M4 12h16M4 18h10"/></svg>},
-    {n:'Settings',icon:<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>}
-  ];
-
-  return(
-    <div className="app">
-      {tab===0&&<WorkoutTab/>}
-      {tab===1&&<ProgressTab/>}
-      {tab===2&&<RecoveryTab/>}
-      {tab===3&&<LibraryTab/>}
-      {tab===4&&<SettingsTab/>}
-      <div className="tabs">
-        {tabs.map((t,i)=>(
-          <button key={i} className={`tab${tab===i?' on':''}`} onClick={()=>{setTab(i);vb()}}>
-            {t.icon}<span>{t.n}</span>
-          </button>
+// === PAIN SCALE ===
+const PainScale=({value,onChange})=>{
+  const colors=['var(--grn)','#7bc67e','var(--yel)','var(--org)','var(--red)'];
+  return (
+    <div>
+      <div style={{fontSize:13,color:'var(--t2)',marginBottom:6}}>Knee Pain (0=none, 4=severe)</div>
+      <div className="pain-row">
+        {[0,1,2,3,4].map(v=>(
+          <div key={v} className="pain-dot"
+            style={{background:value===v?colors[v]:'var(--c2)',borderColor:value===v?colors[v]:'var(--c3)',color:value===v?'#000':'var(--t2)'}}
+            onClick={()=>{vb();onChange(v)}}>{v}</div>
         ))}
       </div>
     </div>
   );
 };
 
-ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+// === RPE SELECTOR ===
+const RPESelector=({value,onChange})=>{
+  return (
+    <div>
+      <div style={{fontSize:13,color:'var(--t2)',marginBottom:6}}>RPE (Rate of Perceived Exertion)</div>
+      <div className="rpe-row">
+        {[5,6,7,8,9,10].map(v=>(
+          <button key={v} className={'rpe-btn'+(value===v?' on':'')} onClick={()=>{vb();onChange(v)}}>{v}</button>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+// === COUNTDOWN TIMER ===
+const CountdownTimer=({duration})=>{
+  const[left,setLeft]=useState(0);
+  const[active,setActive]=useState(false);
+  const ivRef=useRef(null);
+  const secs=parseInt(duration)||60;
+  const toggle=()=>{
+    if(active){clearInterval(ivRef.current);setActive(false);setLeft(0);return}
+    setLeft(secs);setActive(true);
+    ivRef.current=setInterval(()=>setLeft(p=>{if(p<=1){clearInterval(ivRef.current);setActive(false);vb();return 0}return p-1}),1000);
+  };
+  useEffect(()=>()=>clearInterval(ivRef.current),[]);
+  return (
+    <div className="cd-timer" style={{background:active?'var(--org-d)':'var(--c2)',color:active?'var(--org)':'var(--t2)'}} onClick={toggle}>
+      {active?fmtTime(left):'Start '+secs+'s'}
+    </div>
+  );
+};
+
+// === SET LOGGER ===
+const SetLogger=({ex,exData,sets,onUpdate,onDone,onSetsDelta})=>{
+  const exHist=ld('exHistory',{});
+  const lastSession=exHist[ex.eid]||null;
+  const isDuration=ex.t==='d'||ex.t==='c';
+  return (
+    <div className="log-area">
+      <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:8}}>
+        <div style={{fontSize:15,fontWeight:600}}>{exMap[ex.eid]?.n||ex.eid}</div>
+        <div style={{display:'flex',gap:6}}>
+          <button className="btn btn-s" style={{padding:'4px 10px',fontSize:12}} onClick={()=>onSetsDelta(-1)}>-Set</button>
+          <button className="btn btn-s" style={{padding:'4px 10px',fontSize:12}} onClick={()=>onSetsDelta(1)}>+Set</button>
+        </div>
+      </div>
+      {lastSession && (
+        <div style={{fontSize:12,color:'var(--t2)',marginBottom:8,cursor:'pointer'}} onClick={()=>{
+          const filled=[];
+          lastSession.forEach((s,i)=>{if(i<sets)filled.push({w:s.w||'',r:s.r||'',done:false,warmup:false})});
+          onUpdate(filled);
+        }}>Quick fill from last: {lastSession.map(s=>s.w+'x'+s.r).join(', ')}</div>
+      )}
+      {isDuration && <div style={{marginBottom:10}}><CountdownTimer duration={ex.reps} /></div>}
+      {Array.from({length:sets}).map((_,i)=>{
+        const s=exData[i]||{w:'',r:'',done:false,warmup:false};
+        return (
+          <div key={i} className="set-row">
+            <div className="set-num" style={s.warmup?{background:'var(--org-d)',color:'var(--org)'}:s.done?{background:'var(--grn)',color:'#000'}:{}}>{s.warmup?'W':i+1}</div>
+            {!isDuration && <input className={'inp'+(s.done?' done':'')} type="number" inputMode="decimal" placeholder={s.warmup?'Warm':'kg'} value={s.w}
+              onChange={e=>{const d=[...exData];d[i]={...s,w:e.target.value};onUpdate(d)}} />}
+            <input className={'inp'+(s.done?' done':'')} type="number" inputMode="numeric" placeholder={isDuration?'sec':'reps'} value={s.r}
+              onChange={e=>{const d=[...exData];d[i]={...s,r:e.target.value};onUpdate(d)}} />
+            <button className={'btn'+(s.done?' btn-g':' btn-s')} style={{padding:'8px 12px',fontSize:13}} onClick={()=>{
+              const d=[...exData];d[i]={...s,done:!s.done};onUpdate(d);if(!s.done){vb();onDone(ex,d[i])}
+            }}>{s.done?'Done':'Log'}</button>
+            <button className="btn btn-s" style={{padding:'8px 10px',fontSize:11,color:'var(--org)'}} onClick={()=>{
+              const d=[...exData];d[i]={...s,warmup:!s.warmup};onUpdate(d);
+            }}>{s.warmup?'W':'w'}</button>
+          </div>
+        );
+      })}
+      {exData.length>0&&exData.some(s=>s.done&&s.w&&s.r&&!isDuration)&&(
+        <div style={{fontSize:12,color:'var(--t2)',marginTop:4}}>
+          Est 1RM: {est1RM(parseFloat(exData.find(s=>s.done)?.w||0),parseInt(exData.find(s=>s.done)?.r||0))} kg
+        </div>
+      )}
+    </div>
+  );
+};
+
+// === EXERCISE CARD (with swap) ===
+const ExCard=({ex,exData,sets,onUpdate,onDone,onSwap,onSetsDelta})=>{
+  const[open,setOpen]=useState(false);
+  const[showSwap,setShowSwap]=useState(false);
+  const info=exMap[ex.eid];
+  if(!info)return null;
+  const doneSets=(exData||[]).filter(s=>s.done).length;
+  const pct=sets>0?Math.round(doneSets/sets*100):0;
+  const tagLabels={k:'KS',e:'EC',p:'PW',b:'BL',t:'TR',f:'FT'};
+  const swapOptions=EXDB.filter(e=>e.m===info.m&&e.t===info.t&&e.id!==ex.eid);
+  return (
+    <div style={{marginBottom:2}}>
+      <div className="ex-row" onClick={()=>setOpen(!open)} style={{cursor:'pointer'}}>
+        <div style={{flex:1}}>
+          <div className="ex-name">{info.n}</div>
+          <div className="ex-info">{ex.sets}x{ex.reps}{info.note?' - '+info.note:''}</div>
+        </div>
+        <div style={{display:'flex',alignItems:'center',gap:6}}>
+          {pct===100 && <span className="badge badge-g">Done</span>}
+          {pct>0&&pct<100 && <span className="badge badge-o">{pct}%</span>}
+          {info.tags.map(t=><span key={t} className={'ex-tag tag-'+t}>{tagLabels[t]||t}</span>)}
+        </div>
+      </div>
+      {showSwap && (
+        <div style={{padding:'8px 16px',background:'var(--c2)',borderRadius:8,margin:'4px 0'}}>
+          <div style={{fontSize:13,fontWeight:600,marginBottom:6}}>Swap with:</div>
+          {swapOptions.map(s=>(
+            <div key={s.id} style={{padding:'6px 0',borderBottom:'0.5px solid var(--sep)',cursor:'pointer',fontSize:14}}
+              onClick={()=>{onSwap(ex.eid,s.id);setShowSwap(false)}}>{s.n}</div>
+          ))}
+        </div>
+      )}
+      {open && (
+        <div>
+          <div style={{padding:'4px 16px'}}>
+            <button className="btn btn-s" style={{fontSize:12,padding:'4px 10px',marginRight:6}} onClick={e=>{e.stopPropagation();setShowSwap(!showSwap)}}>Swap Exercise</button>
+          </div>
+          <SetLogger ex={ex} exData={exData||[]} sets={sets} onUpdate={onUpdate} onDone={onDone} onSetsDelta={onSetsDelta} />
+        </div>
+      )}
+    </div>
+  );
+};
+
+// === COMPLETION SUMMARY ===
+const CompletionSummary=({stats,onClose})=>{
+  return (
+    <div className="complete-overlay" onClick={onClose}>
+      <div className="complete-card" onClick={e=>e.stopPropagation()}>
+        <div style={{fontSize:48,marginBottom:12}}>Workout Complete!</div>
+        <div style={{fontSize:22,fontWeight:700,marginBottom:20}}>Great work!</div>
+        <div style={{display:'flex',flexWrap:'wrap',justifyContent:'center'}}>
+          <div className="complete-stat"><div style={{fontSize:24,fontWeight:700,color:'var(--grn)'}}>{stats.pct}%</div><div style={{fontSize:11,color:'var(--t2)'}}>Complete</div></div>
+          <div className="complete-stat"><div style={{fontSize:24,fontWeight:700,color:'var(--blu)'}}>{stats.exercises}</div><div style={{fontSize:11,color:'var(--t2)'}}>Exercises</div></div>
+          <div className="complete-stat"><div style={{fontSize:24,fontWeight:700,color:'var(--org)'}}>{fmtTime(stats.duration)}</div><div style={{fontSize:11,color:'var(--t2)'}}>Duration</div></div>
+          <div className="complete-stat"><div style={{fontSize:24,fontWeight:700,color:'var(--red)'}}>{stats.kcal}</div><div style={{fontSize:11,color:'var(--t2)'}}>Est kcal</div></div>
+          {stats.newPRs>0 && <div className="complete-stat"><div style={{fontSize:24,fontWeight:700,color:'var(--pur)'}}>{stats.newPRs}</div><div style={{fontSize:11,color:'var(--t2)'}}>New PRs</div></div>}
+        </div>
+        <button className="btn btn-g" style={{marginTop:24,width:'100%'}} onClick={onClose}>Done</button>
+      </div>
+    </div>
+  );
+};
+
+// === DAY VIEW ===
+const DayView=({day,phase,onBack})=>{
+  const[logData,setLogData]=useState(ld('dayLog_'+day.name.replace(/\s/g,'')+'_p'+phase,{}));
+  const[setsOverride,setSetsOverride]=useState(ld('setsOverride_'+day.name.replace(/\s/g,'')+'_p'+phase,{}));
+  const[pain,setPain]=useState(0);
+  const[rpe,setRpe]=useState(null);
+  const[notes,setNotes]=useState('');
+  const[showComplete,setShowComplete]=useState(null);
+  const[showRest,setShowRest]=useState(false);
+  const[swaps,setSwaps]=useState(ld('swaps',{}));
+  const restTime=ld('restTime',45);
+  const restEnabled=ld('restEnabled',true);
+  const timer=useSessionTimer();
+  const bw=ld('bodyweight',80);
+  const dayKey=day.name.replace(/\s/g,'')+'_p'+phase;
+
+  useEffect(()=>{if(!timer.running)timer.start()},[]);
+  useEffect(()=>{sv('dayLog_'+dayKey,logData)},[logData,dayKey]);
+  useEffect(()=>{sv('setsOverride_'+dayKey,setsOverride)},[setsOverride,dayKey]);
+
+  const handleSwap=(oldId,newId)=>{const s={...swaps,[oldId]:newId};setSwaps(s);sv('swaps',s)};
+  const getEid=(eid)=>swaps[eid]||eid;
+
+  const allExercises=day.supersets.flatMap(ss=>ss.exercises);
+  const totalSets=allExercises.reduce((a,ex)=>(setsOverride[ex.eid]||ex.sets)+a,0);
+  const doneSets=allExercises.reduce((a,ex)=>{const d=logData[getEid(ex.eid)]||[];return a+d.filter(s=>s.done).length},0);
+  const pct=totalSets>0?Math.round(doneSets/totalSets*100):0;
+
+  const totalVolume=allExercises.reduce((a,ex)=>{
+    const d=logData[getEid(ex.eid)]||[];
+    return a+d.filter(s=>s.done&&!s.warmup).reduce((v,s)=>(parseFloat(s.w)||0)*(parseInt(s.r)||0)+v,0);
+  },0);
+
+  const handleSetDone=(ex,setData)=>{
+    const info=exMap[getEid(ex.eid)];
+    if(info&&info.t==='w'&&setData.w&&setData.r&&!setData.warmup){
+      const prs=ld('prs',{});
+      const key=getEid(ex.eid);
+      const e1rm=est1RM(parseFloat(setData.w),parseInt(setData.r));
+      if(!prs[key]||e1rm>prs[key].e1rm){
+        prs[key]={w:parseFloat(setData.w),r:parseInt(setData.r),e1rm,date:today()};
+        sv('prs',prs);
+      }
+    }
+    const hist=ld('exHistory',{});
+    const eid=getEid(ex.eid);
+    const d=logData[eid]||[];
+    hist[eid]=d.filter(s=>s.done);
+    sv('exHistory',hist);
+    if(restEnabled)setShowRest(true);
+  };
+
+  const finishWorkout=()=>{
+    timer.stop();
+    const exDone=allExercises.filter(ex=>{const d=logData[getEid(ex.eid)]||[];return d.some(s=>s.done)}).length;
+    const kcal=estCalories(timer.elapsed,totalVolume,bw);
+    const prs=ld('prs',{});
+    let newPRs=0;
+    allExercises.forEach(ex=>{
+      const pr=prs[getEid(ex.eid)];
+      if(pr&&pr.date===today())newPRs++;
+    });
+    const record={day:day.name,phase,date:today(),duration:timer.elapsed,pain,rpe,notes,pct,exercises:exDone,
+      totalExercises:allExercises.length,volume:totalVolume,calories:kcal,newPRs};
+    const history=ld('history',[]);
+    history.unshift(record);
+    sv('history',history);
+    const wk=ld('weekDone',{});
+    wk[day.name]=today();
+    sv('weekDone',wk);
+    setShowComplete({pct,exercises:exDone,duration:timer.elapsed,kcal,newPRs});
+  };
+
+  return (
+    <div className="app">
+      <div className="hdr">
+        <div style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}>
+          <div>
+            <div style={{display:'flex',alignItems:'center',gap:8}}>
+              <button className="btn btn-s" style={{padding:'6px 10px',fontSize:13}} onClick={()=>{timer.stop();onBack()}}>Back</button>
+              <h1 style={{fontSize:20}}>{day.name}</h1>
+            </div>
+            <div style={{display:'flex',gap:8,marginTop:4}}>
+              {day.focus.map(f=><span key={f} className="focus-tag" style={{background:'var(--c2)'}}>{f}</span>)}
+            </div>
+          </div>
+          <div style={{display:'flex',flexDirection:'column',alignItems:'flex-end',gap:4}}>
+            <div className="session-timer">{fmtTime(timer.elapsed)}</div>
+            <button className="btn btn-s" style={{padding:'2px 8px',fontSize:10}}
+              onClick={()=>{const v=!ld('restEnabled',true);sv('restEnabled',v);window.location.reload()}}>{restEnabled?'Rest: ON':'Rest: OFF'}</button>
+          </div>
+        </div>
+        <div className="prg"><div className="prg-f" style={{width:pct+'%'}} /></div>
+      </div>
+      <div className="scroll">
+        {day.supersets.map((ss,si)=>{
+          const isFinisher=ss.label.includes('Finisher');
+          return (
+            <div key={si} className="card">
+              <div className="ss-h" style={{padding:'12px 16px'}}>
+                <span className="ss-label">{ss.label}</span>
+                <span className="ss-type" style={{background:isFinisher?'var(--red-d)':'var(--blu)',color:isFinisher?'var(--red)':'#fff'}}>
+                  {isFinisher?ss.type:ss.type||'Strength'}
+                </span>
+                <span style={{fontSize:11,color:'var(--t3)',marginLeft:'auto'}}>Rest: {ss.rest}s</span>
+              </div>
+              {ss.exercises.map((ex,ei)=>{
+                const eid=getEid(ex.eid);
+                const sets=setsOverride[eid]||ex.sets;
+                return <ExCard key={eid+ei} ex={{...ex,eid}} exData={logData[eid]||[]} sets={sets}
+                  onUpdate={d=>{const l={...logData};l[eid]=d;setLogData(l)}}
+                  onDone={handleSetDone}
+                  onSwap={handleSwap}
+                  onSetsDelta={delta=>{
+                    const cur=setsOverride[eid]||ex.sets;
+                    const next=Math.max(1,cur+delta);
+                    setSetsOverride(p=>({...p,[eid]:next}));
+                  }} />;
+              })}
+            </div>
+          );
+        })}
+        <div className="card" style={{padding:16}}>
+          <div style={{fontSize:17,fontWeight:600,marginBottom:12}}>Finish Workout</div>
+          <PainScale value={pain} onChange={setPain} />
+          <div style={{height:12}} />
+          <RPESelector value={rpe} onChange={setRpe} />
+          <textarea style={{width:'100%',height:60,background:'var(--c2)',border:'1.5px solid var(--c3)',borderRadius:10,padding:10,color:'var(--t1)',fontFamily:'inherit',fontSize:14,resize:'none',marginTop:8}}
+            placeholder="Notes..." value={notes} onChange={e=>setNotes(e.target.value)} />
+          <button className="btn btn-g" style={{width:'100%',marginTop:12}} onClick={finishWorkout}>
+            Save Workout ({fmtTime(timer.elapsed)})
+          </button>
+        </div>
+      </div>
+      {showRest && <RestTimer seconds={ld('restTime',45)} onDone={()=>setShowRest(false)} />}
+      {showComplete && <CompletionSummary stats={showComplete} onClose={()=>{setShowComplete(null);onBack()}} />}
+    </div>
+  );
+};
+
+// === WORKOUT TAB ===
+const WorkoutTab=({onOpenDay})=>{
+  const[phase,setPhase]=useState(ld('phase',1));
+  const phaseStart=ld('phaseStart',today());
+  const weekDone=ld('weekDone',{});
+  const daysSinceStart=Math.max(0,Math.floor((new Date()-new Date(phaseStart))/(86400000)));
+  const weekNum=Math.floor(daysSinceStart/7)+1;
+  const days=getProgramDays(phase);
+
+  const changePhase=(p)=>{setPhase(p);sv('phase',p);if(p!==phase){sv('phaseStart',today());sv('weekDone',{})}};
+  const newWeek=()=>{sv('weekDone',{});window.location.reload()};
+
+  const dayPct=(day)=>{
+    const logData=ld('dayLog_'+day.name.replace(/\s/g,'')+'_p'+phase,{});
+    const setsOvr=ld('setsOverride_'+day.name.replace(/\s/g,'')+'_p'+phase,{});
+    const allEx=day.supersets.flatMap(s=>s.exercises);
+    const total=allEx.reduce((a,ex)=>(setsOvr[ex.eid]||ex.sets)+a,0);
+    const done=allEx.reduce((a,ex)=>{const d=logData[ex.eid]||[];return a+d.filter(s=>s.done).length},0);
+    return total>0?Math.round(done/total*100):0;
+  };
+
+  return (
+    <>
+      <div className="hdr">
+        <h1>Workout</h1>
+        <p>v17.1 · Knee-Rehab + Weight-Loss Edition · Full Body Split</p>
+      </div>
+      <div className="scroll">
+        <div className="phase-sel">
+          {[1,2,3,4].map(p=>(
+            <button key={p} className={'phase-btn'+(phase===p?' on':'')} onClick={()=>changePhase(p)}>
+              P{p}: {PHASE_NAMES[p-1]}
+            </button>
+          ))}
+        </div>
+        <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:12}}>
+          <div style={{fontSize:14,color:'var(--t2)'}}>Week {weekNum}</div>
+          <button className="btn btn-s" style={{fontSize:12,padding:'6px 12px'}} onClick={newWeek}>New Week</button>
+        </div>
+        {days.map((day,i)=>{
+          const p=dayPct(day);
+          const isDone=weekDone[day.name];
+          return (
+            <div key={i} className="card" onClick={()=>onOpenDay(day,phase)} style={{cursor:'pointer'}}>
+              <div className="card-h">
+                <div>
+                  <h3>{day.name}</h3>
+                  <div className="sub">{day.focus.join(' + ')} · {day.supersets.length} blocks</div>
+                </div>
+                <div style={{display:'flex',alignItems:'center',gap:8}}>
+                  {isDone && <span className="badge badge-g">Done</span>}
+                  {p>0&&!isDone && <span className="badge badge-o">{p}%</span>}
+                  <span style={{fontSize:20,color:'var(--t3)'}}>{'>'}</span>
+                </div>
+              </div>
+              <div style={{padding:'0 16px 12px'}}>
+                <div className="prg"><div className="prg-f" style={{width:p+'%'}} /></div>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </>
+  );
+};
+
+// === PROGRESS TAB ===
+const ProgressTab=()=>{
+  const history=ld('history',[]);
+  const weightLog=ld('weightLog',[]);
+  const prs=ld('prs',{});
+  const bw=ld('bodyweight',80);
+
+  const totalWorkouts=history.length;
+  const thisWeek=history.filter(h=>{const d=new Date(h.date);const now=new Date();const diff=(now-d)/86400000;return diff<7}).length;
+  const totalKcal=history.reduce((a,h)=>a+(h.calories||0),0);
+
+  let streak=0;
+  const sortedDates=[...new Set(history.map(h=>h.date))].sort().reverse();
+  if(sortedDates.length>0){
+    let cur=new Date();cur.setHours(0,0,0,0);
+    for(let i=0;i<sortedDates.length;i++){
+      const d=new Date(sortedDates[i]);d.setHours(0,0,0,0);
+      const diff=Math.round((cur-d)/86400000);
+      if(diff<=1){streak++;cur=d}else break;
+    }
+  }
+
+  const calDays=[];
+  const now=new Date();
+  for(let i=55;i>=0;i--){
+    const d=new Date(now);d.setDate(d.getDate()-i);
+    const ds=d.toISOString().slice(0,10);
+    const count=history.filter(h=>h.date===ds).length;
+    calDays.push({date:ds,count,day:d.getDay()});
+  }
+
+  const lastWeek=history.filter(h=>{const d=(new Date()-new Date(h.date))/86400000;return d>=7&&d<14}).length;
+
+  const acuteLoad=history.filter(h=>(new Date()-new Date(h.date))/86400000<7).reduce((a,h)=>a+(h.volume||0),0);
+  const chronicLoad=history.filter(h=>(new Date()-new Date(h.date))/86400000<28).reduce((a,h)=>a+(h.volume||0),0)/4;
+  const acwr=chronicLoad>0?(acuteLoad/chronicLoad).toFixed(2):0;
+  const acwrPct=Math.min(100,Math.max(0,(parseFloat(acwr)/2)*100));
+
+  const recentHist=history.filter(h=>(new Date()-new Date(h.date))/86400000<7);
+  const muscleVol={};
+  recentHist.forEach(h=>{
+    const dayData=getProgramDays(h.phase||1).find(d=>d.name===h.day);
+    if(dayData){
+      dayData.supersets.flatMap(s=>s.exercises).forEach(ex=>{
+        const info=exMap[ex.eid];
+        if(info){muscleVol[info.m]=(muscleVol[info.m]||0)+ex.sets}
+      });
+    }
+  });
+  const maxVol=Math.max(1,...Object.values(muscleVol));
+
+  const prList=Object.entries(prs).map(([eid,data])=>({eid,name:exMap[eid]?.n||eid,...data})).sort((a,b)=>new Date(b.date)-new Date(a.date));
+
+  const strengthData={};
+  history.slice(0,20).reverse().forEach(h=>{
+    if(h.day&&h.date){
+      if(!strengthData[h.day])strengthData[h.day]=[];
+      strengthData[h.day].push({date:h.date,vol:h.volume||0});
+    }
+  });
+
+  const deleteHist=(idx)=>{const h=[...history];h.splice(idx,1);sv('history',h);window.location.reload()};
+
+  return (
+    <>
+      <div className="hdr"><h1>Progress</h1></div>
+      <div className="scroll">
+        <div className="stat-grid">
+          <div className="stat-card"><div className="val">{totalWorkouts}</div><div className="lbl">Total Workouts</div></div>
+          <div className="stat-card"><div className="val">{thisWeek}</div><div className="lbl">This Week</div></div>
+          <div className="stat-card"><div className="val">{streak}</div><div className="lbl">Day Streak</div></div>
+          <div className="stat-card"><div className="val">{totalKcal.toLocaleString()}</div><div className="lbl">Total kcal</div></div>
+        </div>
+
+        {weightLog.length>1 && (
+          <div className="wt-chart">
+            <div style={{fontSize:14,fontWeight:600,marginBottom:8}}>Body Weight Trend</div>
+            <div className="wt-spark">
+              {(()=>{
+                const last20=weightLog.slice(-20);
+                const mn=Math.min(...last20.map(w=>w.kg));
+                const mx=Math.max(...last20.map(w=>w.kg));
+                const range=mx-mn||1;
+                return last20.map((w,i)=>(
+                  <div key={i} className="wt-bar"
+                    style={{height:Math.max(4,((w.kg-mn)/range)*56)+'px',background:i===last20.length-1?'var(--grn)':'var(--c3)'}}
+                    title={w.kg+'kg '+w.date} />
+                ));
+              })()}
+            </div>
+            <div style={{display:'flex',justifyContent:'space-between',fontSize:11,color:'var(--t3)',marginTop:4}}>
+              <span>{weightLog[weightLog.length-1]?.kg}kg</span>
+              <span>{weightLog.length} entries</span>
+            </div>
+          </div>
+        )}
+
+        <div className="section-t">Activity (8 weeks)</div>
+        <div className="card" style={{padding:12}}>
+          <div style={{display:'grid',gridTemplateColumns:'repeat(7,1fr)',gap:2,marginBottom:4}}>
+            {['M','T','W','T','F','S','S'].map((d,i)=><div key={i} className="cal-label">{d}</div>)}
+          </div>
+          <div className="cal-grid">
+            {calDays.map((d,i)=>(
+              <div key={i} className="cal-cell"
+                style={{background:d.count>0?'var(--grn)':'var(--c2)',color:d.count>0?'#000':'var(--t3)',opacity:d.count>1?1:d.count>0?0.7:0.3}}>
+                {d.count>0?d.count:''}
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="section-t">Weekly Summary</div>
+        <div className="card" style={{padding:16}}>
+          <div style={{display:'flex',justifyContent:'space-between',marginBottom:8}}>
+            <span style={{color:'var(--t2)'}}>This week</span>
+            <span style={{fontWeight:600}}>{thisWeek} workouts</span>
+          </div>
+          <div style={{display:'flex',justifyContent:'space-between',marginBottom:8}}>
+            <span style={{color:'var(--t2)'}}>Last week</span>
+            <span style={{fontWeight:600}}>{lastWeek} workouts</span>
+          </div>
+          <div style={{display:'flex',justifyContent:'space-between'}}>
+            <span style={{color:'var(--t2)'}}>Trend</span>
+            <span style={{fontWeight:600,color:thisWeek>=lastWeek?'var(--grn)':'var(--red)'}}>{thisWeek>=lastWeek?'Up':'Down'}</span>
+          </div>
+        </div>
+
+        <div className="section-t">ACWR Gauge</div>
+        <div className="card" style={{padding:16}}>
+          <div style={{display:'flex',justifyContent:'space-between',marginBottom:4}}>
+            <span style={{fontSize:13,color:'var(--t2)'}}>Acute:Chronic Workload</span>
+            <span style={{fontSize:15,fontWeight:700,color:parseFloat(acwr)>1.5?'var(--red)':parseFloat(acwr)>0.8?'var(--grn)':'var(--org)'}}>{acwr}</span>
+          </div>
+          <div className="acwr-gauge">
+            <div className="acwr-fill" style={{width:acwrPct+'%',background:parseFloat(acwr)>1.5?'var(--red)':parseFloat(acwr)>0.8?'var(--grn)':'var(--org)',borderRadius:12}} />
+            <div className="acwr-marker" style={{left:'calc('+acwrPct+'% - 1.5px)'}} />
+          </div>
+          <div style={{display:'flex',justifyContent:'space-between',fontSize:10,color:'var(--t3)'}}>
+            <span>Under</span><span>Sweet Spot</span><span>Overreach</span>
+          </div>
+        </div>
+
+        {Object.keys(muscleVol).length>0 && (
+          <>
+            <div className="section-t">Muscle Group Volume (This Week)</div>
+            <div className="card" style={{padding:16}}>
+              {Object.entries(muscleVol).sort((a,b)=>b[1]-a[1]).map(([m,v])=>(
+                <div key={m} className="vol-bar-wrap">
+                  <div className="vol-bar-label">{m}</div>
+                  <div className="vol-bar-track">
+                    <div className="vol-bar-fill" style={{width:(v/maxVol*100)+'%',background:'var(--grn)'}} />
+                  </div>
+                  <div className="vol-bar-val">{v} sets</div>
+                </div>
+              ))}
+            </div>
+          </>
+        )}
+
+        {Object.keys(strengthData).length>0 && (
+          <>
+            <div className="section-t">Strength Progression</div>
+            {Object.entries(strengthData).map(([dayName,data])=>(
+              <div key={dayName} className="card" style={{padding:16}}>
+                <div style={{fontSize:14,fontWeight:600,marginBottom:8}}>{dayName} Volume</div>
+                <div className="mini-chart">
+                  {(()=>{
+                    const mx=Math.max(1,...data.map(d=>d.vol));
+                    return data.map((d,i)=>(
+                      <div key={i} className="mini-bar"
+                        style={{height:Math.max(2,(d.vol/mx)*38)+'px',background:i===data.length-1?'var(--grn)':'var(--c3)'}}
+                        title={d.date+': '+d.vol} />
+                    ));
+                  })()}
+                </div>
+              </div>
+            ))}
+          </>
+        )}
+
+        <div className="section-t">Recent Workouts</div>
+        {history.slice(0,15).map((h,i)=>(
+          <div key={i} className="hist-item">
+            <div>
+              <div style={{fontWeight:600,fontSize:15}}>{h.day}</div>
+              <div style={{fontSize:12,color:'var(--t2)'}}>{fmtDate(h.date)} · {fmtTime(h.duration||0)} · {h.calories||0} kcal</div>
+            </div>
+            <div style={{display:'flex',alignItems:'center',gap:8}}>
+              <span className="badge badge-g">{h.pct}%</span>
+              <button style={{background:'none',border:'none',color:'var(--red)',fontSize:16,cursor:'pointer',padding:4}}
+                onClick={e=>{e.stopPropagation();if(confirm('Delete this entry?'))deleteHist(i)}}>X</button>
+            </div>
+          </div>
+        ))}
+
+        {prList.length>0 && (
+          <>
+            <div className="section-t">Personal Records</div>
+            {prList.map((pr,i)=>(
+              <div key={i} className="hist-item">
+                <div>
+                  <div style={{fontWeight:600}}>{pr.name}</div>
+                  <div style={{fontSize:12,color:'var(--t2)'}}>{pr.w}kg x{pr.r} · 1RM: {pr.e1rm}kg</div>
+                </div>
+                <span className="badge badge-p">{fmtDate(pr.date)}</span>
+              </div>
+            ))}
+          </>
+        )}
+      </div>
+    </>
+  );
+};
+
+// === LIBRARY TAB ===
+const LibraryTab=()=>{
+  const[search,setSearch]=useState('');
+  const[muscle,setMuscle]=useState('');
+  const[equip,setEquip]=useState('');
+  const[kneeSafe,setKneeSafe]=useState(false);
+  const muscles=[...new Set(EXDB.map(e=>e.m))].sort();
+  const equips=[...new Set(EXDB.map(e=>e.eq))].sort();
+  const tagLabels={k:'KS',e:'EC',p:'PW',b:'BL',t:'TR',f:'FT'};
+  const filtered=EXDB.filter(e=>{
+    if(search&&!e.n.toLowerCase().includes(search.toLowerCase())&&!e.m.toLowerCase().includes(search.toLowerCase()))return false;
+    if(muscle&&e.m!==muscle)return false;
+    if(equip&&e.eq!==equip)return false;
+    if(kneeSafe&&!e.tags.includes('k'))return false;
+    return true;
+  });
+  return (
+    <>
+      <div className="hdr"><h1>Library</h1></div>
+      <div className="scroll">
+        <input className="inp" style={{width:'100%',marginBottom:12,textAlign:'left',paddingLeft:16}}
+          placeholder="Search exercises..." value={search} onChange={e=>setSearch(e.target.value)} />
+        <div className="filter-pills">
+          <button className={'filter-pill'+(kneeSafe?' on':'')} onClick={()=>setKneeSafe(!kneeSafe)}>Knee-Safe</button>
+          {muscles.map(m=>(
+            <button key={m} className={'filter-pill'+(muscle===m?' on':'')} onClick={()=>setMuscle(muscle===m?'':m)}>{m}</button>
+          ))}
+        </div>
+        <div className="filter-pills">
+          {equips.map(eq=>(
+            <button key={eq} className={'filter-pill'+(equip===eq?' on':'')} onClick={()=>setEquip(equip===eq?'':eq)}>{eq}</button>
+          ))}
+        </div>
+        <div style={{fontSize:13,color:'var(--t2)',marginBottom:8}}>{filtered.length} exercises</div>
+        {filtered.map(ex=>(
+          <div key={ex.id} className="card" style={{padding:14}}>
+            <div style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}>
+              <div>
+                <div style={{fontSize:15,fontWeight:600}}>{ex.n}</div>
+                <div style={{fontSize:12,color:'var(--t2)',marginTop:2}}>{ex.m} · {ex.eq}</div>
+                {ex.note && <div style={{fontSize:12,color:'var(--t3)',marginTop:2}}>{ex.note}</div>}
+              </div>
+              <div style={{display:'flex',gap:3}}>
+                {ex.tags.map(t=><span key={t} className={'ex-tag tag-'+t}>{tagLabels[t]||t}</span>)}
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </>
+  );
+};
+
+// === SETTINGS TAB ===
+const SettingsTab=({showToast})=>{
+  const[bw,setBw]=useState(ld('bodyweight',80));
+  const[bwInput,setBwInput]=useState(String(bw));
+  const[goal,setGoal]=useState(ld('weightGoal',75));
+  const[goalInput,setGoalInput]=useState(String(ld('weightGoal',75)));
+  const[waist,setWaist]=useState(ld('measurements',{}).waist||'');
+  const[chest,setChest]=useState(ld('measurements',{}).chest||'');
+  const[thigh,setThigh]=useState(ld('measurements',{}).thigh||'');
+  const[restTime,setRestTime]=useState(ld('restTime',45));
+  const[restEnabled,setRestEnabled]=useState(ld('restEnabled',true));
+  const weightLog=ld('weightLog',[]);
+  const lastWeighIn=weightLog.length>0?weightLog[weightLog.length-1]:null;
+  const daysSinceWeighIn=lastWeighIn?Math.floor((new Date()-new Date(lastWeighIn.date))/86400000):999;
+
+  const saveBw=()=>{
+    const w=parseFloat(bwInput);
+    if(!w)return;
+    sv('bodyweight',w);setBw(w);
+    const wl=ld('weightLog',[]);
+    wl.push({kg:w,date:today()});
+    sv('weightLog',wl);
+    showToast('Weight saved: '+w+'kg');
+  };
+
+  const saveMeasurements=()=>{
+    sv('measurements',{waist,chest,thigh,date:today()});
+    showToast('Measurements saved');
+  };
+
+  const saveGoal=()=>{const g=parseFloat(goalInput);if(g){sv('weightGoal',g);setGoal(g);showToast('Goal set: '+g+'kg')}};
+
+  const exportData=()=>{
+    const data={};
+    Object.keys(localStorage).filter(k=>k.startsWith('ic17_')).forEach(k=>{data[k]=localStorage.getItem(k)});
+    const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+    const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='ironclad-backup-'+today()+'.json';a.click();
+    showToast('Backup exported');
+  };
+
+  const importData=(e)=>{
+    const file=e.target.files[0];if(!file)return;
+    const reader=new FileReader();
+    reader.onload=(ev)=>{
+      try{
+        const data=JSON.parse(ev.target.result);
+        Object.entries(data).forEach(([k,v])=>localStorage.setItem(k,v));
+        showToast('Data imported - reloading...');
+        setTimeout(()=>window.location.reload(),1000);
+      }catch{showToast('Import failed - invalid file')}
+    };
+    reader.readAsText(file);
+  };
+
+  const clearAll=()=>{
+    if(confirm('Delete ALL data? This cannot be undone.')){
+      Object.keys(localStorage).filter(k=>k.startsWith('ic17_')).forEach(k=>localStorage.removeItem(k));
+      showToast('All data cleared');
+      setTimeout(()=>window.location.reload(),1000);
+    }
+  };
+
+  const startWeight=weightLog.length>0?weightLog[0].kg:bw;
+  const totalChange=Math.abs(startWeight-goal);
+  const currentChange=Math.abs(startWeight-bw);
+  const goalPct=totalChange>0?Math.min(100,Math.round(currentChange/totalChange*100)):0;
+
+  return (
+    <>
+      <div className="hdr"><h1>Settings</h1></div>
+      <div className="scroll">
+        {daysSinceWeighIn>7 && (
+          <div className="card" style={{padding:16,borderLeft:'3px solid var(--org)'}}>
+            <div style={{fontSize:14,fontWeight:600,color:'var(--org)'}}>Time to weigh in!</div>
+            <div style={{fontSize:12,color:'var(--t2)',marginTop:4}}>{daysSinceWeighIn===999?'No weigh-ins yet':'Last weigh-in: '+daysSinceWeighIn+' days ago'}</div>
+          </div>
+        )}
+
+        <div className="section-t">Body Weight</div>
+        <div className="card" style={{padding:16}}>
+          <div style={{display:'flex',gap:8}}>
+            <input className="inp" style={{flex:1}} type="number" inputMode="decimal" placeholder="kg" value={bwInput} onChange={e=>setBwInput(e.target.value)} />
+            <button className="btn btn-g" onClick={saveBw}>Save</button>
+          </div>
+          {lastWeighIn && <div style={{fontSize:12,color:'var(--t2)',marginTop:8}}>Last: {lastWeighIn.kg}kg on {fmtDate(lastWeighIn.date)}</div>}
+        </div>
+
+        <div className="section-t">Weight Goal</div>
+        <div className="card" style={{padding:16}}>
+          <div style={{display:'flex',gap:8,marginBottom:12}}>
+            <input className="inp" style={{flex:1}} type="number" inputMode="decimal" placeholder="Target kg" value={goalInput} onChange={e=>setGoalInput(e.target.value)} />
+            <button className="btn btn-g" onClick={saveGoal}>Set</button>
+          </div>
+          <div style={{display:'flex',justifyContent:'space-between',fontSize:12,color:'var(--t2)',marginBottom:4}}>
+            <span>Start: {startWeight}kg</span>
+            <span>Current: {bw}kg</span>
+            <span>Goal: {goal}kg</span>
+          </div>
+          <div className="goal-bar">
+            <div className="goal-fill" style={{width:goalPct+'%',background:'var(--grn)'}} />
+          </div>
+          <div style={{fontSize:11,color:'var(--t3)',marginTop:4,textAlign:'center'}}>{goalPct}% to goal</div>
+        </div>
+
+        <div className="section-t">Body Measurements</div>
+        <div className="card" style={{padding:16}}>
+          {['Waist','Chest','Thigh'].map((label,i)=>{
+            const val=[waist,chest,thigh][i];
+            const setter=[setWaist,setChest,setThigh][i];
+            return (
+              <div key={label} style={{display:'flex',alignItems:'center',gap:8,marginBottom:8}}>
+                <label style={{width:50,fontSize:13,color:'var(--t2)'}}>{label}</label>
+                <input className="inp" style={{flex:1}} type="number" inputMode="decimal" placeholder="cm" value={val} onChange={e=>setter(e.target.value)} />
+              </div>
+            );
+          })}
+          <button className="btn btn-g" style={{width:'100%',marginTop:4}} onClick={saveMeasurements}>Save Measurements</button>
+        </div>
+
+        <div className="section-t">Rest Timer</div>
+        <div className="card" style={{padding:16}}>
+          <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:12}}>
+            <span style={{fontSize:14}}>Auto Rest Timer</span>
+            <button className={'btn '+(restEnabled?'btn-g':'btn-s')} style={{padding:'6px 16px'}}
+              onClick={()=>{const v=!restEnabled;setRestEnabled(v);sv('restEnabled',v)}}>{restEnabled?'ON':'OFF'}</button>
+          </div>
+          <div style={{display:'flex',gap:8,flexWrap:'wrap'}}>
+            {[30,45,60,90].map(t=>(
+              <button key={t} className={'btn'+(restTime===t?' btn-g':' btn-s')} style={{padding:'8px 16px'}}
+                onClick={()=>{setRestTime(t);sv('restTime',t)}}>{t}s</button>
+            ))}
+          </div>
+          <div style={{display:'flex',gap:8,marginTop:8,alignItems:'center'}}>
+            <span style={{fontSize:13,color:'var(--t2)'}}>Custom:</span>
+            <input className="inp" style={{width:80}} type="number" inputMode="numeric" value={restTime}
+              onChange={e=>{const v=parseInt(e.target.value)||45;setRestTime(v);sv('restTime',v)}} />
+          </div>
+        </div>
+
+        <div className="section-t">Data</div>
+        <div className="card" style={{padding:16}}>
+          <button className="btn btn-s" style={{width:'100%',marginBottom:8}} onClick={exportData}>Export JSON Backup</button>
+          <label className="btn btn-s" style={{display:'block',textAlign:'center',width:'100%',marginBottom:8,cursor:'pointer'}}>
+            Import Backup
+            <input type="file" accept=".json" style={{display:'none'}} onChange={importData} />
+          </label>
+          <button className="btn btn-d" style={{width:'100%'}} onClick={clearAll}>Clear All Data</button>
+        </div>
+
+        <div className="section-t">Program Info</div>
+        <div className="card" style={{padding:16}}>
+          <div style={{fontSize:14,fontWeight:600,marginBottom:8}}>IronClad Pro - Full Body Split</div>
+          <div style={{fontSize:12,color:'var(--t2)',lineHeight:1.5}}>
+            3-day full-body split with 4 progressive phases. Each day has 3 strength supersets (grouped by equipment) + 1 metabolic finisher. Phase 1: Foundation (3x10-12), Phase 2: Build (4x8-10), Phase 3: Strength &amp; Power (4x5-8), Phase 4: Maintain &amp; Perform (3x6-10). 7 trainer-prescribed knee-rehab exercises integrated across all phases. Equipment: Barbells, dumbbells, cables, kettlebells, rowing machine, SkiErg, bands, foam roller, bench, steps, bars.
+          </div>
+        </div>
+        <div style={{textAlign:'center',padding:'16px 0',fontSize:12,color:'var(--t3)'}}>v17.1 IronClad Pro</div>
+      </div>
+    </>
+  );
+};
+
+// === MAIN APP ===
+const App=()=>{
+  const[tab,setTab]=useState('workout');
+  const[dayView,setDayView]=useState(null);
+  const[toast,setToast]=useState(null);
+
+  const showToast=(msg)=>{setToast(msg)};
+
+  if(dayView)return <DayView day={dayView.day} phase={dayView.phase} onBack={()=>setDayView(null)} />;
+
+  const tabs=[
+    {id:'workout',label:'Workout',icon:'M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-4 0h4'},
+    {id:'progress',label:'Progress',icon:'M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6m14 0v-10a2 2 0 00-2-2h-2a2 2 0 00-2 2v10m14 0H3'},
+    {id:'library',label:'Library',icon:'M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253'},
+    {id:'settings',label:'Settings',icon:'M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z M15 12a3 3 0 11-6 0 3 3 0 016 0z'}
+  ];
+
+  return (
+    <div className="app">
+      {tab==='workout' && <WorkoutTab onOpenDay={(day,phase)=>setDayView({day,phase})} />}
+      {tab==='progress' && <ProgressTab />}
+      {tab==='library' && <LibraryTab />}
+      {tab==='settings' && <SettingsTab showToast={showToast} />}
+      <div className="tabs">
+        {tabs.map(t=>(
+          <button key={t.id} className={'tab'+(tab===t.id?' on':'')} onClick={()=>setTab(t.id)}>
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+              <path strokeLinecap="round" strokeLinejoin="round" d={t.icon} />
+            </svg>
+            {t.label}
+          </button>
+        ))}
+      </div>
+      {toast && <Toast msg={toast} onDone={()=>setToast(null)} />}
+    </div>
+  );
+};
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
 </script>
 </body>
 </html>
