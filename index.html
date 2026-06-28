@@ -7,7 +7,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="IronClad">
 <meta name="theme-color" content="#000">
-<meta name="version" content="17.4.0">
+<meta name="version" content="17.5.0">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
@@ -135,7 +135,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--t1);font-
 <div id="root"></div>
 <script>
 (function(){
-  var VER='17.4.0';
+  var VER='17.5.0';
   var stored=localStorage.getItem('ic17_appVersion');
   if(stored && stored!==VER){
     if('caches' in window)caches.keys().then(function(ks){ks.forEach(function(k){caches.delete(k)})});
@@ -148,7 +148,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--t1);font-
 })();
 if('serviceWorker' in navigator){
   const swCode=`
-    const CACHE='ironclad-v17.4';
+    const CACHE='ironclad-v17.5';
     const ASSETS=['/'];
     self.addEventListener('install',e=>e.waitUntil(caches.open(CACHE).then(c=>c.addAll(ASSETS)).then(()=>self.skipWaiting())));
     self.addEventListener('activate',e=>e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim())));
@@ -226,7 +226,7 @@ const EXDB=[
 {id:'hipthrust',n:'Barbell Hip Thrust',m:'Glutes',t:'w',eq:'Barbell',tags:['k'],note:'Drive through heels, squeeze at top'},
 {id:'rdl',n:'Romanian Deadlift',m:'Hamstrings',t:'w',eq:'Barbell',tags:['k'],note:'Hinge at hips, soft knee bend'},
 {id:'slrdl',n:'Single-Leg RDL',m:'Hamstrings',t:'w',eq:'Dumbbell',tags:['k','b'],note:'Balance challenge + hamstring'},
-{id:'legcurl',n:'Lying Leg Curl',m:'Hamstrings',t:'w',eq:'Machine',tags:['k'],note:'Control the eccentric'},
+{id:'nordicham',n:'Nordic Hamstring Curl',m:'Hamstrings',t:'w',eq:'Bodyweight',tags:['k'],note:'Kneel, anchor feet, slow eccentric lower to floor, push back up'},
 {id:'cablekick',n:'Cable Kickback',m:'Glutes',t:'w',eq:'Cable',tags:['k'],note:'Squeeze glute at top'},
 {id:'glutebridge',n:'Glute Bridge',m:'Glutes',t:'r',eq:'Bodyweight',tags:['k'],note:'Pause 2s at top'},
 {id:'clamshell',n:'Clamshell',m:'Glutes',t:'r',eq:'Band',tags:['k'],note:'Band above knees, control motion'},
@@ -301,7 +301,7 @@ const getProgramDays=(phase)=>{
       ]},
       {label:'Superset 2',type:'Cable / Machine',rest:45,exercises:[
         {eid:'latpd',sets:3,reps:'10-12'},
-        {eid:'legcurl',sets:3,reps:'10-12'},
+        {eid:'nordicham',sets:3,reps:'4-6'},
         {eid:'ropepush',sets:3,reps:'10-12'}
       ]},
       {label:'Superset 3',type:'Trainer Rehab',rest:45,exercises:[
@@ -369,7 +369,7 @@ const getProgramDays=(phase)=>{
       ]},
       {label:'Superset 2',type:'Cable / Machine',rest:45,exercises:[
         {eid:'latpd',sets:4,reps:'8-10'},
-        {eid:'legcurl',sets:4,reps:'8-10'},
+        {eid:'nordicham',sets:4,reps:'4-6'},
         {eid:'ropepush',sets:4,reps:'8-10'}
       ]},
       {label:'Superset 3',type:'Trainer Rehab',rest:45,exercises:[
@@ -437,7 +437,7 @@ const getProgramDays=(phase)=>{
       ]},
       {label:'Superset 2',type:'Cable / Machine',rest:60,exercises:[
         {eid:'latpd',sets:4,reps:'6-8'},
-        {eid:'legcurl',sets:4,reps:'6-8'},
+        {eid:'nordicham',sets:4,reps:'3-5'},
         {eid:'ropepush',sets:4,reps:'6-8'}
       ]},
       {label:'Superset 3',type:'Trainer Rehab',rest:45,exercises:[
@@ -506,7 +506,7 @@ const getProgramDays=(phase)=>{
       ]},
       {label:'Superset 2',type:'Cable / Machine',rest:45,exercises:[
         {eid:'latpd',sets:3,reps:'8-10'},
-        {eid:'legcurl',sets:3,reps:'8-10'},
+        {eid:'nordicham',sets:3,reps:'5-8'},
         {eid:'ropepush',sets:3,reps:'8-10'}
       ]},
       {label:'Superset 3',type:'Trainer Rehab',rest:45,exercises:[
@@ -950,7 +950,7 @@ const WorkoutTab=({onOpenDay})=>{
     <>
       <div className="hdr">
         <h1>Workout</h1>
-        <p>v17.4 · Knee-Rehab + Weight-Loss Edition · Full Body Split</p>
+        <p>v17.5 · Knee-Rehab + Weight-Loss Edition · Full Body Split</p>
       </div>
       <div className="scroll">
         <div className="phase-sel">
@@ -1566,7 +1566,7 @@ const SettingsTab=({showToast})=>{
             3-day full-body split with 4 progressive phases. Each day has 3 strength supersets (grouped by equipment) + 1 metabolic finisher. Phase 1: Foundation (3x10-12), Phase 2: Build (4x8-10), Phase 3: Strength &amp; Power (4x5-8), Phase 4: Maintain &amp; Perform (3x6-10). 7 trainer-prescribed knee-rehab exercises integrated across all phases. Equipment: Barbells, dumbbells, cables, kettlebells, rowing machine, SkiErg, bands, foam roller, bench, steps, bars.
           </div>
         </div>
-        <div style={{textAlign:'center',padding:'16px 0',fontSize:12,color:'var(--t3)'}}>v17.4 IronClad Pro</div>
+        <div style={{textAlign:'center',padding:'16px 0',fontSize:12,color:'var(--t3)'}}>v17.5 IronClad Pro</div>
       </div>
     </>
   );
