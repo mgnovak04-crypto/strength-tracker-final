@@ -7,14 +7,14 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="IronClad">
 <meta name="theme-color" content="#000">
-<meta name="version" content="17.5.0">
+<meta name="version" content="18.0.0">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <title>IronClad Pro</title>
-<script src="https://unpkg.com/react@18/umd/react.production.min.js?v=17.4"></script>
-<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js?v=17.4"></script>
-<script src="https://unpkg.com/@babel/standalone/babel.min.js?v=17.4"></script>
+<script src="https://unpkg.com/react@18/umd/react.production.min.js?v=18.0"></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js?v=18.0"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js?v=18.0"></script>
 <style>
 :root{--bg:#000;--c1:#1c1c1e;--c2:#2c2c2e;--c3:#3a3a3c;--sep:rgba(84,84,88,0.65);--t1:#fff;--t2:rgba(235,235,245,0.6);--t3:rgba(235,235,245,0.3);--grn:#009A44;--grn-d:rgba(0,154,68,0.15);--org:#FF8C00;--org-d:rgba(255,140,0,0.15);--red:#ff453a;--red-d:rgba(255,69,58,0.15);--blu:#0a84ff;--pur:#bf5af2;--cyn:#64d2ff;--yel:#ffd60a;--safe-t:env(safe-area-inset-top);--safe-b:env(safe-area-inset-bottom)}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;margin:0;padding:0}
@@ -135,7 +135,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--t1);font-
 <div id="root"></div>
 <script>
 (function(){
-  var VER='17.5.0';
+  var VER='18.0.0';
   var stored=localStorage.getItem('ic17_appVersion');
   if(stored && stored!==VER){
     if('caches' in window)caches.keys().then(function(ks){ks.forEach(function(k){caches.delete(k)})});
@@ -148,7 +148,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--t1);font-
 })();
 if('serviceWorker' in navigator){
   const swCode=`
-    const CACHE='ironclad-v17.5';
+    const CACHE='ironclad-v18.0';
     const ASSETS=['/'];
     self.addEventListener('install',e=>e.waitUntil(caches.open(CACHE).then(c=>c.addAll(ASSETS)).then(()=>self.skipWaiting())));
     self.addEventListener('activate',e=>e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim())));
@@ -215,13 +215,13 @@ const estRunCal=(distKm,bw)=>Math.round((bw||80)*distKm*1.036);
 const EXDB=[
 {id:'trapbar',n:'Trapbar Deadlift',m:'Legs',t:'w',eq:'Barbell',tags:['k','t'],note:'Hip hinge focus, keep back neutral'},
 {id:'foamquad',n:'Foam Rolling Quads',m:'Recovery',t:'d',eq:'Foam Roller',tags:['k','t'],note:'90s per quad, focus on tight spots'},
-{id:'johnsoncalf',n:'BB Johnson Calf Raise',m:'Calves',t:'w',eq:'Barbell',tags:['k','t'],note:'Full ROM, 2s pause at top'},
+{id:'johnsoncalf',n:'BB Johnson Calf Raise',m:'Calves',t:'w',eq:'Barbell',tags:['k','t'],note:'Gastrocnemius focus, 3s eccentric lowering, full ROM'},
 {id:'copenadduct',n:'Copenhagen Adductor',m:'Adductors',t:'d',eq:'Bench',tags:['k','t'],note:'Side plank position, top leg on bench'},
 {id:'starplank',n:'Star Plank',m:'Core',t:'d',eq:'Bodyweight',tags:['k','t'],note:'Extend opposite arm & leg from plank'},
 {id:'staggerpallof',n:'Stagger Stance Pallof Pulses',m:'Core',t:'r',eq:'Cable',tags:['k','b','t'],note:'Split stance, pulse arms out'},
 {id:'anklejump',n:'Ankle Jumps + Alt Skipping',m:'Legs',t:'r',eq:'Bodyweight',tags:['k','p','t'],note:'Quick reactive jumps, minimal knee bend'},
 {id:'eccstepdown',n:'Eccentric Step-Down',m:'Quads',t:'r',eq:'Step',tags:['k','e'],note:'4s lowering, single leg, 15cm step'},
-{id:'bulgsplit',n:'Bulgarian Split Squat',m:'Quads',t:'w',eq:'Dumbbell',tags:['k','e','b','t'],note:'Rear foot elevated, 4s eccentric lowering, shallow depth initially'},
+{id:'bulgsplit',n:'Bulgarian Split Squat',m:'Quads',t:'w',eq:'Dumbbell',tags:['k','e','b','t'],note:'SHALLOW RANGE ONLY - stop before pain, physio override. Rear foot elevated, 4s eccentric lowering'},
 {id:'slraise',n:'Straight Leg Raise',m:'Quads',t:'r',eq:'Bodyweight',tags:['k','e'],note:'Lock knee, lift to 45deg, 3s hold'},
 {id:'hipthrust',n:'Barbell Hip Thrust',m:'Glutes',t:'w',eq:'Barbell',tags:['k'],note:'Drive through heels, squeeze at top'},
 {id:'rdl',n:'Romanian Deadlift',m:'Hamstrings',t:'w',eq:'Barbell',tags:['k'],note:'Hinge at hips, soft knee bend'},
@@ -231,9 +231,9 @@ const EXDB=[
 {id:'glutebridge',n:'Glute Bridge',m:'Glutes',t:'r',eq:'Bodyweight',tags:['k'],note:'Pause 2s at top'},
 {id:'clamshell',n:'Clamshell',m:'Glutes',t:'r',eq:'Band',tags:['k'],note:'Band above knees, control motion'},
 {id:'tke',n:'Terminal Knee Extension',m:'VMO',t:'r',eq:'Band',tags:['k','e'],note:'Band behind knee, squeeze to full extension'},
-{id:'calfstand',n:'Standing Calf Raise',m:'Calves',t:'w',eq:'Machine',tags:['k'],note:'Full ROM, slow eccentric'},
+{id:'calfstand',n:'Standing Calf Raise',m:'Calves',t:'w',eq:'Machine',tags:['k'],note:'Gastrocnemius focus, 3s eccentric lowering, full ROM'},
 {id:'eccheeldrop',n:'Eccentric Heel Drop',m:'Calves',t:'r',eq:'Step',tags:['k','e'],note:'Rise on both feet, lower slowly on one - 4s eccentric'},
-{id:'seatedcalf',n:'Seated Calf Raise',m:'Calves',t:'w',eq:'Machine',tags:['k'],note:'Targets soleus - deep calf loading for achilles'},
+{id:'seatedcalf',n:'Seated Calf Raise',m:'Calves',t:'w',eq:'Machine',tags:['k'],note:'Soleus focus (bent-knee), 3s eccentric lowering - runner calf rebuild'},
 {id:'kbswing',n:'Kettlebell Swing',m:'Glutes',t:'w',eq:'Kettlebell',tags:['k','p'],note:'Power from hips, not arms'},
 {id:'dbbench',n:'Dumbbell Bench Press',m:'Chest',t:'w',eq:'Dumbbell',tags:['k'],note:''},
 {id:'dbincbench',n:'Incline DB Press',m:'Chest',t:'w',eq:'Dumbbell',tags:['k'],note:'30deg incline'},
@@ -276,32 +276,44 @@ const EXDB=[
 {id:'skierswing',n:'KB Skier Swing',m:'Glutes',t:'w',eq:'Kettlebell',tags:['k','p'],note:'Double arm ski-pole motion, explosive hips'},
 {id:'sledpush',n:'Sled Push',m:'Legs',t:'d',eq:'Sled',tags:['k','p','f'],note:'Low handle, drive through toes - great knee-safe conditioning'},
 {id:'tbarrow',n:'T-Bar Row',m:'Back',t:'w',eq:'Barbell',tags:['k'],note:'Chest-supported if available'},
-{id:'dblunge',n:'Walking DB Lunge',m:'Quads',t:'w',eq:'Dumbbell',tags:['k','b'],note:'Only Phase 3+ - controlled stride, upright torso'},
+{id:'dblunge',n:'Walking DB Lunge',m:'Quads',t:'w',eq:'Dumbbell',tags:['k','b'],note:'SHALLOW RANGE - controlled, upright, pain-free only. Only Phase 3+'},
 {id:'hanglegraise',n:'Hanging Leg Raise',m:'Core',t:'r',eq:'Bar',tags:['k'],note:'Full leg raise - progression from knee raise'},
 {id:'slhop',n:'Single-Leg Forward Hop',m:'Legs',t:'r',eq:'Bodyweight',tags:['k','p','b'],note:'Stick the landing, 2s hold - sport-specific power'},
 {id:'suitcasecarry',n:'Suitcase Carry',m:'Core',t:'d',eq:'Dumbbell',tags:['k','b'],note:'Heavy DB one side, walk - anti-lateral flexion'},
-{id:'farmerwalk',n:'Farmer Walk',m:'Full Body',t:'d',eq:'Dumbbell',tags:['k','f'],note:'Heavy DBs both hands, walk 40m - metabolic + grip'}
+{id:'farmerwalk',n:'Farmer Walk',m:'Full Body',t:'d',eq:'Dumbbell',tags:['k','f'],note:'Heavy DBs both hands, walk 40m - metabolic + grip'},
+{id:'kneetowall',n:'Knee-to-Wall Ankle Mob.',m:'Mobility',t:'r',eq:'Wall',tags:['k','e'],note:'Dorsiflexion stretch - knee tracks over 2nd toe, measure cm from wall'},
+{id:'bandlatwalk',n:'Banded Lateral Walk',m:'Glutes',t:'r',eq:'Band',tags:['k'],note:'Band above ankles, stay low, push knees out'},
+{id:'wallsit',n:'Wall Sit',m:'Quads',t:'d',eq:'Wall',tags:['k','e'],note:'Shallow angle - STOP before knee pain, physio override'},
+{id:'shortarcext',n:'Short-Arc Quad Extension',m:'VMO',t:'r',eq:'Towel Roll',tags:['k','e'],note:'Roll under knee, extend from ~30deg to straight - VMO activation, pain-free range only'}
 ];
 const exMap=Object.fromEntries(EXDB.map(e=>[e.id,e]));
 
 // === PROGRAM ===
-// Trainer rehab exercises grouped together:
-//   Day A SS3: foamquad + copenadduct + starplank (trainer rehab circuit)
-//   Day B SS3: staggerpallof + anklejump + tke (trainer rehab circuit)
-//   Day A SS1: trapbar (with other free weights), Day B SS1: johnsoncalf (with other free weights)
-// SS1 = Free Weights, SS2 = Cable/Machine, SS3 = Trainer Rehab or Bodyweight Core
+// v18: Calf rebuild + knee-safe structure
+// Warm-Up → Compounds → Cable/Machine+Calf → Trainer Rehab/Core → Conditioning Finisher
+// Gastrocnemius 2x/wk: Day A (calfstand) + Day B (johnsoncalf)
+// Soleus 2x/wk: Day B (seatedcalf) + Day C (seatedcalf)
+// Glute activation in every warm-up. Ankle mobility (kneetowall) every session.
+// Day A SS4: foamquad + copenadduct + starplank (trainer rehab)
+// Day B SS4: staggerpallof + anklejump + tke (trainer rehab)
+// Day C SS4: core + knee rehab (shortarcext)
 const PHASE_NAMES=['Foundation','Build','Strength & Power','Maintain & Perform'];
 const getProgramDays=(phase)=>{
   if(phase===1) return [
     {name:'Full Body A',focus:['Lower','Push','Core'],supersets:[
+      {label:'Warm-Up',type:'5-10 min low-impact + mobility',rest:0,exercises:[
+        {eid:'rowing',sets:1,reps:'5 min steady'},
+        {eid:'kneetowall',sets:2,reps:'10 each side'},
+        {eid:'bandlatwalk',sets:2,reps:'12 each side'}
+      ]},
       {label:'Superset 1',type:'Free Weights',rest:45,exercises:[
         {eid:'trapbar',sets:3,reps:'10-12',note:'Light load, form focus'},
         {eid:'dbbench',sets:3,reps:'10-12'},
         {eid:'kbswing',sets:3,reps:'10-12'}
       ]},
-      {label:'Superset 2',type:'Cable / Machine',rest:45,exercises:[
+      {label:'Superset 2',type:'Cable / Machine + Calf',rest:45,exercises:[
         {eid:'latpd',sets:3,reps:'10-12'},
-        {eid:'nordicham',sets:3,reps:'4-6'},
+        {eid:'calfstand',sets:3,reps:'12-15',note:'3s eccentric lowering'},
         {eid:'ropepush',sets:3,reps:'10-12'}
       ]},
       {label:'Superset 3',type:'Trainer Rehab',rest:45,exercises:[
@@ -309,21 +321,26 @@ const getProgramDays=(phase)=>{
         {eid:'copenadduct',sets:2,reps:'8 each side'},
         {eid:'starplank',sets:3,reps:'20s each side'}
       ]},
-      {label:'Metabolic Finisher',type:'AMRAP 8min',rest:30,exercises:[
-        {eid:'rowing',sets:1,reps:'500m'},
+      {label:'Conditioning Finisher',type:'AMRAP 8min',rest:30,exercises:[
+        {eid:'skierg',sets:1,reps:'30s max effort'},
         {eid:'bearcrwl',sets:1,reps:'20m'},
         {eid:'jumpingjack',sets:1,reps:'30'}
       ]}
     ]},
-    {name:'Full Body B',focus:['Lower','Pull','Arms'],supersets:[
+    {name:'Full Body B',focus:['Lower','Pull','Calves'],supersets:[
+      {label:'Warm-Up',type:'5-10 min low-impact + mobility',rest:0,exercises:[
+        {eid:'skierg',sets:1,reps:'5 min steady'},
+        {eid:'kneetowall',sets:2,reps:'10 each side'},
+        {eid:'glutebridge',sets:2,reps:'12'}
+      ]},
       {label:'Superset 1',type:'Free Weights',rest:45,exercises:[
         {eid:'rdl',sets:3,reps:'10-12'},
         {eid:'dbrow',sets:3,reps:'10-12'},
-        {eid:'johnsoncalf',sets:3,reps:'12-15'}
+        {eid:'johnsoncalf',sets:3,reps:'12-15',note:'3s eccentric lowering'}
       ]},
-      {label:'Superset 2',type:'Cable / Machine',rest:45,exercises:[
+      {label:'Superset 2',type:'Cable / Machine + Calf',rest:45,exercises:[
         {eid:'cablerow',sets:3,reps:'10-12'},
-        {eid:'calfstand',sets:3,reps:'12-15'},
+        {eid:'seatedcalf',sets:3,reps:'12-15',note:'Soleus focus, 3s eccentric'},
         {eid:'cablefly',sets:3,reps:'10-12'}
       ]},
       {label:'Superset 3',type:'Trainer Rehab',rest:45,exercises:[
@@ -331,29 +348,34 @@ const getProgramDays=(phase)=>{
         {eid:'anklejump',sets:3,reps:'10 each'},
         {eid:'tke',sets:3,reps:'15 each leg'}
       ]},
-      {label:'Metabolic Finisher',type:'Intervals',rest:30,exercises:[
+      {label:'Conditioning Finisher',type:'Intervals',rest:30,exercises:[
         {eid:'rowing',sets:1,reps:'5x 500m'},
         {eid:'mtclimb',sets:1,reps:'30s'},
         {eid:'jumpingjack',sets:1,reps:'30'}
       ]}
     ]},
-    {name:'Full Body C',focus:['Lower','Push','Pull'],supersets:[
+    {name:'Full Body C',focus:['Glutes','Push','Pull'],supersets:[
+      {label:'Warm-Up',type:'5-10 min low-impact + mobility',rest:0,exercises:[
+        {eid:'rowing',sets:1,reps:'5 min steady'},
+        {eid:'kneetowall',sets:2,reps:'10 each side'},
+        {eid:'clamshell',sets:2,reps:'12 each side'}
+      ]},
       {label:'Superset 1',type:'Free Weights',rest:45,exercises:[
         {eid:'hipthrust',sets:3,reps:'10-12'},
         {eid:'dbohp',sets:3,reps:'10-12'},
-        {eid:'dbcurl',sets:3,reps:'10-12'}
+        {eid:'nordicham',sets:3,reps:'4-6'}
       ]},
-      {label:'Superset 2',type:'Cable / Machine',rest:45,exercises:[
+      {label:'Superset 2',type:'Cable / Machine + Calf',rest:45,exercises:[
         {eid:'facepull',sets:3,reps:'10-12'},
-        {eid:'seatedcalf',sets:3,reps:'12-15'},
+        {eid:'seatedcalf',sets:3,reps:'12-15',note:'Soleus focus, 3s eccentric'},
         {eid:'pallof',sets:3,reps:'10 each side'}
       ]},
-      {label:'Superset 3',type:'Bodyweight Core',rest:45,exercises:[
+      {label:'Superset 3',type:'Core + Knee Rehab',rest:45,exercises:[
         {eid:'deadbug',sets:3,reps:'8 each side'},
-        {eid:'birddog',sets:3,reps:'8 each side'},
+        {eid:'shortarcext',sets:3,reps:'12 each leg'},
         {eid:'plank',sets:3,reps:'30s'}
       ]},
-      {label:'Metabolic Finisher',type:'EMOM 6min',rest:30,exercises:[
+      {label:'Conditioning Finisher',type:'EMOM 6min',rest:30,exercises:[
         {eid:'skierg',sets:1,reps:'30s max effort'},
         {eid:'farmerwalk',sets:1,reps:'40m'},
         {eid:'kbswing',sets:1,reps:'15'}
@@ -362,14 +384,19 @@ const getProgramDays=(phase)=>{
   ];
   if(phase===2) return [
     {name:'Full Body A',focus:['Lower','Push','Core'],supersets:[
+      {label:'Warm-Up',type:'5-10 min low-impact + mobility',rest:0,exercises:[
+        {eid:'rowing',sets:1,reps:'5 min steady'},
+        {eid:'kneetowall',sets:2,reps:'10 each side'},
+        {eid:'bandlatwalk',sets:2,reps:'15 each side'}
+      ]},
       {label:'Superset 1',type:'Free Weights',rest:45,exercises:[
         {eid:'trapbar',sets:4,reps:'8-10',note:'Progressive overload'},
         {eid:'dbincbench',sets:4,reps:'8-10'},
         {eid:'skierswing',sets:4,reps:'8-10'}
       ]},
-      {label:'Superset 2',type:'Cable / Machine',rest:45,exercises:[
+      {label:'Superset 2',type:'Cable / Machine + Calf',rest:45,exercises:[
         {eid:'latpd',sets:4,reps:'8-10'},
-        {eid:'nordicham',sets:4,reps:'4-6'},
+        {eid:'calfstand',sets:4,reps:'10-12',note:'3s eccentric lowering'},
         {eid:'ropepush',sets:4,reps:'8-10'}
       ]},
       {label:'Superset 3',type:'Trainer Rehab',rest:45,exercises:[
@@ -377,21 +404,26 @@ const getProgramDays=(phase)=>{
         {eid:'copenadduct',sets:3,reps:'10 each side'},
         {eid:'starplank',sets:3,reps:'25s each side'}
       ]},
-      {label:'Metabolic Finisher',type:'AMRAP 8min',rest:30,exercises:[
+      {label:'Conditioning Finisher',type:'AMRAP 8min',rest:30,exercises:[
         {eid:'kbswing',sets:1,reps:'20'},
         {eid:'mtclimb',sets:1,reps:'30s'},
         {eid:'jumpingjack',sets:1,reps:'40'}
       ]}
     ]},
-    {name:'Full Body B',focus:['Lower','Pull','Arms'],supersets:[
+    {name:'Full Body B',focus:['Lower','Pull','Calves'],supersets:[
+      {label:'Warm-Up',type:'5-10 min low-impact + mobility',rest:0,exercises:[
+        {eid:'skierg',sets:1,reps:'5 min steady'},
+        {eid:'kneetowall',sets:2,reps:'10 each side'},
+        {eid:'glutebridge',sets:2,reps:'15'}
+      ]},
       {label:'Superset 1',type:'Free Weights',rest:45,exercises:[
         {eid:'rdl',sets:4,reps:'8-10'},
         {eid:'dbrow',sets:4,reps:'8-10'},
-        {eid:'johnsoncalf',sets:4,reps:'10-12'}
+        {eid:'johnsoncalf',sets:4,reps:'10-12',note:'3s eccentric lowering'}
       ]},
-      {label:'Superset 2',type:'Cable / Machine',rest:45,exercises:[
+      {label:'Superset 2',type:'Cable / Machine + Calf',rest:45,exercises:[
         {eid:'cablerow',sets:4,reps:'8-10'},
-        {eid:'calfstand',sets:4,reps:'10-12'},
+        {eid:'seatedcalf',sets:4,reps:'10-12',note:'Soleus focus, 3s eccentric'},
         {eid:'cablefly',sets:4,reps:'8-10'}
       ]},
       {label:'Superset 3',type:'Trainer Rehab',rest:45,exercises:[
@@ -399,29 +431,34 @@ const getProgramDays=(phase)=>{
         {eid:'anklejump',sets:3,reps:'12 each'},
         {eid:'tke',sets:3,reps:'15 each leg'}
       ]},
-      {label:'Metabolic Finisher',type:'Intervals',rest:30,exercises:[
+      {label:'Conditioning Finisher',type:'Intervals',rest:30,exercises:[
         {eid:'rowinterval',sets:1,reps:'4x 500m'},
         {eid:'bearcrwl',sets:1,reps:'20m x3'},
         {eid:'jumpingjack',sets:1,reps:'30'}
       ]}
     ]},
-    {name:'Full Body C',focus:['Lower','Push','Pull'],supersets:[
+    {name:'Full Body C',focus:['Glutes','Push','Pull'],supersets:[
+      {label:'Warm-Up',type:'5-10 min low-impact + mobility',rest:0,exercises:[
+        {eid:'rowing',sets:1,reps:'5 min steady'},
+        {eid:'kneetowall',sets:2,reps:'10 each side'},
+        {eid:'clamshell',sets:2,reps:'15 each side'}
+      ]},
       {label:'Superset 1',type:'Free Weights',rest:45,exercises:[
         {eid:'bulgsplit',sets:4,reps:'8-10 each'},
         {eid:'dbohp',sets:4,reps:'8-10'},
         {eid:'hammercurl',sets:4,reps:'8-10'}
       ]},
-      {label:'Superset 2',type:'Cable / Machine',rest:45,exercises:[
+      {label:'Superset 2',type:'Cable / Machine + Calf',rest:45,exercises:[
         {eid:'facepull',sets:4,reps:'10-12'},
-        {eid:'seatedcalf',sets:4,reps:'12-15'},
+        {eid:'seatedcalf',sets:4,reps:'12-15',note:'Soleus focus, 3s eccentric'},
         {eid:'pallof',sets:4,reps:'10 each side'}
       ]},
-      {label:'Superset 3',type:'Bodyweight Core',rest:45,exercises:[
+      {label:'Superset 3',type:'Core + Knee Rehab',rest:45,exercises:[
         {eid:'deadbug',sets:3,reps:'10 each side'},
-        {eid:'birddog',sets:3,reps:'10 each side'},
+        {eid:'shortarcext',sets:3,reps:'12 each leg'},
         {eid:'hangknee',sets:3,reps:'10-12'}
       ]},
-      {label:'Metabolic Finisher',type:'EMOM 8min',rest:30,exercises:[
+      {label:'Conditioning Finisher',type:'EMOM 8min',rest:30,exercises:[
         {eid:'skierg',sets:1,reps:'30s max effort'},
         {eid:'kbswing',sets:1,reps:'15'},
         {eid:'farmerwalk',sets:1,reps:'40m'}
@@ -430,14 +467,19 @@ const getProgramDays=(phase)=>{
   ];
   if(phase===3) return [
     {name:'Full Body A',focus:['Lower','Push','Core'],supersets:[
+      {label:'Warm-Up',type:'5-10 min low-impact + mobility',rest:0,exercises:[
+        {eid:'rowing',sets:1,reps:'5 min steady'},
+        {eid:'kneetowall',sets:2,reps:'10 each side'},
+        {eid:'bandlatwalk',sets:2,reps:'15 each side'}
+      ]},
       {label:'Superset 1',type:'Free Weights - Heavy',rest:60,exercises:[
         {eid:'trapbar',sets:4,reps:'5-6',note:'Heavy day'},
         {eid:'bbench',sets:4,reps:'5-6'},
         {eid:'skierswing',sets:4,reps:'6-8'}
       ]},
-      {label:'Superset 2',type:'Cable / Machine',rest:60,exercises:[
+      {label:'Superset 2',type:'Cable / Machine + Calf',rest:60,exercises:[
         {eid:'latpd',sets:4,reps:'6-8'},
-        {eid:'nordicham',sets:4,reps:'3-5'},
+        {eid:'calfstand',sets:4,reps:'8-10',note:'3s eccentric lowering'},
         {eid:'ropepush',sets:4,reps:'6-8'}
       ]},
       {label:'Superset 3',type:'Trainer Rehab',rest:45,exercises:[
@@ -445,21 +487,26 @@ const getProgramDays=(phase)=>{
         {eid:'copenadduct',sets:3,reps:'10 each side'},
         {eid:'starplank',sets:3,reps:'30s each side'}
       ]},
-      {label:'Metabolic Finisher',type:'Intervals',rest:30,exercises:[
+      {label:'Conditioning Finisher',type:'Intervals',rest:30,exercises:[
         {eid:'skierg',sets:1,reps:'6x 30s on/30s off'},
         {eid:'farmerwalk',sets:1,reps:'3x 40m heavy'},
         {eid:'kbswing',sets:1,reps:'20 heavy'}
       ]}
     ]},
     {name:'Full Body B',focus:['Lower','Pull','Power'],supersets:[
+      {label:'Warm-Up',type:'5-10 min low-impact + mobility',rest:0,exercises:[
+        {eid:'skierg',sets:1,reps:'5 min steady'},
+        {eid:'kneetowall',sets:2,reps:'10 each side'},
+        {eid:'glutebridge',sets:3,reps:'12'}
+      ]},
       {label:'Superset 1',type:'Free Weights - Heavy',rest:60,exercises:[
         {eid:'rdl',sets:4,reps:'5-6'},
         {eid:'tbarrow',sets:4,reps:'6-8'},
-        {eid:'johnsoncalf',sets:4,reps:'8-10'}
+        {eid:'johnsoncalf',sets:4,reps:'8-10',note:'3s eccentric lowering'}
       ]},
-      {label:'Superset 2',type:'Cable / Machine',rest:60,exercises:[
+      {label:'Superset 2',type:'Cable / Machine + Calf',rest:60,exercises:[
         {eid:'cablerow',sets:4,reps:'6-8'},
-        {eid:'calfstand',sets:4,reps:'8-10'},
+        {eid:'seatedcalf',sets:4,reps:'8-10',note:'Soleus focus, 3s eccentric'},
         {eid:'pallof',sets:4,reps:'10 each side'}
       ]},
       {label:'Superset 3',type:'Trainer Rehab',rest:45,exercises:[
@@ -467,29 +514,34 @@ const getProgramDays=(phase)=>{
         {eid:'anklejump',sets:3,reps:'15 each'},
         {eid:'tke',sets:3,reps:'15 each leg'}
       ]},
-      {label:'Metabolic Finisher',type:'AMRAP 8min',rest:30,exercises:[
+      {label:'Conditioning Finisher',type:'AMRAP 8min',rest:30,exercises:[
         {eid:'kbswing',sets:1,reps:'20 heavy'},
         {eid:'mtclimb',sets:1,reps:'30s'},
         {eid:'jumpingjack',sets:1,reps:'30'}
       ]}
     ]},
-    {name:'Full Body C',focus:['Lower','Push','Pull'],supersets:[
+    {name:'Full Body C',focus:['Glutes','Push','Pull'],supersets:[
+      {label:'Warm-Up',type:'5-10 min low-impact + mobility',rest:0,exercises:[
+        {eid:'rowing',sets:1,reps:'5 min steady'},
+        {eid:'kneetowall',sets:2,reps:'10 each side'},
+        {eid:'clamshell',sets:3,reps:'15 each side'}
+      ]},
       {label:'Superset 1',type:'Free Weights - Heavy',rest:60,exercises:[
         {eid:'hipthrusthvy',sets:4,reps:'6-8'},
-        {eid:'dblunge',sets:4,reps:'6-8 each'},
+        {eid:'nordicham',sets:4,reps:'3-5'},
         {eid:'hammercurl',sets:4,reps:'6-8'}
       ]},
-      {label:'Superset 2',type:'Cable / Machine',rest:60,exercises:[
+      {label:'Superset 2',type:'Cable / Machine + Calf',rest:60,exercises:[
         {eid:'facepull',sets:4,reps:'8-10'},
-        {eid:'cablefly',sets:4,reps:'6-8'},
-        {eid:'seatedcalf',sets:4,reps:'8-10'}
+        {eid:'seatedcalf',sets:4,reps:'8-10',note:'Soleus focus, 3s eccentric'},
+        {eid:'cablefly',sets:4,reps:'6-8'}
       ]},
-      {label:'Superset 3',type:'Bodyweight Core',rest:45,exercises:[
+      {label:'Superset 3',type:'Core + Knee Rehab',rest:45,exercises:[
         {eid:'deadbug',sets:3,reps:'10 each side'},
-        {eid:'lowboxjump',sets:3,reps:'5'},
+        {eid:'shortarcext',sets:3,reps:'15 each leg'},
         {eid:'sideplank',sets:3,reps:'30s each side'}
       ]},
-      {label:'Metabolic Finisher',type:'EMOM 8min',rest:30,exercises:[
+      {label:'Conditioning Finisher',type:'EMOM 8min',rest:30,exercises:[
         {eid:'rowinterval',sets:1,reps:'3x 500m max'},
         {eid:'bearcrwl',sets:1,reps:'20m'},
         {eid:'skierg',sets:1,reps:'30s max'}
@@ -499,14 +551,19 @@ const getProgramDays=(phase)=>{
   // Phase 4
   return [
     {name:'Full Body A',focus:['Lower','Push','Core'],supersets:[
+      {label:'Warm-Up',type:'5-10 min low-impact + mobility',rest:0,exercises:[
+        {eid:'rowing',sets:1,reps:'5 min steady'},
+        {eid:'kneetowall',sets:2,reps:'10 each side'},
+        {eid:'bandlatwalk',sets:2,reps:'12 each side'}
+      ]},
       {label:'Superset 1',type:'Free Weights',rest:45,exercises:[
         {eid:'trapbar',sets:3,reps:'6-10'},
         {eid:'dbbench',sets:3,reps:'6-10'},
         {eid:'kbswing',sets:3,reps:'8-10'}
       ]},
-      {label:'Superset 2',type:'Cable / Machine',rest:45,exercises:[
+      {label:'Superset 2',type:'Cable / Machine + Calf',rest:45,exercises:[
         {eid:'latpd',sets:3,reps:'8-10'},
-        {eid:'nordicham',sets:3,reps:'5-8'},
+        {eid:'calfstand',sets:3,reps:'10-12',note:'3s eccentric lowering'},
         {eid:'ropepush',sets:3,reps:'8-10'}
       ]},
       {label:'Superset 3',type:'Trainer Rehab',rest:45,exercises:[
@@ -514,21 +571,26 @@ const getProgramDays=(phase)=>{
         {eid:'copenadduct',sets:3,reps:'10 each side'},
         {eid:'starplank',sets:3,reps:'25s each side'}
       ]},
-      {label:'Metabolic Finisher',type:'AMRAP 8min',rest:30,exercises:[
+      {label:'Conditioning Finisher',type:'AMRAP 8min',rest:30,exercises:[
         {eid:'kbswing',sets:1,reps:'15'},
         {eid:'farmerwalk',sets:1,reps:'40m'},
         {eid:'jumpingjack',sets:1,reps:'30'}
       ]}
     ]},
-    {name:'Full Body B',focus:['Lower','Pull','Arms'],supersets:[
+    {name:'Full Body B',focus:['Lower','Pull','Calves'],supersets:[
+      {label:'Warm-Up',type:'5-10 min low-impact + mobility',rest:0,exercises:[
+        {eid:'skierg',sets:1,reps:'5 min steady'},
+        {eid:'kneetowall',sets:2,reps:'10 each side'},
+        {eid:'glutebridge',sets:2,reps:'12'}
+      ]},
       {label:'Superset 1',type:'Free Weights',rest:45,exercises:[
         {eid:'rdl',sets:3,reps:'8-10'},
         {eid:'dbrow',sets:3,reps:'8-10'},
-        {eid:'johnsoncalf',sets:3,reps:'10-12'}
+        {eid:'johnsoncalf',sets:3,reps:'10-12',note:'3s eccentric lowering'}
       ]},
-      {label:'Superset 2',type:'Cable / Machine',rest:45,exercises:[
+      {label:'Superset 2',type:'Cable / Machine + Calf',rest:45,exercises:[
         {eid:'cablerow',sets:3,reps:'8-10'},
-        {eid:'calfstand',sets:3,reps:'10-12'},
+        {eid:'seatedcalf',sets:3,reps:'10-12',note:'Soleus focus, 3s eccentric'},
         {eid:'cablefly',sets:3,reps:'8-10'}
       ]},
       {label:'Superset 3',type:'Trainer Rehab',rest:45,exercises:[
@@ -536,29 +598,34 @@ const getProgramDays=(phase)=>{
         {eid:'anklejump',sets:3,reps:'12 each'},
         {eid:'tke',sets:3,reps:'15 each leg'}
       ]},
-      {label:'Metabolic Finisher',type:'Intervals',rest:30,exercises:[
+      {label:'Conditioning Finisher',type:'Intervals',rest:30,exercises:[
         {eid:'rowing',sets:1,reps:'5x 500m'},
         {eid:'mtclimb',sets:1,reps:'30s x4'},
         {eid:'bearcrwl',sets:1,reps:'20m'}
       ]}
     ]},
-    {name:'Full Body C',focus:['Lower','Push','Pull'],supersets:[
+    {name:'Full Body C',focus:['Glutes','Push','Pull'],supersets:[
+      {label:'Warm-Up',type:'5-10 min low-impact + mobility',rest:0,exercises:[
+        {eid:'rowing',sets:1,reps:'5 min steady'},
+        {eid:'kneetowall',sets:2,reps:'10 each side'},
+        {eid:'clamshell',sets:2,reps:'12 each side'}
+      ]},
       {label:'Superset 1',type:'Free Weights',rest:45,exercises:[
         {eid:'gobsquat',sets:3,reps:'8-10'},
         {eid:'dbohp',sets:3,reps:'8-10'},
-        {eid:'hammercurl',sets:3,reps:'8-10'}
+        {eid:'nordicham',sets:3,reps:'5-8'}
       ]},
-      {label:'Superset 2',type:'Cable / Machine',rest:45,exercises:[
+      {label:'Superset 2',type:'Cable / Machine + Calf',rest:45,exercises:[
         {eid:'facepull',sets:3,reps:'10-12'},
-        {eid:'seatedcalf',sets:3,reps:'12-15'},
+        {eid:'seatedcalf',sets:3,reps:'12-15',note:'Soleus focus, 3s eccentric'},
         {eid:'pallof',sets:3,reps:'10 each side'}
       ]},
-      {label:'Superset 3',type:'Bodyweight Core',rest:45,exercises:[
+      {label:'Superset 3',type:'Core + Knee Rehab',rest:45,exercises:[
         {eid:'deadbug',sets:3,reps:'10 each side'},
-        {eid:'birddog',sets:3,reps:'10 each side'},
+        {eid:'shortarcext',sets:3,reps:'12 each leg'},
         {eid:'eccheeldrop',sets:3,reps:'10 each'}
       ]},
-      {label:'Metabolic Finisher',type:'EMOM 6min',rest:30,exercises:[
+      {label:'Conditioning Finisher',type:'EMOM 6min',rest:30,exercises:[
         {eid:'skierg',sets:1,reps:'30s max'},
         {eid:'kbswing',sets:1,reps:'15'},
         {eid:'farmerwalk',sets:1,reps:'40m'}
@@ -566,7 +633,6 @@ const getProgramDays=(phase)=>{
     ]}
   ];
 };
-
 // === TOAST COMPONENT ===
 const Toast=({msg,onDone})=>{
   useEffect(()=>{const t=setTimeout(onDone,2200);return()=>clearTimeout(t)},[onDone]);
@@ -950,7 +1016,7 @@ const WorkoutTab=({onOpenDay})=>{
     <>
       <div className="hdr">
         <h1>Workout</h1>
-        <p>v17.5 · Knee-Rehab + Weight-Loss Edition · Full Body Split</p>
+        <p>v18.0 · Calf Rebuild + Knee-Safe · Full Body Split</p>
       </div>
       <div className="scroll">
         <div className="phase-sel">
@@ -1561,12 +1627,15 @@ const SettingsTab=({showToast})=>{
 
         <div className="section-t">Program Info</div>
         <div className="card" style={{padding:16}}>
-          <div style={{fontSize:14,fontWeight:600,marginBottom:8}}>IronClad Pro - Full Body Split</div>
+          <div style={{fontSize:14,fontWeight:600,marginBottom:8}}>IronClad Pro v18 - Full Body Split</div>
           <div style={{fontSize:12,color:'var(--t2)',lineHeight:1.5}}>
-            3-day full-body split with 4 progressive phases. Each day has 3 strength supersets (grouped by equipment) + 1 metabolic finisher. Phase 1: Foundation (3x10-12), Phase 2: Build (4x8-10), Phase 3: Strength &amp; Power (4x5-8), Phase 4: Maintain &amp; Perform (3x6-10). 7 trainer-prescribed knee-rehab exercises integrated across all phases. Equipment: Barbells, dumbbells, cables, kettlebells, rowing machine, SkiErg, bands, foam roller, bench, steps, bars.
+            3-day full-body split with 4 progressive phases. Each session: Warm-Up (low-impact cardio + ankle mobility + glute activation) &rarr; Compound Lifts &rarr; Cable/Machine + Calf Interleave &rarr; Trainer Rehab/Core &rarr; Conditioning Finisher. Calf rebuild: gastrocnemius (standing raises) + soleus (seated raises) each 2x/wk with 3s eccentric tempo. Knee-safe: all loaded knee work in shallow, pain-free ranges. Phase 1: Foundation (3x10-12), Phase 2: Build (4x8-10), Phase 3: Strength &amp; Power (4x5-8), Phase 4: Maintain &amp; Perform (3x6-10).
+          </div>
+          <div style={{fontSize:11,color:'var(--org)',lineHeight:1.5,marginTop:8,padding:'8px 10px',background:'var(--org-d)',borderRadius:8}}>
+            &#9888; Pain-free ranges and loads should be confirmed with your physio / fysikalsk medisin assessment. Your physio&apos;s recommendations override any range or load prescribed here.
           </div>
         </div>
-        <div style={{textAlign:'center',padding:'16px 0',fontSize:12,color:'var(--t3)'}}>v17.5 IronClad Pro</div>
+        <div style={{textAlign:'center',padding:'16px 0',fontSize:12,color:'var(--t3)'}}>v18.0 IronClad Pro</div>
       </div>
     </>
   );
