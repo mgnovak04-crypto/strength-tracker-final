@@ -7,14 +7,14 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="IronClad">
 <meta name="theme-color" content="#000">
-<meta name="version" content="18.0.0">
+<meta name="version" content="18.1.0">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <title>IronClad Pro</title>
-<script src="https://unpkg.com/react@18/umd/react.production.min.js?v=18.0"></script>
-<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js?v=18.0"></script>
-<script src="https://unpkg.com/@babel/standalone/babel.min.js?v=18.0"></script>
+<script src="https://unpkg.com/react@18/umd/react.production.min.js?v=18.1"></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js?v=18.1"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js?v=18.1"></script>
 <style>
 :root{--bg:#000;--c1:#1c1c1e;--c2:#2c2c2e;--c3:#3a3a3c;--sep:rgba(84,84,88,0.65);--t1:#fff;--t2:rgba(235,235,245,0.6);--t3:rgba(235,235,245,0.3);--grn:#009A44;--grn-d:rgba(0,154,68,0.15);--org:#FF8C00;--org-d:rgba(255,140,0,0.15);--red:#ff453a;--red-d:rgba(255,69,58,0.15);--blu:#0a84ff;--pur:#bf5af2;--cyn:#64d2ff;--yel:#ffd60a;--safe-t:env(safe-area-inset-top);--safe-b:env(safe-area-inset-bottom)}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;margin:0;padding:0}
@@ -135,7 +135,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--t1);font-
 <div id="root"></div>
 <script>
 (function(){
-  var VER='18.0.0';
+  var VER='18.1.0';
   var stored=localStorage.getItem('ic17_appVersion');
   if(stored && stored!==VER){
     if('caches' in window)caches.keys().then(function(ks){ks.forEach(function(k){caches.delete(k)})});
@@ -148,7 +148,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--t1);font-
 })();
 if('serviceWorker' in navigator){
   const swCode=`
-    const CACHE='ironclad-v18.0';
+    const CACHE='ironclad-v18.1';
     const ASSETS=['/'];
     self.addEventListener('install',e=>e.waitUntil(caches.open(CACHE).then(c=>c.addAll(ASSETS)).then(()=>self.skipWaiting())));
     self.addEventListener('activate',e=>e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim())));
@@ -861,6 +861,9 @@ const DayView=({day,phase,onBack})=>{
   const[showComplete,setShowComplete]=useState(null);
   const[showRest,setShowRest]=useState(false);
   const[swaps,setSwaps]=useState(ld('swaps',{}));
+  const dayKeyCI=day.name.replace(/\s/g,'')+'_p'+phase;
+  const[kneePre,setKneePre]=useState(()=>{const c=ld('dayCheckin_'+dayKeyCI,{});return c.knee||0});
+  const[calfPre,setCalfPre]=useState(()=>{const c=ld('dayCheckin_'+dayKeyCI,{});return c.calf||0});
   const restTime=ld('restTime',45);
   const restEnabled=ld('restEnabled',true);
   const timer=useSessionTimer();
@@ -870,6 +873,7 @@ const DayView=({day,phase,onBack})=>{
   useEffect(()=>{if(!timer.running)timer.start()},[]);
   useEffect(()=>{sv('dayLog_'+dayKey,logData)},[logData,dayKey]);
   useEffect(()=>{sv('setsOverride_'+dayKey,setsOverride)},[setsOverride,dayKey]);
+  useEffect(()=>{sv('dayCheckin_'+dayKeyCI,{knee:kneePre,calf:calfPre})},[kneePre,calfPre,dayKeyCI]);
 
   const handleSwap=(oldId,newId)=>{const s={...swaps,[oldId]:newId};setSwaps(s);sv('swaps',s)};
   const getEid=(eid)=>swaps[eid]||eid;
@@ -894,6 +898,16 @@ const DayView=({day,phase,onBack})=>{
         prs[key]={w:parseFloat(setData.w),r:parseInt(setData.r),e1rm,date:today()};
         sv('prs',prs);
       }
+      const e1rmHist=ld('e1rmLog',{});
+      if(!e1rmHist[key])e1rmHist[key]=[];
+      const last=e1rmHist[key][e1rmHist[key].length-1];
+      if(last&&last.date===today()){
+        if(e1rm>last.e1rm){last.e1rm=e1rm;last.w=parseFloat(setData.w);last.r=parseInt(setData.r)}
+      }else{
+        e1rmHist[key].push({date:today(),e1rm,w:parseFloat(setData.w),r:parseInt(setData.r)});
+      }
+      if(e1rmHist[key].length>30)e1rmHist[key]=e1rmHist[key].slice(-30);
+      sv('e1rmLog',e1rmHist);
     }
     const hist=ld('exHistory',{});
     const eid=getEid(ex.eid);
@@ -914,7 +928,7 @@ const DayView=({day,phase,onBack})=>{
       if(pr&&pr.date===today())newPRs++;
     });
     const record={day:day.name,phase,date:today(),duration:timer.elapsed,pain,rpe,notes,pct,exercises:exDone,
-      totalExercises:allExercises.length,volume:totalVolume,calories:kcal,newPRs};
+      totalExercises:allExercises.length,volume:totalVolume,calories:kcal,newPRs,kneePre,calfPre};
     const history=ld('history',[]);
     history.unshift(record);
     sv('history',history);
@@ -946,6 +960,29 @@ const DayView=({day,phase,onBack})=>{
         <div className="prg"><div className="prg-f" style={{width:pct+'%'}} /></div>
       </div>
       <div className="scroll">
+        <div className="card" style={{padding:16,borderLeft:'3px solid var(--cyn)'}}>
+          <div style={{fontSize:14,fontWeight:600,marginBottom:10}}>Pre-Workout Check-In</div>
+          <div style={{marginBottom:10}}>
+            <div style={{fontSize:13,color:'var(--t2)',marginBottom:6}}>Knee pain (0=none, 5=severe)</div>
+            <div className="pain-row">
+              {[0,1,2,3,4,5].map(v=>{
+                const c=['var(--grn)','#7bc67e','var(--yel)','var(--org)','var(--red)','#cc2020'][v];
+                return <div key={v} className="pain-dot" style={{background:kneePre===v?c:'var(--c2)',borderColor:kneePre===v?c:'var(--c3)',color:kneePre===v?'#000':'var(--t2)'}}
+                  onClick={()=>{vb();setKneePre(v)}}>{v}</div>;
+              })}
+            </div>
+          </div>
+          <div>
+            <div style={{fontSize:13,color:'var(--t2)',marginBottom:6}}>Calf tightness (0=none, 5=very tight)</div>
+            <div className="pain-row">
+              {[0,1,2,3,4,5].map(v=>{
+                const c=['var(--grn)','#7bc67e','var(--yel)','var(--org)','var(--red)','#cc2020'][v];
+                return <div key={v} className="pain-dot" style={{background:calfPre===v?c:'var(--c2)',borderColor:calfPre===v?c:'var(--c3)',color:calfPre===v?'#000':'var(--t2)'}}
+                  onClick={()=>{vb();setCalfPre(v)}}>{v}</div>;
+              })}
+            </div>
+          </div>
+        </div>
         {day.supersets.map((ss,si)=>{
           const isFinisher=ss.label.includes('Finisher');
           return (
@@ -1016,7 +1053,7 @@ const WorkoutTab=({onOpenDay})=>{
     <>
       <div className="hdr">
         <h1>Workout</h1>
-        <p>v18.0 · Calf Rebuild + Knee-Safe · Full Body Split</p>
+        <p>v18.1 · Calf Rebuild + Knee-Safe · Full Body Split</p>
       </div>
       <div className="scroll">
         <div className="phase-sel">
@@ -1169,6 +1206,71 @@ const ProteinTracker=()=>{
   );
 };
 
+// === DORSIFLEXION TRACKER ===
+const DorsiflexionTracker=({showToast})=>{
+  const[leftCm,setLeftCm]=useState('');
+  const[rightCm,setRightCm]=useState('');
+  const dfLog=ld('dorsiflex',[]);
+
+  const saveDf=()=>{
+    const l=parseFloat(leftCm);const r=parseFloat(rightCm);
+    if(!l&&!r)return;
+    const entry={date:today(),left:l||0,right:r||0};
+    const updated=[entry,...dfLog];
+    sv('dorsiflex',updated);
+    setLeftCm('');setRightCm('');
+    if(showToast)showToast('Dorsiflexion: L'+entry.left+'cm R'+entry.right+'cm');
+  };
+
+  const last10=[...dfLog.slice(0,10)].reverse();
+  const maxCm=Math.max(1,...last10.map(d=>Math.max(d.left||0,d.right||0)));
+
+  return (
+    <>
+      <div className="section-t">Ankle Dorsiflexion (KTW)</div>
+      <div className="card" style={{padding:16}}>
+        <div style={{fontSize:12,color:'var(--t2)',marginBottom:8}}>Knee-to-wall distance (cm from wall). Track both sides.</div>
+        <div style={{display:'flex',gap:8,marginBottom:8}}>
+          <div style={{flex:1}}>
+            <div style={{fontSize:11,color:'var(--t3)',marginBottom:4}}>Left (cm)</div>
+            <input className="inp" type="number" inputMode="decimal" placeholder="cm" value={leftCm} onChange={e=>setLeftCm(e.target.value)} />
+          </div>
+          <div style={{flex:1}}>
+            <div style={{fontSize:11,color:'var(--t3)',marginBottom:4}}>Right (cm)</div>
+            <input className="inp" type="number" inputMode="decimal" placeholder="cm" value={rightCm} onChange={e=>setRightCm(e.target.value)} />
+          </div>
+        </div>
+        <button className="btn btn-g" style={{width:'100%'}} onClick={saveDf}>Log Measurement</button>
+        {last10.length>0 && (
+          <div style={{marginTop:12}}>
+            <div style={{display:'flex',gap:4,alignItems:'flex-end',height:50}}>
+              {last10.map((d,i)=>(
+                <div key={i} style={{flex:1,display:'flex',gap:1,alignItems:'flex-end',height:'100%'}}>
+                  <div style={{flex:1,borderRadius:'2px 2px 0 0',background:'var(--grn)',height:Math.max(2,(d.left||0)/maxCm*48)+'px'}} title={'L:'+d.left+'cm'} />
+                  <div style={{flex:1,borderRadius:'2px 2px 0 0',background:'var(--org)',height:Math.max(2,(d.right||0)/maxCm*48)+'px'}} title={'R:'+d.right+'cm'} />
+                </div>
+              ))}
+            </div>
+            <div style={{display:'flex',justifyContent:'space-between',fontSize:10,color:'var(--t3)',marginTop:4}}>
+              <span style={{color:'var(--grn)'}}>Left</span>
+              <span style={{color:'var(--org)'}}>Right</span>
+            </div>
+            {dfLog.length>0 && (
+              <div style={{fontSize:12,color:'var(--t2)',marginTop:6}}>
+                Latest: L {dfLog[0].left}cm / R {dfLog[0].right}cm ({fmtDate(dfLog[0].date)})
+                {dfLog.length>=2 && (()=>{
+                  const lc=dfLog[0].left-dfLog[1].left;const rc=dfLog[0].right-dfLog[1].right;
+                  return <span style={{color:lc>=0&&rc>=0?'var(--grn)':'var(--org)'}}> ({lc>=0?'+':''}{lc}/{rc>=0?'+':''}{rc})</span>;
+                })()}
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+    </>
+  );
+};
+
 // === PROGRESS TAB ===
 const ProgressTab=({showToast})=>{
   const history=ld('history',[]);
@@ -1223,6 +1325,11 @@ const ProgressTab=({showToast})=>{
   const maxVol=Math.max(1,...Object.values(muscleVol));
 
   const prList=Object.entries(prs).map(([eid,data])=>({eid,name:exMap[eid]?.n||eid,...data})).sort((a,b)=>new Date(b.date)-new Date(a.date));
+
+  const e1rmLog=ld('e1rmLog',{});
+  const e1rmExercises=Object.entries(e1rmLog).filter(([,data])=>data.length>=2).sort((a,b)=>b[1].length-a[1].length).slice(0,8);
+
+  const checkinHistory=history.filter(h=>h.kneePre!==undefined).slice(0,20);
 
   const strengthData={};
   history.slice(0,20).reverse().forEach(h=>{
@@ -1346,6 +1453,62 @@ const ProgressTab=({showToast})=>{
             <span>Under</span><span>Sweet Spot</span><span>Overreach</span>
           </div>
         </div>
+
+        <DorsiflexionTracker showToast={showToast} />
+
+        {checkinHistory.length>0 && (
+          <>
+            <div className="section-t">Pain/Stiffness Trend</div>
+            <div className="card" style={{padding:16}}>
+              <div style={{display:'flex',gap:4,alignItems:'flex-end',height:50,marginBottom:8}}>
+                {[...checkinHistory].reverse().map((h,i)=>(
+                  <div key={i} style={{flex:1,display:'flex',gap:1,alignItems:'flex-end',height:'100%'}}>
+                    <div style={{flex:1,borderRadius:'2px 2px 0 0',background:h.kneePre>2?'var(--red)':'var(--cyn)',height:Math.max(2,h.kneePre/5*48)+'px'}} title={'Knee:'+h.kneePre} />
+                    <div style={{flex:1,borderRadius:'2px 2px 0 0',background:h.calfPre>2?'var(--red)':'var(--pur)',height:Math.max(2,h.calfPre/5*48)+'px'}} title={'Calf:'+h.calfPre} />
+                  </div>
+                ))}
+              </div>
+              <div style={{display:'flex',justifyContent:'space-between',fontSize:10,color:'var(--t3)'}}>
+                <span><span style={{color:'var(--cyn)'}}>Knee</span> / <span style={{color:'var(--pur)'}}>Calf</span></span>
+                <span>Last {checkinHistory.length} sessions</span>
+              </div>
+              <div style={{fontSize:12,color:'var(--t2)',marginTop:6}}>
+                Latest: Knee {checkinHistory[0].kneePre}/5 · Calf {checkinHistory[0].calfPre}/5
+              </div>
+            </div>
+          </>
+        )}
+
+        {e1rmExercises.length>0 && (
+          <>
+            <div className="section-t">1RM Trends</div>
+            {e1rmExercises.map(([eid,data])=>{
+              const mx=Math.max(1,...data.map(d=>d.e1rm));
+              const mn=Math.min(...data.map(d=>d.e1rm));
+              const range=mx-mn||1;
+              const latest=data[data.length-1];
+              const prev=data.length>=2?data[data.length-2]:null;
+              const change=prev?latest.e1rm-prev.e1rm:0;
+              return (
+                <div key={eid} className="card" style={{padding:16}}>
+                  <div style={{display:'flex',justifyContent:'space-between',alignItems:'baseline',marginBottom:8}}>
+                    <div style={{fontSize:14,fontWeight:600}}>{exMap[eid]?.n||eid}</div>
+                    <div style={{fontSize:13,fontWeight:600,color:change>=0?'var(--grn)':'var(--red)'}}>
+                      {latest.e1rm}kg {change!==0&&<span>({change>0?'+':''}{change})</span>}
+                    </div>
+                  </div>
+                  <div className="mini-chart">
+                    {data.slice(-15).map((d,i,arr)=>(
+                      <div key={i} className="mini-bar"
+                        style={{height:Math.max(2,((d.e1rm-mn)/range)*38)+'px',background:i===arr.length-1?'var(--grn)':'var(--c3)'}}
+                        title={d.date+': '+d.e1rm+'kg'} />
+                    ))}
+                  </div>
+                </div>
+              );
+            })}
+          </>
+        )}
 
         {Object.keys(muscleVol).length>0 && (
           <>
@@ -1635,7 +1798,7 @@ const SettingsTab=({showToast})=>{
             &#9888; Pain-free ranges and loads should be confirmed with your physio / fysikalsk medisin assessment. Your physio&apos;s recommendations override any range or load prescribed here.
           </div>
         </div>
-        <div style={{textAlign:'center',padding:'16px 0',fontSize:12,color:'var(--t3)'}}>v18.0 IronClad Pro</div>
+        <div style={{textAlign:'center',padding:'16px 0',fontSize:12,color:'var(--t3)'}}>v18.1 IronClad Pro</div>
       </div>
     </>
   );
