@@ -7,14 +7,14 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="IronClad">
 <meta name="theme-color" content="#000">
-<meta name="version" content="18.1.0">
+<meta name="version" content="18.2.0">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <title>IronClad Pro</title>
-<script src="https://unpkg.com/react@18/umd/react.production.min.js?v=18.1"></script>
-<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js?v=18.1"></script>
-<script src="https://unpkg.com/@babel/standalone/babel.min.js?v=18.1"></script>
+<script src="https://unpkg.com/react@18/umd/react.production.min.js?v=18.2"></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js?v=18.2"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js?v=18.2"></script>
 <style>
 :root{--bg:#000;--c1:#1c1c1e;--c2:#2c2c2e;--c3:#3a3a3c;--sep:rgba(84,84,88,0.65);--t1:#fff;--t2:rgba(235,235,245,0.6);--t3:rgba(235,235,245,0.3);--grn:#009A44;--grn-d:rgba(0,154,68,0.15);--org:#FF8C00;--org-d:rgba(255,140,0,0.15);--red:#ff453a;--red-d:rgba(255,69,58,0.15);--blu:#0a84ff;--pur:#bf5af2;--cyn:#64d2ff;--yel:#ffd60a;--safe-t:env(safe-area-inset-top);--safe-b:env(safe-area-inset-bottom)}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;margin:0;padding:0}
@@ -55,9 +55,9 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--t1);font-
 .tag-t{background:rgba(191,90,242,0.15);color:var(--pur)}
 .tag-f{background:var(--org-d);color:var(--org)}
 .log-area{padding:12px 16px;border-top:0.5px solid var(--sep)}
-.set-row{display:flex;align-items:center;gap:8px;margin-bottom:8px}
-.set-num{width:28px;height:28px;border-radius:8px;background:var(--c2);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;color:var(--t2);flex-shrink:0}
-.inp{flex:1;height:40px;background:var(--c2);border:1.5px solid var(--c3);border-radius:10px;padding:0 12px;color:var(--t1);font-size:16px;font-family:inherit;outline:none;text-align:center;transition:border .2s}
+.set-row{display:flex;align-items:center;gap:6px;margin-bottom:6px}
+.set-num{width:26px;height:26px;border-radius:8px;background:var(--c2);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:var(--t2);flex-shrink:0}
+.inp{flex:1;height:36px;background:var(--c2);border:1.5px solid var(--c3);border-radius:10px;padding:0 10px;color:var(--t1);font-size:15px;font-family:inherit;outline:none;text-align:center;transition:border .2s}
 .inp:focus{border-color:var(--grn)}
 .inp.done{border-color:var(--grn);background:var(--grn-d)}
 .btn{padding:10px 16px;border-radius:10px;border:none;font-size:15px;font-weight:600;font-family:inherit;cursor:pointer;transition:all .2s}
@@ -135,7 +135,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--t1);font-
 <div id="root"></div>
 <script>
 (function(){
-  var VER='18.1.0';
+  var VER='18.2.0';
   var stored=localStorage.getItem('ic17_appVersion');
   if(stored && stored!==VER){
     if('caches' in window)caches.keys().then(function(ks){ks.forEach(function(k){caches.delete(k)})});
@@ -148,7 +148,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--t1);font-
 })();
 if('serviceWorker' in navigator){
   const swCode=`
-    const CACHE='ironclad-v18.1';
+    const CACHE='ironclad-v18.2';
     const ASSETS=['/'];
     self.addEventListener('install',e=>e.waitUntil(caches.open(CACHE).then(c=>c.addAll(ASSETS)).then(()=>self.skipWaiting())));
     self.addEventListener('activate',e=>e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim())));
@@ -740,47 +740,55 @@ const CountdownTimer=({duration})=>{
 
 // === SET LOGGER ===
 const SetLogger=({ex,exData,sets,onUpdate,onDone,onSetsDelta})=>{
+  const info=exMap[ex.eid];
+  const isDuration=info&&(info.t==='d'||info.t==='c');
+  const needsWeight=info&&(info.t==='w'||['Cable','Machine','Dumbbell','Barbell','Kettlebell'].includes(info.eq));
   const exHist=ld('exHistory',{});
   const lastSession=exHist[ex.eid]||null;
-  const isDuration=ex.t==='d'||ex.t==='c';
   return (
     <div className="log-area">
       <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:8}}>
-        <div style={{fontSize:15,fontWeight:600}}>{exMap[ex.eid]?.n||ex.eid}</div>
-        <div style={{display:'flex',gap:6}}>
-          <button className="btn btn-s" style={{padding:'4px 10px',fontSize:12}} onClick={()=>onSetsDelta(-1)}>-Set</button>
-          <button className="btn btn-s" style={{padding:'4px 10px',fontSize:12}} onClick={()=>onSetsDelta(1)}>+Set</button>
+        <div style={{fontSize:14,fontWeight:600}}>{info?.n||ex.eid}</div>
+        <div style={{display:'flex',gap:4}}>
+          <button className="btn btn-s" style={{padding:'3px 8px',fontSize:11}} onClick={()=>onSetsDelta(-1)}>-</button>
+          <button className="btn btn-s" style={{padding:'3px 8px',fontSize:11}} onClick={()=>onSetsDelta(1)}>+</button>
         </div>
       </div>
-      {lastSession && (
-        <div style={{fontSize:12,color:'var(--t2)',marginBottom:8,cursor:'pointer'}} onClick={()=>{
+      {lastSession&&lastSession.length>0 && (
+        <div style={{fontSize:12,color:'var(--blu)',marginBottom:8,cursor:'pointer',padding:'6px 10px',background:'rgba(10,132,255,0.1)',borderRadius:8}} onClick={()=>{
           const filled=[];
-          lastSession.forEach((s,i)=>{if(i<sets)filled.push({w:s.w||'',r:s.r||'',done:false,warmup:false})});
+          lastSession.forEach((s,i)=>{if(i<sets)filled.push({w:s.w||'',r:s.r||'',done:false})});
           onUpdate(filled);
-        }}>Quick fill from last: {lastSession.map(s=>s.w+'x'+s.r).join(', ')}</div>
+        }}>Fill from last: {lastSession.filter(s=>s.w||s.r).map(s=>needsWeight&&s.w?(s.w+'x'+s.r):s.r+(isDuration?'s':'')).join(', ')}</div>
       )}
       {isDuration && <div style={{marginBottom:10}}><CountdownTimer duration={ex.reps} /></div>}
       {Array.from({length:sets}).map((_,i)=>{
-        const s=exData[i]||{w:'',r:'',done:false,warmup:false};
+        const s=exData[i]||{w:'',r:'',done:false};
         return (
           <div key={i} className="set-row">
-            <div className="set-num" style={s.warmup?{background:'var(--org-d)',color:'var(--org)'}:s.done?{background:'var(--grn)',color:'#000'}:{}}>{s.warmup?'W':i+1}</div>
-            {!isDuration && <input className={'inp'+(s.done?' done':'')} type="number" inputMode="decimal" placeholder={s.warmup?'Warm':'kg'} value={s.w}
-              onChange={e=>{const d=[...exData];d[i]={...s,w:e.target.value};onUpdate(d)}} />}
-            <input className={'inp'+(s.done?' done':'')} type="number" inputMode="numeric" placeholder={isDuration?'sec':'reps'} value={s.r}
+            <div className="set-num" style={s.done?{background:'var(--grn)',color:'#000'}:{}}>{s.done?'✓':i+1}</div>
+            {needsWeight && !isDuration && (
+              <input className={'inp'+(s.done?' done':'')} type="number" inputMode="decimal" placeholder="kg" value={s.w}
+                onChange={e=>{const d=[...exData];d[i]={...s,w:e.target.value};onUpdate(d)}} />
+            )}
+            <input className={'inp'+(s.done?' done':'')} type="number" inputMode="numeric"
+              placeholder={isDuration?'sec':'reps'} value={s.r}
               onChange={e=>{const d=[...exData];d[i]={...s,r:e.target.value};onUpdate(d)}} />
-            <button className={'btn'+(s.done?' btn-g':' btn-s')} style={{padding:'8px 12px',fontSize:13}} onClick={()=>{
-              const d=[...exData];d[i]={...s,done:!s.done};onUpdate(d);if(!s.done){vb();onDone(ex,d[i])}
-            }}>{s.done?'Done':'Log'}</button>
-            <button className="btn btn-s" style={{padding:'8px 10px',fontSize:11,color:'var(--org)'}} onClick={()=>{
-              const d=[...exData];d[i]={...s,warmup:!s.warmup};onUpdate(d);
-            }}>{s.warmup?'W':'w'}</button>
+            {!s.done ? (
+              <button className="btn btn-g" style={{padding:'6px 14px',fontSize:13}} onClick={()=>{
+                const d=[...exData];d[i]={...s,done:true};onUpdate(d);vb();onDone(ex,d[i]);
+              }}>Log</button>
+            ) : (
+              <button className="btn btn-s" style={{padding:'6px 10px',fontSize:11,color:'var(--t3)'}} onClick={()=>{
+                const d=[...exData];d[i]={...s,done:false};onUpdate(d);vb();
+              }}>Undo</button>
+            )}
           </div>
         );
       })}
-      {exData.length>0&&exData.some(s=>s.done&&s.w&&s.r&&!isDuration)&&(
+      {needsWeight&&!isDuration&&exData.some(s=>s.done&&s.w&&s.r)&&(
         <div style={{fontSize:12,color:'var(--t2)',marginTop:4}}>
-          Est 1RM: {est1RM(parseFloat(exData.find(s=>s.done)?.w||0),parseInt(exData.find(s=>s.done)?.r||0))} kg
+          Est 1RM: {est1RM(parseFloat(exData.find(s=>s.done&&s.w)?.w||0),parseInt(exData.find(s=>s.done&&s.w)?.r||0))} kg
         </div>
       )}
     </div>
@@ -795,35 +803,44 @@ const ExCard=({ex,exData,sets,onUpdate,onDone,onSwap,onSetsDelta})=>{
   if(!info)return null;
   const doneSets=(exData||[]).filter(s=>s.done).length;
   const pct=sets>0?Math.round(doneSets/sets*100):0;
-  const tagLabels={k:'KS',e:'EC',p:'PW',b:'BL',t:'TR',f:'FT'};
-  const swapOptions=EXDB.filter(e=>e.m===info.m&&e.t===info.t&&e.id!==ex.eid);
+  const isDone=pct===100;
+  const swapOptions=EXDB.filter(e=>e.m===info.m&&e.id!==ex.eid);
+  const swapByEq={};
+  swapOptions.forEach(s=>{if(!swapByEq[s.eq])swapByEq[s.eq]=[];swapByEq[s.eq].push(s)});
   return (
     <div style={{marginBottom:2}}>
-      <div className="ex-row" onClick={()=>setOpen(!open)} style={{cursor:'pointer'}}>
-        <div style={{flex:1}}>
-          <div className="ex-name">{info.n}</div>
-          <div className="ex-info">{ex.sets}x{ex.reps}{info.note?' - '+info.note:''}</div>
+      <div className="ex-row" onClick={()=>setOpen(!open)} style={{cursor:'pointer',padding:'8px 0'}}>
+        <div style={{flex:1,minWidth:0}}>
+          <div style={{display:'flex',alignItems:'center',gap:6}}>
+            <span className="ex-name" style={{fontSize:14}}>{info.n}</span>
+            {isDone && <span className="badge badge-g" style={{fontSize:10,padding:'1px 6px'}}>✓</span>}
+            {pct>0&&!isDone && <span className="badge badge-o" style={{fontSize:10,padding:'1px 6px'}}>{pct}%</span>}
+          </div>
+          <div className="ex-info" style={{fontSize:12}}>{ex.sets}×{ex.reps}{ex.note?' · '+ex.note:''}</div>
         </div>
-        <div style={{display:'flex',alignItems:'center',gap:6}}>
-          {pct===100 && <span className="badge badge-g">Done</span>}
-          {pct>0&&pct<100 && <span className="badge badge-o">{pct}%</span>}
-          {info.tags.map(t=><span key={t} className={'ex-tag tag-'+t}>{tagLabels[t]||t}</span>)}
-        </div>
+        <span style={{fontSize:14,color:'var(--t3)',flexShrink:0,paddingLeft:8}}>{open?'▾':'▸'}</span>
       </div>
-      {showSwap && (
-        <div style={{padding:'8px 16px',background:'var(--c2)',borderRadius:8,margin:'4px 0'}}>
-          <div style={{fontSize:13,fontWeight:600,marginBottom:6}}>Swap with:</div>
-          {swapOptions.map(s=>(
-            <div key={s.id} style={{padding:'6px 0',borderBottom:'0.5px solid var(--sep)',cursor:'pointer',fontSize:14}}
-              onClick={()=>{onSwap(ex.eid,s.id);setShowSwap(false)}}>{s.n}</div>
-          ))}
-        </div>
-      )}
       {open && (
         <div>
-          <div style={{padding:'4px 16px'}}>
-            <button className="btn btn-s" style={{fontSize:12,padding:'4px 10px',marginRight:6}} onClick={e=>{e.stopPropagation();setShowSwap(!showSwap)}}>Swap Exercise</button>
+          <div style={{padding:'4px 16px',display:'flex',gap:6}}>
+            <button className="btn btn-s" style={{fontSize:11,padding:'4px 10px'}} onClick={e=>{e.stopPropagation();setShowSwap(!showSwap)}}>
+              {showSwap?'Cancel':'Swap'}
+            </button>
           </div>
+          {showSwap && (
+            <div style={{padding:'8px 16px',background:'var(--c2)',borderRadius:8,margin:'4px 16px',maxHeight:200,overflowY:'auto'}}>
+              {Object.entries(swapByEq).map(([eq,exs])=>(
+                <div key={eq}>
+                  <div style={{fontSize:11,fontWeight:600,color:'var(--org)',padding:'6px 0 2px'}}>{eq}</div>
+                  {exs.map(s=>(
+                    <div key={s.id} style={{padding:'5px 0',borderBottom:'0.5px solid var(--sep)',cursor:'pointer',fontSize:13}}
+                      onClick={()=>{onSwap(ex.eid,s.id);setShowSwap(false)}}>{s.n}</div>
+                  ))}
+                </div>
+              ))}
+              {swapOptions.length===0 && <div style={{fontSize:12,color:'var(--t3)',padding:8}}>No alternatives</div>}
+            </div>
+          )}
           <SetLogger ex={ex} exData={exData||[]} sets={sets} onUpdate={onUpdate} onDone={onDone} onSetsDelta={onSetsDelta} />
         </div>
       )}
@@ -1053,7 +1070,7 @@ const WorkoutTab=({onOpenDay})=>{
     <>
       <div className="hdr">
         <h1>Workout</h1>
-        <p>v18.1 · Calf Rebuild + Knee-Safe · Full Body Split</p>
+        <p>v18.2 · Calf Rebuild + Knee-Safe · Full Body Split</p>
       </div>
       <div className="scroll">
         <div className="phase-sel">
@@ -1584,6 +1601,50 @@ const ProgressTab=({showToast})=>{
   );
 };
 
+// === LIBRARY CARD ===
+const LibraryCard=({ex})=>{
+  const[showAlts,setShowAlts]=useState(false);
+  const tagLabels={k:'KS',e:'EC',p:'PW',b:'BL',t:'TR',f:'FT'};
+  const alts=EXDB.filter(e=>e.m===ex.m&&e.id!==ex.id);
+  const altsByEq={};
+  alts.forEach(a=>{if(!altsByEq[a.eq])altsByEq[a.eq]=[];altsByEq[a.eq].push(a)});
+  return (
+    <div className="card" style={{padding:14}}>
+      <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start'}}>
+        <div style={{flex:1,minWidth:0}}>
+          <div style={{fontSize:15,fontWeight:600}}>{ex.n}</div>
+          <div style={{fontSize:12,color:'var(--t2)',marginTop:2}}>{ex.m} · {ex.eq}</div>
+        </div>
+        <div style={{display:'flex',gap:3,flexShrink:0}}>
+          {ex.tags.map(t=><span key={t} className={'ex-tag tag-'+t}>{tagLabels[t]||t}</span>)}
+        </div>
+      </div>
+      {ex.note && <div style={{fontSize:12,color:'var(--t3)',marginTop:4}}>{ex.note}</div>}
+      {alts.length>0 && (
+        <button className="btn btn-s" style={{width:'100%',marginTop:8,fontSize:11,padding:'6px 0'}}
+          onClick={()=>setShowAlts(!showAlts)}>
+          {showAlts?'Hide':'Show'} Alternatives ({alts.length})
+        </button>
+      )}
+      {showAlts && (
+        <div style={{marginTop:8,borderTop:'0.5px solid var(--sep)',paddingTop:8}}>
+          {Object.entries(altsByEq).map(([eq,exs])=>(
+            <div key={eq} style={{marginBottom:6}}>
+              <div style={{fontSize:11,fontWeight:600,color:'var(--org)',marginBottom:2}}>{eq}</div>
+              {exs.map(a=>(
+                <div key={a.id} style={{padding:'3px 0 3px 8px',fontSize:13}}>
+                  <span style={{fontWeight:500}}>{a.n}</span>
+                  {a.note && <div style={{fontSize:11,color:'var(--t3)',marginTop:1}}>{a.note}</div>}
+                </div>
+              ))}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
 // === LIBRARY TAB ===
 const LibraryTab=()=>{
   const[search,setSearch]=useState('');
@@ -1592,7 +1653,6 @@ const LibraryTab=()=>{
   const[kneeSafe,setKneeSafe]=useState(false);
   const muscles=[...new Set(EXDB.map(e=>e.m))].sort();
   const equips=[...new Set(EXDB.map(e=>e.eq))].sort();
-  const tagLabels={k:'KS',e:'EC',p:'PW',b:'BL',t:'TR',f:'FT'};
   const filtered=EXDB.filter(e=>{
     if(search&&!e.n.toLowerCase().includes(search.toLowerCase())&&!e.m.toLowerCase().includes(search.toLowerCase()))return false;
     if(muscle&&e.m!==muscle)return false;
@@ -1618,20 +1678,7 @@ const LibraryTab=()=>{
           ))}
         </div>
         <div style={{fontSize:13,color:'var(--t2)',marginBottom:8}}>{filtered.length} exercises</div>
-        {filtered.map(ex=>(
-          <div key={ex.id} className="card" style={{padding:14}}>
-            <div style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}>
-              <div>
-                <div style={{fontSize:15,fontWeight:600}}>{ex.n}</div>
-                <div style={{fontSize:12,color:'var(--t2)',marginTop:2}}>{ex.m} · {ex.eq}</div>
-                {ex.note && <div style={{fontSize:12,color:'var(--t3)',marginTop:2}}>{ex.note}</div>}
-              </div>
-              <div style={{display:'flex',gap:3}}>
-                {ex.tags.map(t=><span key={t} className={'ex-tag tag-'+t}>{tagLabels[t]||t}</span>)}
-              </div>
-            </div>
-          </div>
-        ))}
+        {filtered.map(ex=><LibraryCard key={ex.id} ex={ex} />)}
       </div>
     </>
   );
@@ -1798,7 +1845,7 @@ const SettingsTab=({showToast})=>{
             &#9888; Pain-free ranges and loads should be confirmed with your physio / fysikalsk medisin assessment. Your physio&apos;s recommendations override any range or load prescribed here.
           </div>
         </div>
-        <div style={{textAlign:'center',padding:'16px 0',fontSize:12,color:'var(--t3)'}}>v18.1 IronClad Pro</div>
+        <div style={{textAlign:'center',padding:'16px 0',fontSize:12,color:'var(--t3)'}}>v18.2 IronClad Pro</div>
       </div>
     </>
   );
