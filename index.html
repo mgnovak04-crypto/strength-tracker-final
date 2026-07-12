@@ -7,14 +7,14 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="IronClad">
 <meta name="theme-color" content="#000">
-<meta name="version" content="18.4.0">
+<meta name="version" content="18.5.0">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <title>IronClad Pro</title>
-<script src="https://unpkg.com/react@18/umd/react.production.min.js?v=18.4"></script>
-<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js?v=18.4"></script>
-<script src="https://unpkg.com/@babel/standalone/babel.min.js?v=18.4"></script>
+<script src="https://unpkg.com/react@18/umd/react.production.min.js?v=18.5"></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js?v=18.5"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js?v=18.5"></script>
 <style>
 :root{--bg:#000;--c1:#1c1c1e;--c2:#2c2c2e;--c3:#3a3a3c;--sep:rgba(84,84,88,0.65);--t1:#fff;--t2:rgba(235,235,245,0.6);--t3:rgba(235,235,245,0.3);--grn:#009A44;--grn-d:rgba(0,154,68,0.15);--org:#FF8C00;--org-d:rgba(255,140,0,0.15);--red:#ff453a;--red-d:rgba(255,69,58,0.15);--blu:#0a84ff;--pur:#bf5af2;--cyn:#64d2ff;--yel:#ffd60a;--safe-t:env(safe-area-inset-top);--safe-b:env(safe-area-inset-bottom)}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;margin:0;padding:0}
@@ -135,7 +135,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--t1);font-
 <div id="root"></div>
 <script>
 (function(){
-  var VER='18.4.0';
+  var VER='18.5.0';
   var stored=localStorage.getItem('ic17_appVersion');
   if(stored && stored!==VER){
     if('caches' in window)caches.keys().then(function(ks){ks.forEach(function(k){caches.delete(k)})});
@@ -148,7 +148,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--t1);font-
 })();
 if('serviceWorker' in navigator){
   const swCode=`
-    const CACHE='ironclad-v18.4';
+    const CACHE='ironclad-v18.5';
     const ASSETS=['/'];
     self.addEventListener('install',e=>e.waitUntil(caches.open(CACHE).then(c=>c.addAll(ASSETS)).then(()=>self.skipWaiting())));
     self.addEventListener('activate',e=>e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim())));
@@ -223,6 +223,47 @@ const suggestTarget=(lastSets,range,eq)=>{
   const[lo,hi]=range;
   if(repsAtW>=hi){const nw=Math.round((w+weightStep(eq))*2)/2;return{w:nw,r:lo,add:true};}
   return{w,r:Math.min(repsAtW+1,hi),add:false};
+};
+// Least-squares slope: pts=[{x,y}] -> dy/dx
+const linSlope=(pts)=>{
+  const n=pts.length;if(n<2)return 0;
+  const sx=pts.reduce((a,p)=>a+p.x,0),sy=pts.reduce((a,p)=>a+p.y,0);
+  const sxx=pts.reduce((a,p)=>a+p.x*p.x,0),sxy=pts.reduce((a,p)=>a+p.x*p.y,0);
+  const d=n*sxx-sx*sx;return d===0?0:(n*sxy-sx*sy)/d;
+};
+// Daily readiness / auto-regulation from recent check-ins, RPE, rest, ACWR
+const computeReadiness=(history,acwr)=>{
+  if(!history.length)return null;
+  const last=history[0];
+  const daysSince=Math.round((new Date()-new Date(last.date))/86400000);
+  let score=100;const f=[];
+  const kp=last.kneePre,cp=last.calfPre;
+  if(kp!==undefined||cp!==undefined){
+    const pen=Math.round((((kp||0)+(cp||0))/2)*8);
+    if(pen>0){score-=pen;f.push({t:`Knee ${kp||0}/5 · Calf ${cp||0}/5`,d:-pen});}
+  }
+  const ck=history.filter(h=>h.kneePre!==undefined);
+  if(ck.length>=4){
+    const avg=a=>a.reduce((s,h)=>s+((h.kneePre||0)+(h.calfPre||0)),0)/a.length;
+    if(avg(ck.slice(0,3))>avg(ck.slice(3,6))+1){score-=8;f.push({t:'Pain trending up',d:-8});}
+  }
+  if(last.rpe){
+    const pen=Math.max(0,Math.round((last.rpe-7)*5));
+    if(pen>0){score-=pen;f.push({t:`Last session hard (RPE ${last.rpe})`,d:-pen});}
+  }
+  if(daysSince<=0){score-=12;f.push({t:'Back-to-back training day',d:-12});}
+  else if(daysSince===1)score-=4;
+  else if(daysSince>=8){score-=5;f.push({t:`${daysSince} days since last session`,d:-5});}
+  const a=parseFloat(acwr)||0;
+  if(a>1.5){score-=15;f.push({t:`Training-load spike (ACWR ${a})`,d:-15});}
+  else if(a>1.3){score-=8;f.push({t:`Load climbing (ACWR ${a})`,d:-8});}
+  score=Math.max(0,Math.min(100,Math.round(score)));
+  let label,color;
+  if(score>=80){label='Go heavy — push your progression targets';color='var(--grn)';}
+  else if(score>=60){label='Train as planned';color='var(--grn)';}
+  else if(score>=40){label='Lighten load ~10–20%, focus on technique';color='var(--org)';}
+  else{label='Active recovery / mobility only — protect the knee';color='var(--red)';}
+  return{score,label,color,factors:f,daysSince};
 };
 
 // === EXERCISE DATABASE ===
@@ -1168,7 +1209,7 @@ const WorkoutTab=({onOpenDay})=>{
     <>
       <div className="hdr">
         <h1>Workout</h1>
-        <p>v18.4 · Calf Rebuild + Knee-Safe · Full Body Split</p>
+        <p>v18.5 · Calf Rebuild + Knee-Safe · Full Body Split</p>
       </div>
       <div className="scroll">
         <TodayCard days={days} weekDone={weekDone} phase={phase} onOpenDay={onOpenDay} />
@@ -1466,14 +1507,56 @@ const ProgressTab=({showToast})=>{
   const proteinDays7=[];
   for(let i=0;i<7;i++){const d=new Date();d.setDate(d.getDate()-i);proteinDays7.push(d.toISOString().slice(0,10))}
   const proteinCompDays=proteinDays7.filter(k=>(proteinLog[k]||0)>=proteinTarget).length;
-  let weeklyWeightRate=0;
-  const recentWeights=weightLog.filter(w=>(new Date()-new Date(w.date))/86400000<14);
-  if(recentWeights.length>=2){
-    const sorted=[...recentWeights].sort((a,b)=>new Date(a.date)-new Date(b.date));
-    const first=sorted[0];const last=sorted[sorted.length-1];
-    const daysDiff=(new Date(last.date)-new Date(first.date))/86400000;
-    if(daysDiff>0)weeklyWeightRate=Math.round((last.kg-first.kg)/daysDiff*7*10)/10;
+  // --- Weight-loss regression forecast (least-squares over last 28d) ---
+  const goalW=ld('weightGoal',75);
+  const curW=weightLog.length?weightLog[weightLog.length-1].kg:bw;
+  let weeklyWeightRate=0,pctPerWk=0,wlFlag=null,etaWeeks=null,etaDate=null,wlSpanDays=0;
+  if(weightLog.length>=2){
+    const sortedW=[...weightLog].sort((a,b)=>new Date(a.date)-new Date(b.date));
+    const t0=new Date(sortedW[0].date);
+    const allPts=sortedW.map(w=>({x:(new Date(w.date)-t0)/86400000,y:w.kg}));
+    const maxX=allPts[allPts.length-1].x;
+    const pts=allPts.filter(p=>p.x>=maxX-28);
+    const use=pts.length>=2?pts:allPts;
+    wlSpanDays=use[use.length-1].x-use[0].x;
+    weeklyWeightRate=Math.round(linSlope(use)*7*100)/100;
+    pctPerWk=curW>0?Math.round(weeklyWeightRate/curW*1000)/10:0;
+    if(wlSpanDays>=7){
+      if(pctPerWk<=-1)wlFlag={c:'var(--red)',bg:'var(--red-d)',t:'Losing >1%/wk — too fast. A deficit this steep burns muscle and stalls your lifts. Ease it back ~200–300 kcal/day.'};
+      else if(pctPerWk<=-0.5)wlFlag={c:'var(--grn)',bg:'var(--grn-d)',t:'Ideal rate (0.5–1%/wk) — fast enough to progress, slow enough to keep muscle while you rebuild.'};
+      else if(pctPerWk<0)wlFlag={c:'var(--org)',bg:'var(--org-d)',t:'Slow, conservative loss. Fine if you feel strong; nudge the deficit for faster results.'};
+      else if(pctPerWk<0.15)wlFlag={c:'var(--org)',bg:'var(--org-d)',t:'Plateaued 2+ weeks. If loss is the goal, tighten intake or add a run/finisher.'};
+      else wlFlag={c:'var(--org)',bg:'var(--org-d)',t:'Trending up — expected during a strength push; watch it if fat loss is the priority.'};
+    }
+    if(weeklyWeightRate<0&&curW>goalW){
+      etaWeeks=Math.ceil((curW-goalW)/(-weeklyWeightRate));
+      if(etaWeeks>0&&etaWeeks<520){const dd=new Date();dd.setDate(dd.getDate()+etaWeeks*7);etaDate=dd.toISOString().slice(0,10);}
+    }
   }
+
+  const readiness=computeReadiness(history,acwr);
+
+  // --- Relative strength: e1RM ÷ bodyweight per lift ---
+  const bwAtDate=(date)=>{if(!weightLog.length)return bw;let best=weightLog[0],bd=Infinity;weightLog.forEach(w=>{const dd=Math.abs(new Date(w.date)-new Date(date));if(dd<bd){bd=dd;best=w}});return best.kg||bw;};
+  const relStrength=e1rmExercises.map(([eid,data])=>{
+    const latest=data[data.length-1],first=data[0];
+    const rNow=latest.e1rm/bwAtDate(latest.date);
+    const rThen=first.e1rm/bwAtDate(first.date);
+    const pct=rThen>0?Math.round((rNow-rThen)/rThen*100):0;
+    return{eid,name:exMap[eid]?.n||eid,rNow:Math.round(rNow*100)/100,pct,rawKg:Math.round((latest.e1rm-first.e1rm)*10)/10};
+  }).filter(x=>x.rNow>0);
+
+  // --- Stall detection: no e1RM improvement in last 3 sessions ---
+  const stalledLifts=[];let progressingCount=0;
+  Object.entries(e1rmLog).forEach(([eid,data])=>{
+    if(data.length<3)return;
+    if(data[data.length-1].e1rm<=data[data.length-3].e1rm)stalledLifts.push({name:exMap[eid]?.n||eid,e1rm:data[data.length-1].e1rm});
+    else progressingCount++;
+  });
+
+  // --- Weekly volume vs growth landmarks (~10-20 sets/wk primary muscles) ---
+  const PRIMARY=['Chest','Back','Quads','Hamstrings','Glutes','Calves','Shoulders','Triceps','Biceps','Legs'];
+  const volStatus=(m,v)=>{if(!PRIMARY.includes(m))return null;if(v<8)return{c:'var(--org)',l:'low'};if(v>22)return{c:'var(--red)',l:'high'};return{c:'var(--grn)',l:'ok'};};
 
   return (
     <>
@@ -1485,6 +1568,31 @@ const ProgressTab=({showToast})=>{
           <div className="stat-card"><div className="val">{streak}</div><div className="lbl">Day Streak</div></div>
           <div className="stat-card"><div className="val">{totalKcal.toLocaleString()}</div><div className="lbl">Total kcal</div></div>
         </div>
+
+        {readiness ? (
+          <div className="card" style={{padding:16,marginBottom:4}}>
+            <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:10}}>
+              <div style={{fontSize:14,fontWeight:700}}>Readiness</div>
+              <div style={{fontSize:11,color:'var(--t3)'}}>from recent check-ins · RPE · load</div>
+            </div>
+            <div style={{display:'flex',alignItems:'center',gap:14}}>
+              <div style={{width:64,height:64,borderRadius:'50%',flexShrink:0,display:'flex',alignItems:'center',justifyContent:'center',background:'conic-gradient('+readiness.color+' '+(readiness.score*3.6)+'deg,var(--c2) 0)'}}>
+                <div style={{width:50,height:50,borderRadius:'50%',background:'var(--c1)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:19,fontWeight:700}}>{readiness.score}</div>
+              </div>
+              <div style={{flex:1,minWidth:0}}>
+                <div style={{fontSize:14,fontWeight:600,color:readiness.color}}>{readiness.label}</div>
+                {readiness.factors.length>0 && (
+                  <div style={{fontSize:11,color:'var(--t2)',marginTop:4,lineHeight:1.5}}>
+                    {readiness.factors.map((f,i)=><div key={i}>· {f.t} <span style={{color:'var(--t3)'}}>({f.d})</span></div>)}
+                  </div>
+                )}
+                {readiness.factors.length===0 && <div style={{fontSize:11,color:'var(--t2)',marginTop:4}}>No fatigue or pain flags — you're fresh.</div>}
+              </div>
+            </div>
+          </div>
+        ) : (
+          <div className="card" style={{padding:14,marginBottom:4,fontSize:12,color:'var(--t2)'}}>Readiness score activates after your first logged session with a knee/calf check-in.</div>
+        )}
 
         {weightLog.length>1 && (
           <div className="wt-chart">
@@ -1507,6 +1615,35 @@ const ProgressTab=({showToast})=>{
               <span>{weightLog.length} entries</span>
             </div>
           </div>
+        )}
+
+        {weightLog.length>=2 && wlSpanDays>=7 && (
+          <>
+            <div className="section-t">Weight-Loss Forecast</div>
+            <div className="card" style={{padding:16}}>
+              <div style={{display:'flex',justifyContent:'space-between',alignItems:'baseline',marginBottom:8}}>
+                <span style={{color:'var(--t2)',fontSize:13}}>Trend (regression)</span>
+                <span style={{fontWeight:700,fontSize:16,color:weeklyWeightRate<0?'var(--grn)':'var(--org)'}}>{weeklyWeightRate>0?'+':''}{weeklyWeightRate} kg/wk · {pctPerWk>0?'+':''}{pctPerWk}%/wk</span>
+              </div>
+              <div style={{display:'flex',justifyContent:'space-between',marginBottom:8,fontSize:13}}>
+                <span style={{color:'var(--t2)'}}>Current → goal</span>
+                <span style={{fontWeight:600}}>{curW}kg → {goalW}kg{curW>goalW?` (${Math.round((curW-goalW)*10)/10} to go)`:''}</span>
+              </div>
+              {etaWeeks!==null ? (
+                <div style={{display:'flex',justifyContent:'space-between',marginBottom:4,fontSize:13}}>
+                  <span style={{color:'var(--t2)'}}>Projected to hit goal</span>
+                  <span style={{fontWeight:600,color:'var(--grn)'}}>~{etaWeeks} wk{etaWeeks>1?'s':''}{etaDate?` · ${fmtDate(etaDate)}`:''}</span>
+                </div>
+              ) : (curW<=goalW ? (
+                <div style={{fontSize:13,color:'var(--grn)',marginBottom:4}}>🎯 At or below your goal weight.</div>
+              ) : (
+                <div style={{fontSize:12,color:'var(--t3)',marginBottom:4}}>No downward trend yet — ETA appears once you're losing.</div>
+              ))}
+              {wlFlag && (
+                <div style={{fontSize:12,color:wlFlag.c,marginTop:8,padding:'8px 10px',background:wlFlag.bg,borderRadius:8,lineHeight:1.5}}>{wlFlag.t}</div>
+              )}
+            </div>
+          </>
         )}
 
         <div className="section-t">Activity (8 weeks)</div>
@@ -1626,19 +1763,69 @@ const ProgressTab=({showToast})=>{
           </>
         )}
 
+        {relStrength.length>0 && (
+          <>
+            <div className="section-t">Relative Strength</div>
+            <div style={{fontSize:12,color:'var(--t2)',margin:'-4px 2px 8px'}}>Strength ÷ bodyweight — rises even when you're lighter. Separates getting weaker from getting lighter.</div>
+            <div className="card" style={{padding:16}}>
+              {relStrength.map((x,i)=>(
+                <div key={i} style={{display:'flex',justifyContent:'space-between',alignItems:'center',padding:'7px 0',borderBottom:i<relStrength.length-1?'0.5px solid var(--sep)':'none'}}>
+                  <div style={{minWidth:0,flex:1}}>
+                    <div style={{fontSize:14,fontWeight:600}}>{x.name}</div>
+                    <div style={{fontSize:11,color:'var(--t3)'}}>{x.rawKg>0?'+':''}{x.rawKg}kg 1RM since start</div>
+                  </div>
+                  <div style={{textAlign:'right',flexShrink:0}}>
+                    <div style={{fontSize:15,fontWeight:700}}>{x.rNow}×<span style={{fontSize:11,fontWeight:400,color:'var(--t2)'}}> BW</span></div>
+                    {x.pct!==0 && <div style={{fontSize:12,fontWeight:600,color:x.pct>0?'var(--grn)':'var(--red)'}}>{x.pct>0?'↑':'↓'} {Math.abs(x.pct)}%</div>}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </>
+        )}
+
+        {(stalledLifts.length>0||progressingCount>0) && (
+          <>
+            <div className="section-t">Progression Health</div>
+            <div className="card" style={{padding:16}}>
+              <div style={{display:'flex',justifyContent:'space-between',marginBottom:stalledLifts.length>0?10:0}}>
+                <span style={{color:'var(--t2)',fontSize:13}}>Lifts progressing</span>
+                <span style={{fontWeight:700,color:'var(--grn)'}}>{progressingCount}</span>
+              </div>
+              {stalledLifts.length>0 && (
+                <div style={{borderTop:'0.5px solid var(--sep)',paddingTop:10}}>
+                  <div style={{fontSize:13,color:'var(--org)',fontWeight:600,marginBottom:6}}>Stalled ({stalledLifts.length}) — no gain in 3 sessions</div>
+                  {stalledLifts.map((s,i)=>(
+                    <div key={i} style={{display:'flex',justifyContent:'space-between',fontSize:13,padding:'3px 0'}}>
+                      <span>{s.name}</span><span style={{color:'var(--t3)'}}>{s.e1rm}kg 1RM</span>
+                    </div>
+                  ))}
+                  <div style={{fontSize:11,color:'var(--t2)',marginTop:8,padding:'6px 10px',background:'var(--org-d)',borderRadius:8,lineHeight:1.5}}>
+                    Stalled lifts usually mean accumulated fatigue or a form limit. Try a lighter "deload" week (~10% off) or drop reps and reset — it almost always breaks the plateau.
+                  </div>
+                </div>
+              )}
+            </div>
+          </>
+        )}
+
         {Object.keys(muscleVol).length>0 && (
           <>
             <div className="section-t">Muscle Group Volume (This Week)</div>
+            <div style={{fontSize:12,color:'var(--t2)',margin:'-4px 2px 8px'}}>Weekly sets vs the ~10–20 growth range. <span style={{color:'var(--org)'}}>Low</span> = add a set, <span style={{color:'var(--red)'}}>High</span> = plenty.</div>
             <div className="card" style={{padding:16}}>
-              {Object.entries(muscleVol).sort((a,b)=>b[1]-a[1]).map(([m,v])=>(
-                <div key={m} className="vol-bar-wrap">
-                  <div className="vol-bar-label">{m}</div>
-                  <div className="vol-bar-track">
-                    <div className="vol-bar-fill" style={{width:(v/maxVol*100)+'%',background:'var(--grn)'}} />
+              {Object.entries(muscleVol).sort((a,b)=>b[1]-a[1]).map(([m,v])=>{
+                const st=volStatus(m,v);
+                return (
+                  <div key={m} className="vol-bar-wrap">
+                    <div className="vol-bar-label">{m}</div>
+                    <div className="vol-bar-track">
+                      <div className="vol-bar-fill" style={{width:(v/maxVol*100)+'%',background:st?st.c:'var(--c3)'}} />
+                    </div>
+                    <div className="vol-bar-val">{v}{st?<span style={{color:st.c,fontSize:10}}> {st.l}</span>:''}</div>
                   </div>
-                  <div className="vol-bar-val">{v} sets</div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </>
         )}
@@ -1944,7 +2131,7 @@ const SettingsTab=({showToast})=>{
             &#9888; Pain-free ranges and loads should be confirmed with your physio / fysikalsk medisin assessment. Your physio&apos;s recommendations override any range or load prescribed here.
           </div>
         </div>
-        <div style={{textAlign:'center',padding:'16px 0',fontSize:12,color:'var(--t3)'}}>v18.4 IronClad Pro</div>
+        <div style={{textAlign:'center',padding:'16px 0',fontSize:12,color:'var(--t3)'}}>v18.5 IronClad Pro</div>
       </div>
     </>
   );
