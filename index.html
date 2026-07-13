@@ -7,14 +7,14 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="IronClad">
 <meta name="theme-color" content="#000">
-<meta name="version" content="18.6.0">
+<meta name="version" content="18.7.0">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <title>IronClad Pro</title>
-<script src="https://unpkg.com/react@18/umd/react.production.min.js?v=18.6"></script>
-<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js?v=18.6"></script>
-<script src="https://unpkg.com/@babel/standalone/babel.min.js?v=18.6"></script>
+<script src="https://unpkg.com/react@18/umd/react.production.min.js?v=18.7"></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js?v=18.7"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js?v=18.7"></script>
 <style>
 :root{--bg:#000;--c1:#1c1c1e;--c2:#2c2c2e;--c3:#3a3a3c;--sep:rgba(84,84,88,0.65);--t1:#fff;--t2:rgba(235,235,245,0.6);--t3:rgba(235,235,245,0.3);--grn:#009A44;--grn-d:rgba(0,154,68,0.15);--org:#FF8C00;--org-d:rgba(255,140,0,0.15);--red:#ff453a;--red-d:rgba(255,69,58,0.15);--blu:#0a84ff;--pur:#bf5af2;--cyn:#64d2ff;--yel:#ffd60a;--safe-t:env(safe-area-inset-top);--safe-b:env(safe-area-inset-bottom)}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;margin:0;padding:0}
@@ -139,7 +139,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--t1);font-
 <div id="root"></div>
 <script>
 (function(){
-  var VER='18.6.0';
+  var VER='18.7.0';
   var stored=localStorage.getItem('ic17_appVersion');
   if(stored && stored!==VER){
     if('caches' in window)caches.keys().then(function(ks){ks.forEach(function(k){caches.delete(k)})});
@@ -152,7 +152,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--t1);font-
 })();
 if('serviceWorker' in navigator){
   const swCode=`
-    const CACHE='ironclad-v18.6';
+    const CACHE='ironclad-v18.7';
     const ASSETS=['/'];
     self.addEventListener('install',e=>e.waitUntil(caches.open(CACHE).then(c=>c.addAll(ASSETS)).then(()=>self.skipWaiting())));
     self.addEventListener('activate',e=>e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim())));
@@ -725,16 +725,22 @@ const Toast=({msg,onDone})=>{
 // === REST TIMER ===
 const RestTimer=({seconds,onDone})=>{
   const[left,setLeft]=useState(seconds);
+  const[base,setBase]=useState(seconds);
+  const doneRef=useRef(onDone);doneRef.current=onDone;
+  // Only re-arm the interval when `seconds` changes — NOT when the parent
+  // re-renders (the session timer re-renders DayView every second, and a
+  // fresh inline onDone used to reset this countdown each tick).
   useEffect(()=>{
-    setLeft(seconds);
-    const iv=setInterval(()=>setLeft(p=>{if(p<=1){clearInterval(iv);onDone();return 0}return p-1}),1000);
+    setLeft(seconds);setBase(seconds);
+    const iv=setInterval(()=>setLeft(p=>{if(p<=1){clearInterval(iv);doneRef.current&&doneRef.current();return 0}return p-1}),1000);
     return()=>clearInterval(iv);
-  },[seconds,onDone]);
-  const pct=left/seconds;
+  },[seconds]);
+  const pct=base>0?left/base:0;
   const r=90,c=2*Math.PI*r;
+  const close=()=>doneRef.current&&doneRef.current();
   return (
-    <div className="rest-overlay" onClick={onDone}>
-      <div style={{textAlign:'center'}}>
+    <div className="rest-overlay" onClick={close}>
+      <div style={{textAlign:'center'}} onClick={e=>e.stopPropagation()}>
         <div className="rest-ring">
           <svg width={200} height={200}>
             <circle cx={100} cy={100} r={r} fill="none" stroke="var(--c2)" strokeWidth={8} />
@@ -746,8 +752,8 @@ const RestTimer=({seconds,onDone})=>{
           </div>
         </div>
         <div className="rest-btns">
-          <button className="rest-btn" style={{background:'var(--c2)',color:'var(--t1)'}} onClick={e=>{e.stopPropagation();onDone()}}>Skip</button>
-          <button className="rest-btn" style={{background:'var(--grn)',color:'#000'}} onClick={e=>{e.stopPropagation();onDone()}}>Done</button>
+          <button className="rest-btn" style={{background:'var(--c2)',color:'var(--t1)'}} onClick={()=>{setLeft(p=>p+15);setBase(b=>Math.max(b,left+15))}}>+15s</button>
+          <button className="rest-btn" style={{background:'var(--grn)',color:'#000'}} onClick={close}>Skip</button>
         </div>
       </div>
     </div>
@@ -870,7 +876,7 @@ const SetLogger=({ex,exData,sets,onUpdate,onDone,onSetsDelta})=>{
               onChange={e=>{const d=[...exData];d[i]={...s,r:e.target.value};onUpdate(d)}} />
             {!s.done ? (
               <button className="logbtn" style={{background:'var(--grn)',color:'#000'}} onClick={()=>{
-                const d=[...exData];d[i]={...s,done:true};onUpdate(d);vb();onDone(ex,d[i]);
+                const d=[...exData];d[i]={...s,done:true};onUpdate(d);vb();onDone(ex,d[i],d);
               }}>Log</button>
             ) : (
               <button className="logbtn" style={{background:'var(--c2)',color:'var(--t3)',fontSize:12}} onClick={()=>{
@@ -890,27 +896,32 @@ const SetLogger=({ex,exData,sets,onUpdate,onDone,onSetsDelta})=>{
 };
 
 // === EXERCISE CARD (with swap) ===
-const ExCard=({ex,exData,sets,onUpdate,onDone,onSwap,onSetsDelta})=>{
-  const[open,setOpen]=useState(false);
+const ExCard=({ex,exData,sets,open,onToggle,rowId,onUpdate,onDone,onSwap,onSetsDelta})=>{
   const[showSwap,setShowSwap]=useState(false);
   const info=exMap[ex.eid];
   if(!info)return null;
-  const doneSets=(exData||[]).filter(s=>s.done).length;
+  const doneList=(exData||[]).filter(s=>s.done);
+  const doneSets=doneList.length;
   const pct=sets>0?Math.round(doneSets/sets*100):0;
   const isDone=pct===100;
+  const isDur=info.t==='d'||info.t==='c';
+  const needW=info.t==='w'||['Cable','Machine','Dumbbell','Barbell','Kettlebell'].includes(info.eq);
+  const summary=doneList.map(s=>(needW&&s.w)?(s.w+'×'+s.r):(s.r+(isDur?'s':''))).join(' · ');
   const swapOptions=EXDB.filter(e=>e.m===info.m&&e.id!==ex.eid);
   const swapByEq={};
   swapOptions.forEach(s=>{if(!swapByEq[s.eq])swapByEq[s.eq]=[];swapByEq[s.eq].push(s)});
   return (
-    <div style={{marginBottom:2}}>
-      <div className="ex-row" onClick={()=>setOpen(!open)} style={{cursor:'pointer',padding:'8px 0'}}>
+    <div id={'row-'+rowId} style={{marginBottom:2}}>
+      <div className="ex-row" onClick={onToggle} style={{cursor:'pointer',padding:'8px 0'}}>
         <div style={{flex:1,minWidth:0}}>
           <div style={{display:'flex',alignItems:'center',gap:6}}>
             <span className="ex-name" style={{fontSize:14}}>{info.n}</span>
             {isDone && <span className="badge badge-g" style={{fontSize:10,padding:'1px 6px'}}>✓</span>}
             {pct>0&&!isDone && <span className="badge badge-o" style={{fontSize:10,padding:'1px 6px'}}>{pct}%</span>}
           </div>
-          <div className="ex-info" style={{fontSize:12}}>{ex.sets}×{ex.reps}{ex.note?' · '+ex.note:''}</div>
+          {(!open&&doneSets>0&&summary)
+            ? <div className="ex-info" style={{fontSize:12,color:'var(--grn)',fontWeight:600}}>{summary}</div>
+            : <div className="ex-info" style={{fontSize:12}}>{ex.sets}×{ex.reps}{ex.note?' · '+ex.note:''}</div>}
         </div>
         <span style={{fontSize:14,color:'var(--t3)',flexShrink:0,paddingLeft:8}}>{open?'▾':'▸'}</span>
       </div>
@@ -935,7 +946,7 @@ const ExCard=({ex,exData,sets,onUpdate,onDone,onSwap,onSetsDelta})=>{
               {swapOptions.length===0 && <div style={{fontSize:12,color:'var(--t3)',padding:8}}>No alternatives</div>}
             </div>
           )}
-          <SetLogger ex={ex} exData={exData||[]} sets={sets} onUpdate={onUpdate} onDone={onDone} onSetsDelta={onSetsDelta} />
+          <SetLogger ex={ex} exData={exData||[]} sets={sets} onUpdate={onUpdate} onDone={(exx,sd,all)=>onDone(exx,sd,all,rowId)} onSetsDelta={onSetsDelta} />
         </div>
       )}
     </div>
@@ -970,7 +981,9 @@ const DayView=({day,phase,onBack})=>{
   const[rpe,setRpe]=useState(null);
   const[notes,setNotes]=useState('');
   const[showComplete,setShowComplete]=useState(null);
-  const[showRest,setShowRest]=useState(false);
+  const[restSecs,setRestSecs]=useState(null);
+  const[restKey,setRestKey]=useState(0);
+  const[openRow,setOpenRow]=useState(null);
   const[swaps,setSwaps]=useState(ld('swaps',{}));
   const dayKeyCI=day.name.replace(/\s/g,'')+'_p'+phase;
   const[kneePre,setKneePre]=useState(()=>{const c=ld('dayCheckin_'+dayKeyCI,{});return c.knee||0});
@@ -999,7 +1012,7 @@ const DayView=({day,phase,onBack})=>{
     return a+d.filter(s=>s.done&&!s.warmup).reduce((v,s)=>(parseFloat(s.w)||0)*(parseInt(s.r)||0)+v,0);
   },0);
 
-  const handleSetDone=(ex,setData)=>{
+  const handleSetDone=(ex,setData,allData,rowId)=>{
     const info=exMap[getEid(ex.eid)];
     if(info&&info.t==='w'&&setData.w&&setData.r&&!setData.warmup){
       const prs=ld('prs',{});
@@ -1022,10 +1035,26 @@ const DayView=({day,phase,onBack})=>{
     }
     const hist=ld('exHistory',{});
     const eid=getEid(ex.eid);
-    const d=logData[eid]||[];
-    hist[eid]=d.filter(s=>s.done);
+    hist[eid]=(allData||[]).filter(s=>s.done);
     sv('exHistory',hist);
-    if(restEnabled)setShowRest(true);
+    // Block-aware rest: use this superset's rest; skip for warm-up/mobility (rest:0)
+    const restSec=ex.rest;
+    if(restEnabled && restSec>0){setRestSecs(restSec);setRestKey(k=>k+1)}
+    // Auto-advance: if this exercise is now fully done, open + scroll the next unfinished one
+    const targetSets=setsOverride[eid]||ex.sets;
+    const doneN=(allData||[]).filter(s=>s.done).length;
+    if(doneN>=targetSets){
+      const rows=[];
+      day.supersets.forEach((ss,si)=>ss.exercises.forEach((e,ei)=>{
+        const rid=si+'_'+ei;const eeid=getEid(e.eid);const tset=setsOverride[eeid]||e.sets;
+        const dc=(rid===rowId)?doneN:((logData[eeid]||[]).filter(s=>s.done).length);
+        rows.push({rid,complete:dc>=tset});
+      }));
+      const ci=rows.findIndex(r=>r.rid===rowId);
+      const next=rows.slice(ci+1).find(r=>!r.complete)||rows.find(r=>!r.complete&&r.rid!==rowId);
+      if(next){setOpenRow(next.rid);setTimeout(()=>{const el=document.getElementById('row-'+next.rid);if(el)el.scrollIntoView({behavior:'smooth',block:'center'})},300)}
+      else setOpenRow(null);
+    }
   };
 
   const finishWorkout=()=>{
@@ -1108,7 +1137,9 @@ const DayView=({day,phase,onBack})=>{
               {ss.exercises.map((ex,ei)=>{
                 const eid=getEid(ex.eid);
                 const sets=setsOverride[eid]||ex.sets;
-                return <ExCard key={eid+ei} ex={{...ex,eid}} exData={logData[eid]||[]} sets={sets}
+                const rowId=si+'_'+ei;
+                return <ExCard key={eid+ei} ex={{...ex,eid,rest:ss.rest}} exData={logData[eid]||[]} sets={sets}
+                  rowId={rowId} open={openRow===rowId} onToggle={()=>setOpenRow(openRow===rowId?null:rowId)}
                   onUpdate={d=>{const l={...logData};l[eid]=d;setLogData(l)}}
                   onDone={handleSetDone}
                   onSwap={handleSwap}
@@ -1133,7 +1164,7 @@ const DayView=({day,phase,onBack})=>{
           </button>
         </div>
       </div>
-      {showRest && <RestTimer seconds={ld('restTime',45)} onDone={()=>setShowRest(false)} />}
+      {restSecs && <RestTimer key={restKey} seconds={restSecs} onDone={()=>setRestSecs(null)} />}
       {showComplete && <CompletionSummary stats={showComplete} onClose={()=>{setShowComplete(null);onBack()}} />}
     </div>
   );
@@ -1215,7 +1246,7 @@ const WorkoutTab=({onOpenDay})=>{
     <>
       <div className="hdr">
         <h1>Workout</h1>
-        <p>v18.6 · Calf Rebuild + Knee-Safe · Full Body Split</p>
+        <p>v18.7 · Calf Rebuild + Knee-Safe · Full Body Split</p>
       </div>
       <div className="scroll">
         <TodayCard days={days} weekDone={weekDone} phase={phase} onOpenDay={onOpenDay} />
@@ -2137,7 +2168,7 @@ const SettingsTab=({showToast})=>{
             &#9888; Pain-free ranges and loads should be confirmed with your physio / fysikalsk medisin assessment. Your physio&apos;s recommendations override any range or load prescribed here.
           </div>
         </div>
-        <div style={{textAlign:'center',padding:'16px 0',fontSize:12,color:'var(--t3)'}}>v18.6 IronClad Pro</div>
+        <div style={{textAlign:'center',padding:'16px 0',fontSize:12,color:'var(--t3)'}}>v18.7 IronClad Pro</div>
       </div>
     </>
   );
