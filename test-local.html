@@ -7,7 +7,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="IronClad">
 <meta name="theme-color" content="#000">
-<meta name="version" content="18.7.0">
+<meta name="version" content="18.8.0">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
@@ -139,7 +139,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--t1);font-
 <div id="root"></div>
 <script>
 (function(){
-  var VER='18.7.0';
+  var VER='18.8.0';
   var stored=localStorage.getItem('ic17_appVersion');
   if(stored && stored!==VER){
     if('caches' in window)caches.keys().then(function(ks){ks.forEach(function(k){caches.delete(k)})});
@@ -152,7 +152,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--t1);font-
 })();
 if('serviceWorker' in navigator){
   const swCode=`
-    const CACHE='ironclad-v18.7';
+    const CACHE='ironclad-v18.8';
     const ASSETS=['/'];
     self.addEventListener('install',e=>e.waitUntil(caches.open(CACHE).then(c=>c.addAll(ASSETS)).then(()=>self.skipWaiting())));
     self.addEventListener('activate',e=>e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim())));
@@ -172,6 +172,7 @@ const{useState,useEffect,useRef,useCallback}=React;
 const P='ic17_';
 const ld=(k,d)=>{try{const v=localStorage.getItem(P+k);return v?JSON.parse(v):d}catch{return d}};
 const sv=(k,v)=>localStorage.setItem(P+k,JSON.stringify(v));
+const rm=(k)=>localStorage.removeItem(P+k);
 const vb=()=>{try{navigator.vibrate?.(10)}catch{}};
 const fmtDate=(d)=>new Date(d).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});
 const fmtTime=(s)=>{const m=Math.floor(s/60);const sec=s%60;return `${m}:${sec.toString().padStart(2,'0')}`};
@@ -1231,7 +1232,15 @@ const WorkoutTab=({onOpenDay})=>{
   const days=getProgramDays(phase);
 
   const changePhase=(p)=>{setPhase(p);sv('phase',p);if(p!==phase){sv('phaseStart',today());sv('weekDone',{})}};
-  const newWeek=()=>{sv('weekDone',{});window.location.reload()};
+  const newWeek=()=>{
+    if(!confirm('Start a new week?\n\nThis clears this week\'s logged sets, set changes and check-ins for all days in this phase so you get a fresh board. Your saved workouts, PRs and progress are kept.'))return;
+    days.forEach(d=>{
+      const k=d.name.replace(/\s/g,'')+'_p'+phase;
+      rm('dayLog_'+k);rm('setsOverride_'+k);rm('dayCheckin_'+k);
+    });
+    sv('weekDone',{});
+    window.location.reload();
+  };
 
   const dayPct=(day)=>{
     const logData=ld('dayLog_'+day.name.replace(/\s/g,'')+'_p'+phase,{});
@@ -1246,7 +1255,7 @@ const WorkoutTab=({onOpenDay})=>{
     <>
       <div className="hdr">
         <h1>Workout</h1>
-        <p>v18.7 · Calf Rebuild + Knee-Safe · Full Body Split</p>
+        <p>v18.8 · Calf Rebuild + Knee-Safe · Full Body Split</p>
       </div>
       <div className="scroll">
         <TodayCard days={days} weekDone={weekDone} phase={phase} onOpenDay={onOpenDay} />
@@ -2168,7 +2177,7 @@ const SettingsTab=({showToast})=>{
             &#9888; Pain-free ranges and loads should be confirmed with your physio / fysikalsk medisin assessment. Your physio&apos;s recommendations override any range or load prescribed here.
           </div>
         </div>
-        <div style={{textAlign:'center',padding:'16px 0',fontSize:12,color:'var(--t3)'}}>v18.7 IronClad Pro</div>
+        <div style={{textAlign:'center',padding:'16px 0',fontSize:12,color:'var(--t3)'}}>v18.8 IronClad Pro</div>
       </div>
     </>
   );
