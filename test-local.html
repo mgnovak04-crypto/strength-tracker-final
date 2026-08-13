@@ -7,7 +7,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="IronClad">
 <meta name="theme-color" content="#000">
-<meta name="version" content="18.8.0">
+<meta name="version" content="18.9.0">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
@@ -139,7 +139,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--t1);font-
 <div id="root"></div>
 <script>
 (function(){
-  var VER='18.8.0';
+  var VER='18.9.0';
   var stored=localStorage.getItem('ic17_appVersion');
   if(stored && stored!==VER){
     if('caches' in window)caches.keys().then(function(ks){ks.forEach(function(k){caches.delete(k)})});
@@ -152,7 +152,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--t1);font-
 })();
 if('serviceWorker' in navigator){
   const swCode=`
-    const CACHE='ironclad-v18.8';
+    const CACHE='ironclad-v18.9';
     const ASSETS=['/'];
     self.addEventListener('install',e=>e.waitUntil(caches.open(CACHE).then(c=>c.addAll(ASSETS)).then(()=>self.skipWaiting())));
     self.addEventListener('activate',e=>e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim())));
@@ -1172,6 +1172,51 @@ const DayView=({day,phase,onBack})=>{
 };
 
 // === WORKOUT TAB ===
+// === SESSION LENGTH ===
+// Trim a full day into a shorter session while protecting the priorities:
+// compound lifts, calf rebuild, one knee-rehab move, and (for 45m) a short finisher.
+const SESSION_MODES=[
+  {id:'m30',label:'Quick',mins:'~30m'},
+  {id:'m45',label:'45 min',mins:'~45m'},
+  {id:'full',label:'Full',mins:'~60m'}
+];
+const trimDay=(day,mode)=>{
+  if(!mode||mode==='full')return day;
+  const q=mode==='m30';
+  const cfg=q
+    ?{warmKeep:2,s1Keep:2,s2Keep:2,capSets:3,rehabKeep:0,finisher:false}
+    :{warmKeep:2,s1Keep:3,s2Keep:2,capSets:3,rehabKeep:1,finisher:true};
+  const cap=ex=>({...ex,sets:Math.min(ex.sets,cfg.capSets)});
+  const out=[];
+  day.supersets.forEach(ss=>{
+    const L=ss.label;
+    // Superset 3 is always the rehab/core block (its type says "Trainer Rehab" / "Core + Knee Rehab")
+    if(L==='Warm-Up')out.push({...ss,exercises:ss.exercises.slice(0,cfg.warmKeep)});
+    else if(L.includes('Finisher')){if(cfg.finisher)out.push({...ss,exercises:ss.exercises.slice(0,1)})}
+    else if(L==='Superset 1')out.push({...ss,exercises:ss.exercises.slice(0,cfg.s1Keep).map(cap)});
+    else if(L==='Superset 2')out.push({...ss,exercises:ss.exercises.slice(0,cfg.s2Keep).map(cap)});
+    else if(L==='Superset 3'){if(cfg.rehabKeep>0)out.push({...ss,exercises:ss.exercises.slice(0,cfg.rehabKeep).map(cap)})}
+    else out.push({...ss,exercises:ss.exercises.map(cap)});
+  });
+  return {...day,supersets:out};
+};
+// Rough session-time estimate in minutes (work + rest + transitions)
+const estDayMinutes=(day)=>{
+  let sec=0;
+  day.supersets.forEach(ss=>{
+    sec+=25;
+    ss.exercises.forEach(ex=>{
+      const info=exMap[ex.eid];const reps=String(ex.reps);
+      let per;
+      if(/min/.test(reps))per=(parseInt(reps)||5)*60;
+      else if(info&&(info.t==='d'||info.t==='c'))per=(parseInt(reps)||40)+10;
+      else per=40+(ss.rest||30);
+      sec+=(ex.sets||1)*per;
+    });
+  });
+  return Math.round(sec/60);
+};
+
 // === TODAY DASHBOARD ===
 const TodayCard=({days,weekDone,phase,onOpenDay})=>{
   const bw=ld('bodyweight',80);
@@ -1225,13 +1270,15 @@ const TodayCard=({days,weekDone,phase,onOpenDay})=>{
 
 const WorkoutTab=({onOpenDay})=>{
   const[phase,setPhase]=useState(ld('phase',1));
+  const[sessionLen,setSessionLen]=useState(ld('sessionLen','m45'));
   const phaseStart=ld('phaseStart',today());
   const weekDone=ld('weekDone',{});
   const daysSinceStart=Math.max(0,Math.floor((new Date()-new Date(phaseStart))/(86400000)));
   const weekNum=Math.floor(daysSinceStart/7)+1;
-  const days=getProgramDays(phase);
+  const days=getProgramDays(phase).map(d=>trimDay(d,sessionLen));
 
   const changePhase=(p)=>{setPhase(p);sv('phase',p);if(p!==phase){sv('phaseStart',today());sv('weekDone',{})}};
+  const changeLen=(m)=>{setSessionLen(m);sv('sessionLen',m)};
   const newWeek=()=>{
     if(!confirm('Start a new week?\n\nThis clears this week\'s logged sets, set changes and check-ins for all days in this phase so you get a fresh board. Your saved workouts, PRs and progress are kept.'))return;
     days.forEach(d=>{
@@ -1255,7 +1302,7 @@ const WorkoutTab=({onOpenDay})=>{
     <>
       <div className="hdr">
         <h1>Workout</h1>
-        <p>v18.8 · Calf Rebuild + Knee-Safe · Full Body Split</p>
+        <p>v18.9 · Calf Rebuild + Knee-Safe · Full Body Split</p>
       </div>
       <div className="scroll">
         <TodayCard days={days} weekDone={weekDone} phase={phase} onOpenDay={onOpenDay} />
@@ -1265,6 +1312,16 @@ const WorkoutTab=({onOpenDay})=>{
               P{p}: {PHASE_NAMES[p-1]}
             </button>
           ))}
+        </div>
+        <div style={{marginBottom:12}}>
+          <div style={{fontSize:11,color:'var(--t3)',marginBottom:6,textTransform:'uppercase',letterSpacing:0.5}}>Session length</div>
+          <div style={{display:'flex',gap:8}}>
+            {SESSION_MODES.map(m=>(
+              <button key={m.id} className={'phase-btn'+(sessionLen===m.id?' on':'')} style={{flex:1,textAlign:'center'}} onClick={()=>changeLen(m.id)}>
+                {m.label}<div style={{fontSize:10,color:'var(--t3)',fontWeight:400}}>{m.mins}</div>
+              </button>
+            ))}
+          </div>
         </div>
         <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:12}}>
           <div style={{fontSize:14,color:'var(--t2)'}}>Week {weekNum}</div>
@@ -1278,7 +1335,7 @@ const WorkoutTab=({onOpenDay})=>{
               <div className="card-h">
                 <div>
                   <h3>{day.name}</h3>
-                  <div className="sub">{day.focus.join(' + ')} · {day.supersets.length} blocks</div>
+                  <div className="sub">{day.focus.join(' + ')} · ~{estDayMinutes(day)}m</div>
                 </div>
                 <div style={{display:'flex',alignItems:'center',gap:8}}>
                   {isDone && <span className="badge badge-g">Done</span>}
@@ -2177,7 +2234,7 @@ const SettingsTab=({showToast})=>{
             &#9888; Pain-free ranges and loads should be confirmed with your physio / fysikalsk medisin assessment. Your physio&apos;s recommendations override any range or load prescribed here.
           </div>
         </div>
-        <div style={{textAlign:'center',padding:'16px 0',fontSize:12,color:'var(--t3)'}}>v18.8 IronClad Pro</div>
+        <div style={{textAlign:'center',padding:'16px 0',fontSize:12,color:'var(--t3)'}}>v18.9 IronClad Pro</div>
       </div>
     </>
   );
