@@ -7,14 +7,14 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="IronClad">
 <meta name="theme-color" content="#000">
-<meta name="version" content="19.0.0">
+<meta name="version" content="19.1.0">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <title>IronClad Pro</title>
-<script src="https://unpkg.com/react@18/umd/react.production.min.js?v=19.0"></script>
-<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js?v=19.0"></script>
-<script src="https://unpkg.com/@babel/standalone/babel.min.js?v=19.0"></script>
+<script src="https://unpkg.com/react@18/umd/react.production.min.js?v=19.1"></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js?v=19.1"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js?v=19.1"></script>
 <style>
 :root{--bg:#000;--c1:#1c1c1e;--c2:#2c2c2e;--c3:#3a3a3c;--sep:rgba(84,84,88,0.65);--t1:#fff;--t2:rgba(235,235,245,0.6);--t3:rgba(235,235,245,0.3);--grn:#009A44;--grn-d:rgba(0,154,68,0.15);--org:#FF8C00;--org-d:rgba(255,140,0,0.15);--red:#ff453a;--red-d:rgba(255,69,58,0.15);--blu:#0a84ff;--pur:#bf5af2;--cyn:#64d2ff;--yel:#ffd60a;--safe-t:env(safe-area-inset-top);--safe-b:env(safe-area-inset-bottom)}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;margin:0;padding:0}
@@ -139,7 +139,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--t1);font-
 <div id="root"></div>
 <script>
 (function(){
-  var VER='19.0.0';
+  var VER='19.1.0';
   var stored=localStorage.getItem('ic17_appVersion');
   if(stored && stored!==VER){
     if('caches' in window)caches.keys().then(function(ks){ks.forEach(function(k){caches.delete(k)})});
@@ -152,7 +152,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--t1);font-
 })();
 if('serviceWorker' in navigator){
   const swCode=`
-    const CACHE='ironclad-v19.0';
+    const CACHE='ironclad-v19.1';
     const ASSETS=['/'];
     self.addEventListener('install',e=>e.waitUntil(caches.open(CACHE).then(c=>c.addAll(ASSETS)).then(()=>self.skipWaiting())));
     self.addEventListener('activate',e=>e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim())));
@@ -320,6 +320,10 @@ const EXDB=[
 {id:'hangknee',n:'Hanging Knee Raise',m:'Core',t:'r',eq:'Bar',tags:['k'],note:'Control the swing'},
 {id:'bearcrwl',n:'Bear Crawl',m:'Core',t:'d',eq:'Bodyweight',tags:['k','b'],note:'Knees 1 inch off ground'},
 {id:'mtclimb',n:'Mountain Climbers',m:'Core',t:'d',eq:'Bodyweight',tags:['k','p'],note:'Quick but controlled'},
+{id:'vacuum',n:'Stomach Vacuum',m:'Core',t:'d',eq:'Bodyweight',tags:['k','e'],note:'Exhale fully, draw navel to spine and hold - trains the deep TVA that cinches the waist in'},
+{id:'hollowhold',n:'Hollow Body Hold',m:'Core',t:'d',eq:'Bodyweight',tags:['k'],note:'Low back pressed flat, arms/legs extended - bend knees to regress. Deep-core tension'},
+{id:'revcrunch',n:'Reverse Crunch',m:'Core',t:'r',eq:'Bodyweight',tags:['k'],note:'Curl pelvis up into a posterior tilt - lower-ab focus, no swinging'},
+{id:'abwheel',n:'Ab Wheel Rollout',m:'Core',t:'r',eq:'Ab Wheel',tags:['k'],note:'From knees, brace hard, do not let hips sag - strong anti-extension progression'},
 {id:'bosusquat',n:'BOSU Balance Squat',m:'Legs',t:'r',eq:'BOSU',tags:['k','b'],note:'Shallow squat, focus on stability'},
 {id:'slstand',n:'Single-Leg Balance Hold',m:'Balance',t:'d',eq:'Bodyweight',tags:['k','b'],note:'30-60s, eyes closed to progress'},
 {id:'boxstep',n:'Low Box Step-Up',m:'Quads',t:'r',eq:'Step',tags:['k','b'],note:'Low step, controlled, no push-off'},
@@ -1184,6 +1188,10 @@ const getCoreDay=()=>({
       {eid:'birddog',sets:2,reps:'10 each side'},
       {eid:'deadbug',sets:2,reps:'10 each side'}
     ]},
+    {label:'Deep Core - Draw-In',type:'Waist / TVA',rest:30,exercises:[
+      {eid:'vacuum',sets:3,reps:'15s',note:'Exhale hard first, pull navel to spine'},
+      {eid:'hollowhold',sets:3,reps:'25s'}
+    ]},
     {label:'Anti-Extension',type:'Bracing',rest:45,exercises:[
       {eid:'plank',sets:3,reps:'40s',note:'Squeeze glutes, ribs down - no sagging'},
       {eid:'hangknee',sets:3,reps:'10-12',note:'Swap for lying leg raise if no bar'}
@@ -1336,7 +1344,7 @@ const WorkoutTab=({onOpenDay})=>{
     <>
       <div className="hdr">
         <h1>Workout</h1>
-        <p>v19.0 · Calf Rebuild + Knee-Safe · Full Body Split</p>
+        <p>v19.1 · Calf Rebuild + Knee-Safe · Full Body Split</p>
       </div>
       <div className="scroll">
         <TodayCard days={days} weekDone={weekDone} phase={phase} onOpenDay={onOpenDay} />
@@ -2294,7 +2302,7 @@ const SettingsTab=({showToast})=>{
             &#9888; Pain-free ranges and loads should be confirmed with your physio / fysikalsk medisin assessment. Your physio&apos;s recommendations override any range or load prescribed here.
           </div>
         </div>
-        <div style={{textAlign:'center',padding:'16px 0',fontSize:12,color:'var(--t3)'}}>v19.0 IronClad Pro</div>
+        <div style={{textAlign:'center',padding:'16px 0',fontSize:12,color:'var(--t3)'}}>v19.1 IronClad Pro</div>
       </div>
     </>
   );
