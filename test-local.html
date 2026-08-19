@@ -7,7 +7,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="IronClad">
 <meta name="theme-color" content="#000">
-<meta name="version" content="19.1.0">
+<meta name="version" content="19.2.0">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
@@ -139,7 +139,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--t1);font-
 <div id="root"></div>
 <script>
 (function(){
-  var VER='19.1.0';
+  var VER='19.2.0';
   var stored=localStorage.getItem('ic17_appVersion');
   if(stored && stored!==VER){
     if('caches' in window)caches.keys().then(function(ks){ks.forEach(function(k){caches.delete(k)})});
@@ -152,7 +152,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--t1);font-
 })();
 if('serviceWorker' in navigator){
   const swCode=`
-    const CACHE='ironclad-v19.1';
+    const CACHE='ironclad-v19.2';
     const ASSETS=['/'];
     self.addEventListener('install',e=>e.waitUntil(caches.open(CACHE).then(c=>c.addAll(ASSETS)).then(()=>self.skipWaiting())));
     self.addEventListener('activate',e=>e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim())));
@@ -1188,13 +1188,13 @@ const getCoreDay=()=>({
       {eid:'birddog',sets:2,reps:'10 each side'},
       {eid:'deadbug',sets:2,reps:'10 each side'}
     ]},
-    {label:'Deep Core - Draw-In',type:'Waist / TVA',rest:30,exercises:[
-      {eid:'vacuum',sets:3,reps:'15s',note:'Exhale hard first, pull navel to spine'},
-      {eid:'hollowhold',sets:3,reps:'25s'}
+    {label:'Deep Core',type:'Tension + Lower Abs',rest:45,exercises:[
+      {eid:'hollowhold',sets:3,reps:'25s',note:'Press low back flat - bend knees to regress'},
+      {eid:'hanglegraise',sets:3,reps:'8-12',note:'Straight legs; bend knees or do a lying leg raise if no bar'}
     ]},
     {label:'Anti-Extension',type:'Bracing',rest:45,exercises:[
       {eid:'plank',sets:3,reps:'40s',note:'Squeeze glutes, ribs down - no sagging'},
-      {eid:'hangknee',sets:3,reps:'10-12',note:'Swap for lying leg raise if no bar'}
+      {eid:'abwheel',sets:3,reps:'8-12',note:'From knees, brace hard - do not let hips sag'}
     ]},
     {label:'Anti-Rotation',type:'Core Cable/Band',rest:45,exercises:[
       {eid:'pallof',sets:3,reps:'10 each side'},
@@ -1344,7 +1344,7 @@ const WorkoutTab=({onOpenDay})=>{
     <>
       <div className="hdr">
         <h1>Workout</h1>
-        <p>v19.1 · Calf Rebuild + Knee-Safe · Full Body Split</p>
+        <p>v19.2 · Calf Rebuild + Knee-Safe · Full Body Split</p>
       </div>
       <div className="scroll">
         <TodayCard days={days} weekDone={weekDone} phase={phase} onOpenDay={onOpenDay} />
@@ -2302,7 +2302,7 @@ const SettingsTab=({showToast})=>{
             &#9888; Pain-free ranges and loads should be confirmed with your physio / fysikalsk medisin assessment. Your physio&apos;s recommendations override any range or load prescribed here.
           </div>
         </div>
-        <div style={{textAlign:'center',padding:'16px 0',fontSize:12,color:'var(--t3)'}}>v19.1 IronClad Pro</div>
+        <div style={{textAlign:'center',padding:'16px 0',fontSize:12,color:'var(--t3)'}}>v19.2 IronClad Pro</div>
       </div>
     </>
   );
