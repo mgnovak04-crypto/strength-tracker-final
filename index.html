@@ -7,14 +7,14 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="IronClad">
 <meta name="theme-color" content="#000">
-<meta name="version" content="18.9.0">
+<meta name="version" content="19.0.0">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <title>IronClad Pro</title>
-<script src="https://unpkg.com/react@18/umd/react.production.min.js?v=18.9"></script>
-<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js?v=18.9"></script>
-<script src="https://unpkg.com/@babel/standalone/babel.min.js?v=18.9"></script>
+<script src="https://unpkg.com/react@18/umd/react.production.min.js?v=19.0"></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js?v=19.0"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js?v=19.0"></script>
 <style>
 :root{--bg:#000;--c1:#1c1c1e;--c2:#2c2c2e;--c3:#3a3a3c;--sep:rgba(84,84,88,0.65);--t1:#fff;--t2:rgba(235,235,245,0.6);--t3:rgba(235,235,245,0.3);--grn:#009A44;--grn-d:rgba(0,154,68,0.15);--org:#FF8C00;--org-d:rgba(255,140,0,0.15);--red:#ff453a;--red-d:rgba(255,69,58,0.15);--blu:#0a84ff;--pur:#bf5af2;--cyn:#64d2ff;--yel:#ffd60a;--safe-t:env(safe-area-inset-top);--safe-b:env(safe-area-inset-bottom)}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;margin:0;padding:0}
@@ -139,7 +139,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--t1);font-
 <div id="root"></div>
 <script>
 (function(){
-  var VER='18.9.0';
+  var VER='19.0.0';
   var stored=localStorage.getItem('ic17_appVersion');
   if(stored && stored!==VER){
     if('caches' in window)caches.keys().then(function(ks){ks.forEach(function(k){caches.delete(k)})});
@@ -152,7 +152,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--t1);font-
 })();
 if('serviceWorker' in navigator){
   const swCode=`
-    const CACHE='ironclad-v18.9';
+    const CACHE='ironclad-v19.0';
     const ASSETS=['/'];
     self.addEventListener('install',e=>e.waitUntil(caches.open(CACHE).then(c=>c.addAll(ASSETS)).then(()=>self.skipWaiting())));
     self.addEventListener('activate',e=>e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim())));
@@ -1172,6 +1172,37 @@ const DayView=({day,phase,onBack})=>{
 };
 
 // === WORKOUT TAB ===
+// === OPTIONAL CORE SESSION (standalone, phase-independent) ===
+// Structured by core function: anti-extension, anti-rotation, anti-lateral flexion.
+const CORE_PHASE='core';
+const getCoreDay=()=>({
+  name:'Core Focus',
+  focus:['Anti-Rotation','Anti-Extension','Stability'],
+  optional:true,
+  supersets:[
+    {label:'Warm-Up',type:'Activation',rest:0,exercises:[
+      {eid:'birddog',sets:2,reps:'10 each side'},
+      {eid:'deadbug',sets:2,reps:'10 each side'}
+    ]},
+    {label:'Anti-Extension',type:'Bracing',rest:45,exercises:[
+      {eid:'plank',sets:3,reps:'40s',note:'Squeeze glutes, ribs down - no sagging'},
+      {eid:'hangknee',sets:3,reps:'10-12',note:'Swap for lying leg raise if no bar'}
+    ]},
+    {label:'Anti-Rotation',type:'Core Cable/Band',rest:45,exercises:[
+      {eid:'pallof',sets:3,reps:'10 each side'},
+      {eid:'staggerpallof',sets:3,reps:'10 each side'}
+    ]},
+    {label:'Anti-Lateral Flexion',type:'Obliques',rest:45,exercises:[
+      {eid:'sideplank',sets:3,reps:'30s each'},
+      {eid:'suitcasecarry',sets:3,reps:'30s each side',note:'Heavy DB one side, stay tall'}
+    ]},
+    {label:'Core Finisher',type:'Dynamic',rest:30,exercises:[
+      {eid:'bearcrwl',sets:3,reps:'30s'},
+      {eid:'mtclimb',sets:3,reps:'30s',note:'Controlled - low impact for knees'}
+    ]}
+  ]
+});
+
 // === SESSION LENGTH ===
 // Trim a full day into a shorter session while protecting the priorities:
 // compound lifts, calf rebuild, one knee-rehab move, and (for 45m) a short finisher.
@@ -1285,24 +1316,27 @@ const WorkoutTab=({onOpenDay})=>{
       const k=d.name.replace(/\s/g,'')+'_p'+phase;
       rm('dayLog_'+k);rm('setsOverride_'+k);rm('dayCheckin_'+k);
     });
+    const ck='CoreFocus_p'+CORE_PHASE;
+    rm('dayLog_'+ck);rm('setsOverride_'+ck);rm('dayCheckin_'+ck);
     sv('weekDone',{});
     window.location.reload();
   };
 
-  const dayPct=(day)=>{
-    const logData=ld('dayLog_'+day.name.replace(/\s/g,'')+'_p'+phase,{});
-    const setsOvr=ld('setsOverride_'+day.name.replace(/\s/g,'')+'_p'+phase,{});
+  const dayPct=(day,ph=phase)=>{
+    const logData=ld('dayLog_'+day.name.replace(/\s/g,'')+'_p'+ph,{});
+    const setsOvr=ld('setsOverride_'+day.name.replace(/\s/g,'')+'_p'+ph,{});
     const allEx=day.supersets.flatMap(s=>s.exercises);
     const total=allEx.reduce((a,ex)=>(setsOvr[ex.eid]||ex.sets)+a,0);
     const done=allEx.reduce((a,ex)=>{const d=logData[ex.eid]||[];return a+d.filter(s=>s.done).length},0);
     return total>0?Math.round(done/total*100):0;
   };
+  const coreDay=getCoreDay();
 
   return (
     <>
       <div className="hdr">
         <h1>Workout</h1>
-        <p>v18.9 · Calf Rebuild + Knee-Safe · Full Body Split</p>
+        <p>v19.0 · Calf Rebuild + Knee-Safe · Full Body Split</p>
       </div>
       <div className="scroll">
         <TodayCard days={days} weekDone={weekDone} phase={phase} onOpenDay={onOpenDay} />
@@ -1349,6 +1383,32 @@ const WorkoutTab=({onOpenDay})=>{
             </div>
           );
         })}
+        {(()=>{
+          const cp=dayPct(coreDay,CORE_PHASE);
+          const cDone=weekDone[coreDay.name];
+          return (
+            <>
+              <div style={{fontSize:11,color:'var(--t3)',margin:'8px 0 6px',textTransform:'uppercase',letterSpacing:0.5}}>Optional add-on</div>
+              <div className="card" onClick={()=>onOpenDay(coreDay,CORE_PHASE)} style={{cursor:'pointer',borderLeft:'3px solid var(--cyn)'}}>
+                <div className="card-h">
+                  <div>
+                    <h3>{coreDay.name}</h3>
+                    <div className="sub">{coreDay.focus.join(' + ')} · ~{estDayMinutes(coreDay)}m</div>
+                  </div>
+                  <div style={{display:'flex',alignItems:'center',gap:8}}>
+                    {cDone && <span className="badge badge-g">Done</span>}
+                    {cp>0&&!cDone && <span className="badge" style={{background:'rgba(100,210,255,0.15)',color:'var(--cyn)'}}>{cp}%</span>}
+                    <span style={{fontSize:20,color:'var(--t3)'}}>{'>'}</span>
+                  </div>
+                </div>
+                <div style={{padding:'0 16px 4px',fontSize:12,color:'var(--t2)'}}>Standalone core day — add it any time, doesn't replace your workouts.</div>
+                <div style={{padding:'6px 16px 12px'}}>
+                  <div className="prg"><div className="prg-f" style={{width:cp+'%',background:'var(--cyn)'}} /></div>
+                </div>
+              </div>
+            </>
+          );
+        })()}
       </div>
     </>
   );
@@ -2234,7 +2294,7 @@ const SettingsTab=({showToast})=>{
             &#9888; Pain-free ranges and loads should be confirmed with your physio / fysikalsk medisin assessment. Your physio&apos;s recommendations override any range or load prescribed here.
           </div>
         </div>
-        <div style={{textAlign:'center',padding:'16px 0',fontSize:12,color:'var(--t3)'}}>v18.9 IronClad Pro</div>
+        <div style={{textAlign:'center',padding:'16px 0',fontSize:12,color:'var(--t3)'}}>v19.0 IronClad Pro</div>
       </div>
     </>
   );
