@@ -7,7 +7,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="IronClad">
 <meta name="theme-color" content="#000">
-<meta name="version" content="19.2.0">
+<meta name="version" content="19.3.0">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
@@ -139,7 +139,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--t1);font-
 <div id="root"></div>
 <script>
 (function(){
-  var VER='19.2.0';
+  var VER='19.3.0';
   var stored=localStorage.getItem('ic17_appVersion');
   if(stored && stored!==VER){
     if('caches' in window)caches.keys().then(function(ks){ks.forEach(function(k){caches.delete(k)})});
@@ -152,7 +152,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--t1);font-
 })();
 if('serviceWorker' in navigator){
   const swCode=`
-    const CACHE='ironclad-v19.2';
+    const CACHE='ironclad-v19.3';
     const ASSETS=['/'];
     self.addEventListener('install',e=>e.waitUntil(caches.open(CACHE).then(c=>c.addAll(ASSETS)).then(()=>self.skipWaiting())));
     self.addEventListener('activate',e=>e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim())));
@@ -1215,15 +1215,15 @@ const getCoreDay=()=>({
 // Trim a full day into a shorter session while protecting the priorities:
 // compound lifts, calf rebuild, one knee-rehab move, and (for 45m) a short finisher.
 const SESSION_MODES=[
-  {id:'m30',label:'Quick',mins:'~30m'},
+  {id:'m35',label:'35 min',mins:'~35m'},
   {id:'m45',label:'45 min',mins:'~45m'},
   {id:'full',label:'Full',mins:'~60m'}
 ];
 const trimDay=(day,mode)=>{
   if(!mode||mode==='full')return day;
-  const q=mode==='m30';
+  const q=mode==='m35';
   const cfg=q
-    ?{warmKeep:2,s1Keep:2,s2Keep:2,capSets:3,rehabKeep:0,finisher:false}
+    ?{warmKeep:2,s1Keep:2,s2Keep:2,capSets:3,rehabKeep:0,finisher:true}
     :{warmKeep:2,s1Keep:3,s2Keep:2,capSets:3,rehabKeep:1,finisher:true};
   const cap=ex=>({...ex,sets:Math.min(ex.sets,cfg.capSets)});
   const out=[];
@@ -1243,14 +1243,14 @@ const trimDay=(day,mode)=>{
 const estDayMinutes=(day)=>{
   let sec=0;
   day.supersets.forEach(ss=>{
-    sec+=25;
+    sec+=35; // block setup/transition
     ss.exercises.forEach(ex=>{
       const info=exMap[ex.eid];const reps=String(ex.reps);
       let per;
       if(/min/.test(reps))per=(parseInt(reps)||5)*60;
-      else if(info&&(info.t==='d'||info.t==='c'))per=(parseInt(reps)||40)+10;
-      else per=40+(ss.rest||30);
-      sec+=(ex.sets||1)*per;
+      else if(info&&(info.t==='d'||info.t==='c'))per=(parseInt(reps)||40)+15+(ss.rest||20);
+      else per=50+(ss.rest||30); // ~50s work incl. unrack/re-rack, + block rest
+      sec+=(ex.sets||1)*per+15; // +15s per-exercise setup
     });
   });
   return Math.round(sec/60);
@@ -1309,7 +1309,7 @@ const TodayCard=({days,weekDone,phase,onOpenDay})=>{
 
 const WorkoutTab=({onOpenDay})=>{
   const[phase,setPhase]=useState(ld('phase',1));
-  const[sessionLen,setSessionLen]=useState(ld('sessionLen','m45'));
+  const[sessionLen,setSessionLen]=useState(()=>{const s=ld('sessionLen','m45');return s==='m30'?'m35':s});
   const phaseStart=ld('phaseStart',today());
   const weekDone=ld('weekDone',{});
   const daysSinceStart=Math.max(0,Math.floor((new Date()-new Date(phaseStart))/(86400000)));
@@ -1344,7 +1344,7 @@ const WorkoutTab=({onOpenDay})=>{
     <>
       <div className="hdr">
         <h1>Workout</h1>
-        <p>v19.2 · Calf Rebuild + Knee-Safe · Full Body Split</p>
+        <p>v19.3 · Calf Rebuild + Knee-Safe · Full Body Split</p>
       </div>
       <div className="scroll">
         <TodayCard days={days} weekDone={weekDone} phase={phase} onOpenDay={onOpenDay} />
@@ -2302,7 +2302,7 @@ const SettingsTab=({showToast})=>{
             &#9888; Pain-free ranges and loads should be confirmed with your physio / fysikalsk medisin assessment. Your physio&apos;s recommendations override any range or load prescribed here.
           </div>
         </div>
-        <div style={{textAlign:'center',padding:'16px 0',fontSize:12,color:'var(--t3)'}}>v19.2 IronClad Pro</div>
+        <div style={{textAlign:'center',padding:'16px 0',fontSize:12,color:'var(--t3)'}}>v19.3 IronClad Pro</div>
       </div>
     </>
   );
