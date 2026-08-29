@@ -7,14 +7,14 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="IronClad">
 <meta name="theme-color" content="#000">
-<meta name="version" content="19.3.0">
+<meta name="version" content="19.4.0">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <title>IronClad Pro</title>
-<script src="https://unpkg.com/react@18/umd/react.production.min.js?v=19.3"></script>
-<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js?v=19.3"></script>
-<script src="https://unpkg.com/@babel/standalone/babel.min.js?v=19.3"></script>
+<script src="https://unpkg.com/react@18/umd/react.production.min.js?v=19.4"></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js?v=19.4"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js?v=19.4"></script>
 <style>
 :root{--bg:#000;--c1:#1c1c1e;--c2:#2c2c2e;--c3:#3a3a3c;--sep:rgba(84,84,88,0.65);--t1:#fff;--t2:rgba(235,235,245,0.6);--t3:rgba(235,235,245,0.3);--grn:#009A44;--grn-d:rgba(0,154,68,0.15);--org:#FF8C00;--org-d:rgba(255,140,0,0.15);--red:#ff453a;--red-d:rgba(255,69,58,0.15);--blu:#0a84ff;--pur:#bf5af2;--cyn:#64d2ff;--yel:#ffd60a;--safe-t:env(safe-area-inset-top);--safe-b:env(safe-area-inset-bottom)}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;margin:0;padding:0}
@@ -139,7 +139,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--t1);font-
 <div id="root"></div>
 <script>
 (function(){
-  var VER='19.3.0';
+  var VER='19.4.0';
   var stored=localStorage.getItem('ic17_appVersion');
   if(stored && stored!==VER){
     if('caches' in window)caches.keys().then(function(ks){ks.forEach(function(k){caches.delete(k)})});
@@ -152,7 +152,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--t1);font-
 })();
 if('serviceWorker' in navigator){
   const swCode=`
-    const CACHE='ironclad-v19.3';
+    const CACHE='ironclad-v19.4';
     const ASSETS=['/'];
     self.addEventListener('install',e=>e.waitUntil(caches.open(CACHE).then(c=>c.addAll(ASSETS)).then(()=>self.skipWaiting())));
     self.addEventListener('activate',e=>e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim())));
@@ -1258,6 +1258,8 @@ const estDayMinutes=(day)=>{
 
 // === TODAY DASHBOARD ===
 const TodayCard=({days,weekDone,phase,onOpenDay})=>{
+  const[wGoal,setWGoal]=useState(ld('weeklyGoal',3));
+  const setGoal=(g)=>{const v=Math.max(1,Math.min(7,g));setWGoal(v);sv('weeklyGoal',v)};
   const bw=ld('bodyweight',80);
   const goal=ld('weightGoal',75);
   const wLog=ld('weightLog',[]);
@@ -1274,10 +1276,21 @@ const TodayCard=({days,weekDone,phase,onOpenDay})=>{
   const pPct=pTarget>0?Math.min(100,Math.round(pToday/pTarget*100)):0;
   const history=ld('history',[]);
   const last=history[0]||null;
-  const weekCount=history.filter(h=>(new Date()-new Date(h.date))/86400000<7).length;
   let streak=0;const dates=[...new Set(history.map(h=>h.date))].sort().reverse();
   if(dates.length){let cur=new Date();for(const ds of dates){const diff=Math.round((cur-new Date(ds))/86400000);if(diff<=1){streak++;cur=new Date(ds)}else break}}
   const next=days.find(d=>!weekDone[d.name])||days[0];
+  // Weekly consistency goal: distinct training days per calendar week (Mon-start)
+  const mondayKey=(d)=>{const x=new Date(d);x.setHours(0,0,0,0);x.setDate(x.getDate()-((x.getDay()+6)%7));return x.toISOString().slice(0,10)};
+  const weekSets={};
+  history.forEach(h=>{const k=mondayKey(h.date);(weekSets[k]=weekSets[k]||new Set()).add(h.date)});
+  const weekCountG=weekSets[mondayKey(new Date())]?weekSets[mondayKey(new Date())].size:0;
+  const goalMet=weekCountG>=wGoal;
+  const metWk=(k)=>((weekSets[k]?weekSets[k].size:0)>=wGoal);
+  let wkStreak=0;{
+    let probe=new Date();probe.setHours(0,0,0,0);probe.setDate(probe.getDate()-((probe.getDay()+6)%7));
+    if(!metWk(mondayKey(probe)))probe.setDate(probe.getDate()-7);
+    while(metWk(mondayKey(probe))){wkStreak++;probe.setDate(probe.getDate()-7)}
+  }
   return (
     <div className="card" style={{padding:14,marginBottom:12}}>
       <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:10}}>
@@ -1297,8 +1310,25 @@ const TodayCard=({days,weekDone,phase,onOpenDay})=>{
           <div style={{fontSize:11,color:'var(--t2)'}}>Protein today</div>
           <div style={{fontSize:18,fontWeight:700}}>{pToday}<span style={{fontSize:12,fontWeight:400,color:'var(--t2)'}}>/{pTarget}g</span></div>
           <div className="prg" style={{height:6,marginTop:6}}><div className="prg-f" style={{width:pPct+'%',background:pPct>=100?'var(--grn)':'var(--org)'}} /></div>
-          <div style={{fontSize:11,color:'var(--t2)',marginTop:4}}>{weekCount} workout{weekCount!==1?'s':''} this week{last?' · last '+fmtDate(last.date):''}</div>
+          <div style={{fontSize:11,color:'var(--t2)',marginTop:4}}>{last?'last session '+fmtDate(last.date):'no sessions yet'}</div>
         </div>
+      </div>
+      <div style={{background:'var(--c2)',borderRadius:10,padding:'8px 10px',marginBottom:10}}>
+        <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:6}}>
+          <div style={{fontSize:11,color:'var(--t2)'}}>Weekly goal{goalMet&&<span style={{color:'var(--grn)',fontWeight:600}}> · hit ✓</span>}</div>
+          <div style={{display:'flex',alignItems:'center',gap:6}}>
+            {wkStreak>0&&<span style={{fontSize:11,color:'var(--org)',fontWeight:600}}>🔥 {wkStreak} wk{wkStreak>1?'s':''} in a row</span>}
+            <button className="btn btn-s" style={{padding:'1px 8px',fontSize:14,lineHeight:1}} onClick={()=>setGoal(wGoal-1)}>−</button>
+            <span style={{fontSize:13,fontWeight:700,minWidth:12,textAlign:'center'}}>{wGoal}</span>
+            <button className="btn btn-s" style={{padding:'1px 8px',fontSize:14,lineHeight:1}} onClick={()=>setGoal(wGoal+1)}>+</button>
+          </div>
+        </div>
+        <div style={{display:'flex',gap:4}}>
+          {Array.from({length:wGoal}).map((_,i)=>(
+            <div key={i} style={{flex:1,height:8,borderRadius:4,background:i<weekCountG?'var(--grn)':'var(--c3)'}} />
+          ))}
+        </div>
+        <div style={{fontSize:11,color:'var(--t2)',marginTop:5}}>{weekCountG}/{wGoal} sessions this week{goalMet?' — nice work! 🎯':(weekCountG>0?' — keep it up':' — let’s get one in')}</div>
       </div>
       <button className="btn btn-g" style={{width:'100%',fontSize:14}} onClick={()=>onOpenDay(next,phase)}>
         {weekDone[next.name]?'Repeat':'Start'} {next.name} →
@@ -1344,7 +1374,7 @@ const WorkoutTab=({onOpenDay})=>{
     <>
       <div className="hdr">
         <h1>Workout</h1>
-        <p>v19.3 · Calf Rebuild + Knee-Safe · Full Body Split</p>
+        <p>v19.4 · Calf Rebuild + Knee-Safe · Full Body Split</p>
       </div>
       <div className="scroll">
         <TodayCard days={days} weekDone={weekDone} phase={phase} onOpenDay={onOpenDay} />
@@ -2302,7 +2332,7 @@ const SettingsTab=({showToast})=>{
             &#9888; Pain-free ranges and loads should be confirmed with your physio / fysikalsk medisin assessment. Your physio&apos;s recommendations override any range or load prescribed here.
           </div>
         </div>
-        <div style={{textAlign:'center',padding:'16px 0',fontSize:12,color:'var(--t3)'}}>v19.3 IronClad Pro</div>
+        <div style={{textAlign:'center',padding:'16px 0',fontSize:12,color:'var(--t3)'}}>v19.4 IronClad Pro</div>
       </div>
     </>
   );
