@@ -7,7 +7,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="IronClad">
 <meta name="theme-color" content="#000">
-<meta name="version" content="19.5.0">
+<meta name="version" content="19.6.0">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
@@ -139,7 +139,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--t1);font-
 <div id="root"></div>
 <script>
 (function(){
-  var VER='19.5.0';
+  var VER='19.6.0';
   var stored=localStorage.getItem('ic17_appVersion');
   if(stored && stored!==VER){
     if('caches' in window)caches.keys().then(function(ks){ks.forEach(function(k){caches.delete(k)})});
@@ -152,7 +152,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--t1);font-
 })();
 if('serviceWorker' in navigator){
   const swCode=`
-    const CACHE='ironclad-v19.5';
+    const CACHE='ironclad-v19.6';
     const ASSETS=['/'];
     self.addEventListener('install',e=>e.waitUntil(caches.open(CACHE).then(c=>c.addAll(ASSETS)).then(()=>self.skipWaiting())));
     self.addEventListener('activate',e=>e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim())));
@@ -272,7 +272,7 @@ const computeReadiness=(history,acwr)=>{
 };
 
 // === EXERCISE DATABASE ===
-const EXDB=[
+const EXDB_BASE=[
 {id:'trapbar',n:'Trapbar Deadlift',m:'Legs',t:'w',eq:'Barbell',tags:['k','t'],note:'Hip hinge focus, keep back neutral'},
 {id:'foamquad',n:'Foam Rolling Quads',m:'Recovery',t:'d',eq:'Foam Roller',tags:['k','t'],note:'90s per quad, focus on tight spots'},
 {id:'johnsoncalf',n:'BB Johnson Calf Raise',m:'Calves',t:'w',eq:'Barbell',tags:['k','t'],note:'Gastrocnemius focus, 3s eccentric lowering, full ROM'},
@@ -366,6 +366,8 @@ const EXDB=[
 {id:'tibraise',n:'Tibialis Raise',m:'Shins',t:'r',eq:'Bodyweight',tags:['k','e'],note:'Heels down, lift toes toward shins - balances calf work and builds ankle resilience'},
 {id:'slcalf',n:'Single-Leg Calf Raise',m:'Calves',t:'r',eq:'Bodyweight',tags:['k','e'],note:'One leg, full range, 3s lower - per-side calf balance for the rebuild'}
 ];
+// User-added custom exercises are merged in at load (see Library "Add Exercise")
+const EXDB=[...EXDB_BASE,...ld('customExercises',[]).filter(e=>e&&e.id&&e.n)];
 const exMap=Object.fromEntries(EXDB.map(e=>[e.id,e]));
 
 // === PROGRAM ===
@@ -1378,7 +1380,7 @@ const WorkoutTab=({onOpenDay})=>{
     <>
       <div className="hdr">
         <h1>Workout</h1>
-        <p>v19.5 · Calf Rebuild + Knee-Safe · Full Body Split</p>
+        <p>v19.6 · Calf Rebuild + Knee-Safe · Full Body Split</p>
       </div>
       <div className="scroll">
         <TodayCard days={days} weekDone={weekDone} phase={phase} onOpenDay={onOpenDay} />
@@ -2099,18 +2101,22 @@ const LibraryCard=({ex})=>{
   const alts=EXDB.filter(e=>e.m===ex.m&&e.id!==ex.id);
   const altsByEq={};
   alts.forEach(a=>{if(!altsByEq[a.eq])altsByEq[a.eq]=[];altsByEq[a.eq].push(a)});
+  const typeLabel=ex.t==='w'?'Weighted':(ex.t==='d'||ex.t==='c')?'Timed':'Bodyweight';
+  const delCustom=()=>{if(!confirm('Delete "'+ex.n+'" from your exercises?'))return;sv('customExercises',ld('customExercises',[]).filter(c=>c.id!==ex.id));window.location.reload()};
   return (
     <div className="card" style={{padding:14}}>
       <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start'}}>
         <div style={{flex:1,minWidth:0}}>
           <div style={{fontSize:15,fontWeight:600}}>{ex.n}</div>
-          <div style={{fontSize:12,color:'var(--t2)',marginTop:2}}>{ex.m} · {ex.eq}</div>
+          <div style={{fontSize:12,color:'var(--t2)',marginTop:2}}>{ex.m} · {ex.eq} · {typeLabel}</div>
         </div>
-        <div style={{display:'flex',gap:3,flexShrink:0}}>
-          {ex.tags.map(t=><span key={t} className={'ex-tag tag-'+t}>{tagLabels[t]||t}</span>)}
+        <div style={{display:'flex',gap:3,flexShrink:0,flexWrap:'wrap',justifyContent:'flex-end'}}>
+          {ex.custom&&<span className="ex-tag" style={{background:'var(--org-d)',color:'var(--org)'}}>Custom</span>}
+          {(ex.tags||[]).map(t=><span key={t} className={'ex-tag tag-'+t}>{tagLabels[t]||t}</span>)}
         </div>
       </div>
       {ex.note && <div style={{fontSize:12,color:'var(--t3)',marginTop:4}}>{ex.note}</div>}
+      {ex.custom&&<button className="btn" style={{width:'100%',marginTop:8,fontSize:11,padding:'6px 0',background:'var(--red-d)',color:'var(--red)'}} onClick={delCustom}>Delete Exercise</button>}
       {alts.length>0 && (
         <button className="btn btn-s" style={{width:'100%',marginTop:8,fontSize:11,padding:'6px 0'}}
           onClick={()=>setShowAlts(!showAlts)}>
@@ -2136,6 +2142,56 @@ const LibraryCard=({ex})=>{
   );
 };
 
+// === ADD CUSTOM EXERCISE FORM ===
+const AddExerciseForm=({muscleOptions,onAdded})=>{
+  const[open,setOpen]=useState(false);
+  const[n,setN]=useState('');
+  const[m,setM]=useState('');
+  const[t,setT]=useState('w');
+  const[eq,setEq]=useState('');
+  const[note,setNote]=useState('');
+  const TYPES=[{v:'w',l:'Weighted',hint:'kg + reps'},{v:'r',l:'Bodyweight',hint:'reps only'},{v:'d',l:'Timed',hint:'seconds'}];
+  const defEq=t==='w'?'Dumbbell':'Bodyweight';
+  const save=()=>{
+    const name=n.trim();const mus=m.trim();
+    if(!name||!mus)return;
+    const ex={id:'custom_'+Date.now(),n:name,m:mus,t,eq:(eq.trim()||defEq),tags:['k'],note:note.trim(),custom:true};
+    sv('customExercises',[...ld('customExercises',[]),ex]);
+    onAdded&&onAdded(name);
+    window.location.reload();
+  };
+  if(!open)return (
+    <button className="btn btn-g" style={{width:'100%',marginBottom:12}} onClick={()=>setOpen(true)}>＋ Add Your Own Exercise</button>
+  );
+  return (
+    <div className="card" style={{padding:14,marginBottom:12,borderLeft:'3px solid var(--org)'}}>
+      <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:10}}>
+        <div style={{fontSize:15,fontWeight:700}}>Add Exercise</div>
+        <button className="btn btn-s" style={{fontSize:12,padding:'4px 10px'}} onClick={()=>setOpen(false)}>Cancel</button>
+      </div>
+      <input className="inp" style={{width:'100%',textAlign:'left',paddingLeft:12,marginBottom:8}} placeholder="Exercise name" value={n} onChange={e=>setN(e.target.value)} />
+      <div style={{fontSize:11,color:'var(--t2)',margin:'2px 0 4px'}}>Type</div>
+      <div style={{display:'flex',gap:6,marginBottom:8}}>
+        {TYPES.map(x=>(
+          <button key={x.v} className={'btn'+(t===x.v?' btn-g':' btn-s')} style={{flex:1,fontSize:12,padding:'8px 0'}} onClick={()=>setT(x.v)}>
+            {x.l}<div style={{fontSize:9,fontWeight:400,opacity:0.8}}>{x.hint}</div>
+          </button>
+        ))}
+      </div>
+      <div style={{fontSize:11,color:'var(--t2)',margin:'2px 0 4px'}}>Muscle group</div>
+      <input className="inp" style={{width:'100%',textAlign:'left',paddingLeft:12,marginBottom:6}} placeholder="e.g. Chest" value={m} onChange={e=>setM(e.target.value)} />
+      <div style={{display:'flex',flexWrap:'wrap',gap:5,marginBottom:8}}>
+        {muscleOptions.slice(0,10).map(mu=>(
+          <button key={mu} className="btn btn-s" style={{fontSize:11,padding:'3px 8px'}} onClick={()=>setM(mu)}>{mu}</button>
+        ))}
+      </div>
+      <input className="inp" style={{width:'100%',textAlign:'left',paddingLeft:12,marginBottom:8}} placeholder={'Equipment (default: '+defEq+')'} value={eq} onChange={e=>setEq(e.target.value)} />
+      <input className="inp" style={{width:'100%',textAlign:'left',paddingLeft:12,marginBottom:10}} placeholder="Note / form cue (optional)" value={note} onChange={e=>setNote(e.target.value)} />
+      <button className="btn btn-g" style={{width:'100%',opacity:(n.trim()&&m.trim())?1:0.5}} disabled={!n.trim()||!m.trim()} onClick={save}>Save Exercise</button>
+    </div>
+  );
+};
+
 // === LIBRARY TAB ===
 const LibraryTab=()=>{
   const[search,setSearch]=useState('');
@@ -2155,6 +2211,7 @@ const LibraryTab=()=>{
     <>
       <div className="hdr"><h1>Library</h1></div>
       <div className="scroll">
+        <AddExerciseForm muscleOptions={muscles} />
         <input className="inp" style={{width:'100%',marginBottom:12,textAlign:'left',paddingLeft:16}}
           placeholder="Search exercises..." value={search} onChange={e=>setSearch(e.target.value)} />
         <div className="filter-pills">
@@ -2336,7 +2393,7 @@ const SettingsTab=({showToast})=>{
             &#9888; Pain-free ranges and loads should be confirmed with your physio / fysikalsk medisin assessment. Your physio&apos;s recommendations override any range or load prescribed here.
           </div>
         </div>
-        <div style={{textAlign:'center',padding:'16px 0',fontSize:12,color:'var(--t3)'}}>v19.5 IronClad Pro</div>
+        <div style={{textAlign:'center',padding:'16px 0',fontSize:12,color:'var(--t3)'}}>v19.6 IronClad Pro</div>
       </div>
     </>
   );
