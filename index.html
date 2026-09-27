@@ -425,12 +425,12 @@ const EXDB_BASE = [{
   note: 'Split stance, pulse arms out'
 }, {
   id: 'anklejump',
-  n: 'Ankle Jumps + Alt Skipping',
+  n: 'Pogo Hops (Ankle Jumps)',
   m: 'Plyo',
   t: 'r',
   eq: 'Bodyweight',
   tags: ['k', 'p', 't'],
-  note: 'Quick reactive jumps, minimal knee bend'
+  note: 'Quick reactive pogo hops, stiff ankles, minimal knee bend'
 }, {
   id: 'eccstepdown',
   n: 'Eccentric Step-Down',
@@ -534,7 +534,8 @@ const EXDB_BASE = [{
   t: 'r',
   eq: 'Step',
   tags: ['k', 'e'],
-  note: 'Rise on both feet, lower slowly on one - 4s eccentric'
+  note: 'Rise on both feet, lower slowly on one - 4s eccentric',
+  lw: 1
 }, {
   id: 'seatedcalf',
   n: 'Seated Calf Raise',
@@ -806,7 +807,8 @@ const EXDB_BASE = [{
   t: 'r',
   eq: 'Step',
   tags: ['k', 'b'],
-  note: 'Low step, controlled, no push-off'
+  note: 'Low step, controlled, no push-off',
+  lw: 1
 }, {
   id: 'rowing',
   n: 'Rowing Machine',
@@ -942,7 +944,8 @@ const EXDB_BASE = [{
   t: 'd',
   eq: 'Dumbbell',
   tags: ['k', 'b'],
-  note: 'Heavy DB one side, walk - anti-lateral flexion'
+  note: 'Heavy DB one side, walk - anti-lateral flexion',
+  lw: 1
 }, {
   id: 'farmerwalk',
   n: 'Farmer Walk',
@@ -950,7 +953,8 @@ const EXDB_BASE = [{
   t: 'd',
   eq: 'Dumbbell',
   tags: ['k', 'f'],
-  note: 'Heavy DBs both hands, walk 40m - metabolic + grip'
+  note: 'Heavy DBs both hands, walk 40m - metabolic + grip',
+  lw: 1
 }, {
   id: 'kneetowall',
   n: 'Knee-to-Wall Ankle Mob.',
@@ -1046,7 +1050,8 @@ const EXDB_BASE = [{
   t: 'd',
   eq: 'Sandbag',
   tags: ['k', 'f'],
-  note: 'Bear hug carry, walk 40m - full body conditioning'
+  note: 'Bear hug carry, walk 40m - full body conditioning',
+  lw: 1
 }, {
   id: 'revlunge',
   n: 'Reverse Lunge',
@@ -1110,7 +1115,8 @@ const EXDB_BASE = [{
   t: 'r',
   eq: 'Bodyweight',
   tags: ['k', 'e'],
-  note: 'One leg, full range, 3s lower - per-side calf balance for the rebuild'
+  note: 'One leg, full range, 3s lower - per-side calf balance for the rebuild',
+  lw: 1
 }, {
   id: 'snapdown',
   n: 'Snap-Down to Stick',
@@ -1287,7 +1293,7 @@ const PROGRAM = {
         sets: 1,
         reps: '12 each side',
         k: 1,
-        note: 'Knee over 2nd toe, heel down, 2s hold - log cm from wall'
+        note: 'Knee over 2nd toe, heel down, 2s hold - track cm in Progress'
       }, {
         eid: 'tke',
         sets: 2,
@@ -1418,7 +1424,7 @@ const PROGRAM = {
         sets: 1,
         reps: '12 each side',
         k: 1,
-        note: 'Knee over 2nd toe, heel down, 2s hold - log cm from wall'
+        note: 'Knee over 2nd toe, heel down, 2s hold - track cm in Progress'
       }, {
         eid: 'tke',
         sets: 2,
@@ -1543,7 +1549,7 @@ const PROGRAM = {
         sets: 1,
         reps: '12 each side',
         k: 1,
-        note: 'Knee over 2nd toe, heel down, 2s hold - log cm from wall'
+        note: 'Knee over 2nd toe, heel down, 2s hold - track cm in Progress'
       }, {
         eid: 'tke',
         sets: 2,
@@ -1675,7 +1681,7 @@ const PROGRAM = {
         sets: 1,
         reps: '12 each side',
         k: 1,
-        note: 'Knee over 2nd toe, heel down, 2s hold - log cm from wall'
+        note: 'Knee over 2nd toe, heel down, 2s hold - track cm in Progress'
       }, {
         eid: 'tke',
         sets: 2,
@@ -1806,7 +1812,7 @@ const PROGRAM = {
         sets: 1,
         reps: '12 each side',
         k: 1,
-        note: 'Knee over 2nd toe, heel down, 2s hold - log cm from wall'
+        note: 'Knee over 2nd toe, heel down, 2s hold - track cm in Progress'
       }, {
         eid: 'tke',
         sets: 2,
@@ -1931,7 +1937,7 @@ const PROGRAM = {
         sets: 1,
         reps: '12 each side',
         k: 1,
-        note: 'Knee over 2nd toe, heel down, 2s hold - log cm from wall'
+        note: 'Knee over 2nd toe, heel down, 2s hold - track cm in Progress'
       }, {
         eid: 'tke',
         sets: 2,
@@ -2063,7 +2069,7 @@ const PROGRAM = {
         sets: 1,
         reps: '12 each side',
         k: 1,
-        note: 'Knee over 2nd toe, heel down, 2s hold - log cm from wall'
+        note: 'Knee over 2nd toe, heel down, 2s hold - track cm in Progress'
       }, {
         eid: 'tke',
         sets: 2,
@@ -2194,7 +2200,7 @@ const PROGRAM = {
         sets: 1,
         reps: '12 each side',
         k: 1,
-        note: 'Knee over 2nd toe, heel down, 2s hold - log cm from wall'
+        note: 'Knee over 2nd toe, heel down, 2s hold - track cm in Progress'
       }, {
         eid: 'tke',
         sets: 2,
@@ -2319,7 +2325,7 @@ const PROGRAM = {
         sets: 1,
         reps: '12 each side',
         k: 1,
-        note: 'Knee over 2nd toe, heel down, 2s hold - log cm from wall'
+        note: 'Knee over 2nd toe, heel down, 2s hold - track cm in Progress'
       }, {
         eid: 'tke',
         sets: 2,
@@ -2451,7 +2457,7 @@ const PROGRAM = {
         sets: 1,
         reps: '12 each side',
         k: 1,
-        note: 'Knee over 2nd toe, heel down, 2s hold - log cm from wall'
+        note: 'Knee over 2nd toe, heel down, 2s hold - track cm in Progress'
       }, {
         eid: 'tke',
         sets: 2,
@@ -2582,7 +2588,7 @@ const PROGRAM = {
         sets: 1,
         reps: '12 each side',
         k: 1,
-        note: 'Knee over 2nd toe, heel down, 2s hold - log cm from wall'
+        note: 'Knee over 2nd toe, heel down, 2s hold - track cm in Progress'
       }, {
         eid: 'tke',
         sets: 2,
@@ -2707,7 +2713,7 @@ const PROGRAM = {
         sets: 1,
         reps: '12 each side',
         k: 1,
-        note: 'Knee over 2nd toe, heel down, 2s hold - log cm from wall'
+        note: 'Knee over 2nd toe, heel down, 2s hold - track cm in Progress'
       }, {
         eid: 'tke',
         sets: 2,
@@ -3074,7 +3080,7 @@ const SetLogger = ({
     };
     return d;
   };
-  const needsWeight = info && (info.t === 'w' || ['Cable', 'Machine', 'Dumbbell', 'Barbell', 'Kettlebell'].includes(info.eq));
+  const needsWeight = info && (info.t === 'w' || !!info.lw || ['Cable', 'Machine', 'Dumbbell', 'Barbell', 'Kettlebell'].includes(info.eq));
   const exHist = ld('exHistory', {});
   const lastSession = exHist[ex.eid] || null;
   const target = needsWeight && !isDuration ? suggestTarget(lastSession, parseRepRange(ex.reps), info && info.eq) : null;
@@ -3173,7 +3179,7 @@ const SetLogger = ({
       fontSize: 10,
       color: 'var(--t3)'
     }
-  }, "tap to fill")), isDuration && React.createElement("div", {
+  }, "tap to fill")), (isDuration || /\d\s*min\b/.test(String(ex.reps))) && React.createElement("div", {
     style: {
       marginBottom: 8
     }
@@ -3196,7 +3202,7 @@ const SetLogger = ({
         background: 'var(--grn)',
         color: '#000'
       } : {}
-    }, s.done ? '✓' : i + 1), needsWeight && !isDuration && React.createElement("input", {
+    }, s.done ? '✓' : i + 1), needsWeight && (!isDuration || info.lw) && React.createElement("input", {
       className: 'inp' + (s.done ? ' done' : ''),
       type: "number",
       inputMode: "decimal",
@@ -3284,9 +3290,9 @@ const ExCard = ({
   const info = exMap[ex.eid];
   if (!info) return null;
   const doneList = (exData || []).filter(s => s && s.done);
-  const doneSets = doneList.length;
+  const doneSets = Math.min(doneList.length, sets);
   const pct = sets > 0 ? Math.round(doneSets / sets * 100) : 0;
-  const isDone = pct === 100;
+  const isDone = sets > 0 && doneList.length >= sets;
   const isDur = info.t === 'd' || info.t === 'c';
   const needW = info.t === 'w' || ['Cable', 'Machine', 'Dumbbell', 'Barbell', 'Kettlebell'].includes(info.eq);
   const summary = doneList.map(s => needW && s.w ? s.w + '×' + s.r : (s.b ? bandLabel(s.b) + ' ' : '') + s.r + (isDur ? 's' : '')).join(' · ');
@@ -3348,7 +3354,7 @@ const ExCard = ({
     style: {
       fontSize: 12
     }
-  }, ex.sets, "\xD7", ex.reps, ex.note ? ' · ' + ex.note : '')), React.createElement("span", {
+  }, sets, "\xD7", ex.reps, ex.note ? ' · ' + ex.note : '')), React.createElement("span", {
     style: {
       fontSize: 14,
       color: 'var(--t3)',
@@ -3380,7 +3386,26 @@ const ExCard = ({
       maxHeight: 200,
       overflowY: 'auto'
     }
-  }, Object.entries(swapByEq).map(([eq, exs]) => React.createElement("div", {
+  }, ex.origEid && ex.origEid !== ex.eid && exMap[ex.origEid] && React.createElement("div", {
+    style: {
+      padding: '6px 0',
+      borderBottom: '0.5px solid var(--sep)',
+      cursor: 'pointer',
+      fontSize: 13,
+      color: 'var(--grn)',
+      fontWeight: 600
+    },
+    onClick: () => {
+      onSwap(ex.origEid, ex.origEid);
+      setShowSwap(false);
+    }
+  }, "\u21BA Back to ", exMap[ex.origEid].n), React.createElement("div", {
+    style: {
+      fontSize: 10,
+      color: 'var(--t3)',
+      padding: '4px 0'
+    }
+  }, "Swaps apply everywhere this exercise appears."), Object.entries(swapByEq).map(([eq, exs]) => React.createElement("div", {
     key: eq
   }, React.createElement("div", {
     style: {
@@ -3398,7 +3423,7 @@ const ExCard = ({
       fontSize: 13
     },
     onClick: () => {
-      onSwap(ex.eid, s.id);
+      onSwap(ex.origEid || ex.eid, s.id);
       setShowSwap(false);
     }
   }, s.n)))), swapOptions.length === 0 && React.createElement("div", {
@@ -3541,7 +3566,8 @@ const DayView = ({
     const c = ld('dayCheckin_' + dayKeyCI, {});
     return c.calf || 0;
   });
-  const restEnabled = ld('restEnabled', true);
+  const [restEnabled, setRestEnabled] = useState(() => ld('restEnabled', true));
+  const restMul = REST_SCALES[ld('restScale', '1')] || 1;
   const timer = useSessionTimer();
   const bw = ld('bodyweight', 80);
   const dayKey = day.name.replace(/\s/g, '') + '_p' + phase;
@@ -3560,21 +3586,21 @@ const DayView = ({
       calf: calfPre
     });
   }, [kneePre, calfPre, dayKeyCI]);
-  const handleSwap = (oldId, newId) => {
+  const handleSwap = (origId, newId) => {
     const s = {
-      ...swaps,
-      [oldId]: newId
+      ...swaps
     };
+    if (newId === origId) delete s[origId];else s[origId] = newId;
     setSwaps(s);
     sv('swaps', s);
   };
-  const getEid = eid => swaps[eid] || eid;
+  const dayIds = dayExerciseIds(day);
+  const getEid = eid => resolveSwap(eid, swaps, dayIds);
   const allExercises = day.supersets.flatMap(ss => ss.exercises);
-  const totalSets = allExercises.reduce((a, ex) => (setsOverride[ex.eid] || ex.sets) + a, 0);
-  const doneSets = allExercises.reduce((a, ex) => {
-    const d = logData[getEid(ex.eid)] || [];
-    return a + d.filter(s => s.done).length;
-  }, 0);
+  const planned = ex => setsOverride[getEid(ex.eid)] || ex.sets;
+  const doneOf = ex => (logData[getEid(ex.eid)] || []).filter(s => s && s.done).length;
+  const totalSets = allExercises.reduce((a, ex) => a + planned(ex), 0);
+  const doneSets = allExercises.reduce((a, ex) => a + Math.min(planned(ex), doneOf(ex)), 0);
   const pct = totalSets > 0 ? Math.round(doneSets / totalSets * 100) : 0;
   const totalVolume = allExercises.reduce((a, ex) => {
     const d = logData[getEid(ex.eid)] || [];
@@ -3582,7 +3608,7 @@ const DayView = ({
   }, 0);
   const handleSetDone = (ex, setData, allData, rowId) => {
     const info = exMap[getEid(ex.eid)];
-    if (info && info.t === 'w' && setData.w && setData.r && !setData.warmup) {
+    if (info && (info.t === 'w' || info.lw && info.t === 'r') && setData.w && setData.r && !setData.warmup) {
       const prs = ld('prs', {});
       const key = getEid(ex.eid);
       const e1rm = est1RM(parseFloat(setData.w), parseInt(setData.r));
@@ -3619,38 +3645,67 @@ const DayView = ({
     const eid = getEid(ex.eid);
     hist[eid] = (allData || []).filter(s => s.done);
     sv('exHistory', hist);
-    const restSec = Math.round((ex.rest || 0) * (REST_SCALES[ld('restScale', '1')] || 1));
-    if (restEnabled && restSec > 0) {
-      setRestSecs(restSec);
-      setRestKey(k => k + 1);
-    }
-    const targetSets = setsOverride[eid] || ex.sets;
-    const doneN = (allData || []).filter(s => s.done).length;
-    if (doneN >= targetSets) {
-      const rows = [];
-      day.supersets.forEach((ss, si) => ss.exercises.forEach((e, ei) => {
-        const rid = si + '_' + ei;
-        const eeid = getEid(e.eid);
-        const tset = setsOverride[eeid] || e.sets;
-        const dc = rid === rowId ? doneN : (logData[eeid] || []).filter(s => s.done).length;
-        rows.push({
-          rid,
-          complete: dc >= tset
+    const restSec = Math.round((ex.rest || 0) * restMul);
+    const startRest = () => {
+      if (restEnabled && restSec > 0) {
+        setRestSecs(restSec);
+        setRestKey(k => k + 1);
+      }
+    };
+    const doneN = (allData || []).filter(s => s && s.done).length;
+    const [si, ei] = String(rowId).split('_').map(Number);
+    const block = day.supersets[si];
+    const left = (e, j) => {
+      const id = getEid(e.eid);
+      const done = j === ei ? doneN : (logData[id] || []).filter(s => s && s.done).length;
+      return (setsOverride[id] || e.sets) - done;
+    };
+    const goTo = rid => {
+      setOpenRow(rid);
+      setTimeout(() => {
+        const el = document.getElementById('row-' + rid);
+        if (el) el.scrollIntoView({
+          behavior: 'smooth',
+          block: 'center'
         });
-      }));
-      const ci = rows.findIndex(r => r.rid === rowId);
-      const next = rows.slice(ci + 1).find(r => !r.complete) || rows.find(r => !r.complete && r.rid !== rowId);
-      if (next) {
-        setOpenRow(next.rid);
-        setTimeout(() => {
-          const el = document.getElementById('row-' + next.rid);
-          if (el) el.scrollIntoView({
-            behavior: 'smooth',
-            block: 'center'
-          });
-        }, 300);
-      } else setOpenRow(null);
+      }, 300);
+    };
+    if (block && block.rest > 0 && block.exercises.length > 1) {
+      const n = block.exercises.length;
+      let nxt = -1;
+      for (let k = 1; k <= n; k++) {
+        const j = (ei + k) % n;
+        if (left(block.exercises[j], j) > 0) {
+          nxt = j;
+          break;
+        }
+      }
+      if (nxt > ei) {
+        goTo(si + '_' + nxt);
+        return;
+      }
+      startRest();
+      if (nxt >= 0) {
+        goTo(si + '_' + nxt);
+        return;
+      }
+    } else {
+      startRest();
+      if (left(block ? block.exercises[ei] : ex, ei) > 0) return;
     }
+    const rows = [];
+    day.supersets.forEach((ss, bi) => ss.exercises.forEach((e, j) => {
+      const id = getEid(e.eid);
+      const rid = bi + '_' + j;
+      const dc = rid === rowId ? doneN : (logData[id] || []).filter(s => s && s.done).length;
+      rows.push({
+        rid,
+        complete: dc >= (setsOverride[id] || e.sets)
+      });
+    }));
+    const ci = rows.findIndex(r => r.rid === rowId);
+    const next = rows.slice(ci + 1).find(r => !r.complete) || rows.find(r => !r.complete && r.rid !== rowId);
+    if (next) goTo(next.rid);else setOpenRow(null);
   };
   const finishWorkout = () => {
     timer.stop();
@@ -3665,10 +3720,17 @@ const DayView = ({
       const pr = prs[getEid(ex.eid)];
       if (pr && pr.date === today()) newPRs++;
     });
+    const doneMap = {};
+    allExercises.forEach(ex => {
+      const id = getEid(ex.eid);
+      const n = Math.min(planned(ex), doneOf(ex));
+      if (n) doneMap[id] = (doneMap[id] || 0) + n;
+    });
     const record = {
       day: day.name,
       phase,
       trainPhase: ld('phase', 1),
+      len: ld('sessionLen', 'm45'),
       date: today(),
       duration: timer.elapsed,
       pain,
@@ -3681,8 +3743,12 @@ const DayView = ({
       calories: kcal,
       newPRs,
       kneePre,
-      calfPre
+      calfPre,
+      doneSets: doneMap
     };
+    try {
+      localStorage.removeItem(PRE_RESTORE);
+    } catch (e) {}
     const history = ld('history', []);
     history.unshift(record);
     sv('history', history);
@@ -3755,9 +3821,10 @@ const DayView = ({
       fontSize: 10
     },
     onClick: () => {
-      const v = !ld('restEnabled', true);
+      const v = !restEnabled;
+      setRestEnabled(v);
       sv('restEnabled', v);
-      window.location.reload();
+      if (!v) setRestSecs(null);
     }
   }, restEnabled ? 'Rest: ON' : 'Rest: OFF'))), React.createElement("div", {
     className: "prg"
@@ -3908,7 +3975,7 @@ const DayView = ({
         color: 'var(--t3)',
         marginLeft: 'auto'
       }
-    }, "Rest: ", ss.rest, "s")), ss.exercises.map((ex, ei) => {
+    }, "Rest: ", Math.round((ss.rest || 0) * restMul), "s")), ss.exercises.map((ex, ei) => {
       const eid = getEid(ex.eid);
       const sets = setsOverride[eid] || ex.sets;
       const rowId = si + '_' + ei;
@@ -3917,6 +3984,7 @@ const DayView = ({
         ex: {
           ...ex,
           eid,
+          origEid: ex.eid,
           rest: ss.rest
         },
         exData: logData[eid] || [],
@@ -3935,7 +4003,8 @@ const DayView = ({
         onSwap: handleSwap,
         onSetsDelta: delta => {
           const cur = setsOverride[eid] || ex.sets;
-          const next = Math.max(1, cur + delta);
+          const logged = (logData[eid] || []).reduce((m, s, i) => s && s.done ? i + 1 : m, 0);
+          const next = Math.max(1, logged, cur + delta);
           setSetsOverride(p => ({
             ...p,
             [eid]: next
@@ -4111,7 +4180,7 @@ const PLYO_DAYS = {
         eid: 'kneetowall',
         sets: 1,
         reps: '10 each side',
-        note: 'Knee tracks over 2nd toe - note the cm from the wall'
+        note: 'Knee tracks over 2nd toe - track cm in Progress'
       }, {
         eid: 'tibraise',
         sets: 1,
@@ -4184,7 +4253,7 @@ const PLYO_DAYS = {
         eid: 'kneetowall',
         sets: 1,
         reps: '10 each side',
-        note: 'Knee tracks over 2nd toe - note the cm from the wall'
+        note: 'Knee tracks over 2nd toe - track cm in Progress'
       }, {
         eid: 'tibraise',
         sets: 1,
@@ -4267,7 +4336,7 @@ const PLYO_DAYS = {
         eid: 'kneetowall',
         sets: 1,
         reps: '10 each side',
-        note: 'Knee tracks over 2nd toe - note the cm from the wall'
+        note: 'Knee tracks over 2nd toe - track cm in Progress'
       }, {
         eid: 'tibraise',
         sets: 1,
@@ -4350,7 +4419,7 @@ const PLYO_DAYS = {
         eid: 'kneetowall',
         sets: 1,
         reps: '10 each side',
-        note: 'Knee tracks over 2nd toe - note the cm from the wall'
+        note: 'Knee tracks over 2nd toe - track cm in Progress'
       }, {
         eid: 'tibraise',
         sets: 1,
@@ -4429,7 +4498,7 @@ const BAND_DAYS = {
         eid: 'kneetowall',
         sets: 1,
         reps: '10 each side',
-        note: 'Knee tracks over 2nd toe - note the cm from the wall'
+        note: 'Knee tracks over 2nd toe - track cm in Progress'
       }, {
         eid: 'tke',
         sets: 2,
@@ -4520,7 +4589,7 @@ const BAND_DAYS = {
         eid: 'kneetowall',
         sets: 1,
         reps: '10 each side',
-        note: 'Knee tracks over 2nd toe - note the cm from the wall'
+        note: 'Knee tracks over 2nd toe - track cm in Progress'
       }, {
         eid: 'tke',
         sets: 2,
@@ -4616,7 +4685,7 @@ const BAND_DAYS = {
         eid: 'kneetowall',
         sets: 1,
         reps: '10 each side',
-        note: 'Knee tracks over 2nd toe - note the cm from the wall'
+        note: 'Knee tracks over 2nd toe - track cm in Progress'
       }, {
         eid: 'tke',
         sets: 2,
@@ -4707,7 +4776,7 @@ const BAND_DAYS = {
         eid: 'kneetowall',
         sets: 1,
         reps: '10 each side',
-        note: 'Knee tracks over 2nd toe - note the cm from the wall'
+        note: 'Knee tracks over 2nd toe - track cm in Progress'
       }, {
         eid: 'tke',
         sets: 2,
@@ -5229,17 +5298,28 @@ const sessionCoverage = day => {
     any: MUSCLE_GROUPS.filter(g => any.has(g))
   };
 };
-const applySwaps = (day, swaps = ld('swaps', {})) => ({
-  ...day,
-  supersets: day.supersets.map(ss => ({
-    ...ss,
-    exercises: ss.exercises.map(ex => swaps[ex.eid] ? {
-      ...ex,
-      eid: swaps[ex.eid],
-      origEid: ex.eid
-    } : ex)
-  }))
-});
+const dayExerciseIds = day => new Set(day.supersets.flatMap(ss => ss.exercises.map(e => e.eid)));
+const resolveSwap = (eid, swaps, dayIds) => {
+  const t = swaps && swaps[eid];
+  return t && t !== eid && exMap[t] && !(dayIds && dayIds.has(t)) ? t : eid;
+};
+const applySwaps = (day, swaps = ld('swaps', {})) => {
+  const ids = dayExerciseIds(day);
+  return {
+    ...day,
+    supersets: day.supersets.map(ss => ({
+      ...ss,
+      exercises: ss.exercises.map(ex => {
+        const t = resolveSwap(ex.eid, swaps, ids);
+        return t !== ex.eid ? {
+          ...ex,
+          eid: t,
+          origEid: ex.eid
+        } : ex;
+      })
+    }))
+  };
+};
 const MuscleChips = ({
   day
 }) => {
@@ -5329,12 +5409,14 @@ const WorkoutTab = ({
     const logData = cleanLog(ld('dayLog_' + day.name.replace(/\s/g, '') + '_p' + ph, {}));
     const setsOvr = ld('setsOverride_' + day.name.replace(/\s/g, '') + '_p' + ph, {});
     const swapMap = ld('swaps', {});
-    const id = eid => swapMap[eid] || eid;
+    const ids = dayExerciseIds(day);
+    const id = eid => resolveSwap(eid, swapMap, ids);
     const allEx = day.supersets.flatMap(s => s.exercises);
-    const total = allEx.reduce((a, ex) => (setsOvr[id(ex.eid)] || ex.sets) + a, 0);
+    const plan = ex => setsOvr[id(ex.eid)] || ex.sets;
+    const total = allEx.reduce((a, ex) => a + plan(ex), 0);
     const done = allEx.reduce((a, ex) => {
       const d = logData[id(ex.eid)] || [];
-      return a + d.filter(s => s.done).length;
+      return a + Math.min(plan(ex), d.filter(s => s.done).length);
     }, 0);
     return total > 0 ? Math.round(done / total * 100) : 0;
   };
@@ -5947,16 +6029,20 @@ const ProgressTab = ({
   const acwrPct = Math.min(100, Math.max(0, parseFloat(acwr) / 2 * 100));
   const recentHist = history.filter(h => (new Date() - new Date(h.date)) / 86400000 < 7);
   const muscleVol = {};
+  const addSets = (eid, n) => {
+    const m = MUSCLE_MAP[eid];
+    const groups = m ? m[0] : musclesFromText((exMap[eid] || {}).m);
+    groups.forEach(g => {
+      muscleVol[g] = (muscleVol[g] || 0) + n;
+    });
+  };
   recentHist.forEach(h => {
-    const dayData = dayForHistory(h);
-    if (dayData) {
-      dayData.supersets.flatMap(s => s.exercises).forEach(ex => {
-        const info = exMap[ex.eid];
-        if (info) {
-          muscleVol[info.m] = (muscleVol[info.m] || 0) + ex.sets;
-        }
-      });
+    if (h.doneSets && typeof h.doneSets === 'object') {
+      Object.entries(h.doneSets).forEach(([eid, n]) => addSets(eid, Number(n) || 0));
+      return;
     }
+    const dayData = dayForHistory(h);
+    if (dayData) dayData.supersets.flatMap(s => s.exercises).forEach(ex => addSets(ex.eid, ex.sets));
   });
   const maxVol = Math.max(1, ...Object.values(muscleVol));
   const prList = Object.entries(prs).map(([eid, data]) => ({
@@ -5965,7 +6051,9 @@ const ProgressTab = ({
     ...data
   })).sort((a, b) => new Date(b.date) - new Date(a.date));
   const e1rmLog = ld('e1rmLog', {});
-  const e1rmExercises = Object.entries(e1rmLog).filter(([, data]) => data.length >= 2).sort((a, b) => b[1].length - a[1].length).slice(0, 8);
+  const lastLogged = d => d[d.length - 1] && d[d.length - 1].date || '';
+  const recentCutoff = new Date(Date.now() - 56 * 86400000).toISOString().slice(0, 10);
+  const e1rmExercises = Object.entries(e1rmLog).filter(([, data]) => Array.isArray(data) && data.length >= 2).sort((a, b) => lastLogged(b[1]).localeCompare(lastLogged(a[1])) || b[1].length - a[1].length).slice(0, 8);
   const checkinHistory = history.filter(h => h.kneePre !== undefined).slice(0, 20);
   const strengthData = {};
   history.slice(0, 20).reverse().forEach(h => {
@@ -6080,13 +6168,13 @@ const ProgressTab = ({
   const stalledLifts = [];
   let progressingCount = 0;
   Object.entries(e1rmLog).forEach(([eid, data]) => {
-    if (data.length < 3) return;
+    if (!Array.isArray(data) || data.length < 3 || lastLogged(data) < recentCutoff) return;
     if (data[data.length - 1].e1rm <= data[data.length - 3].e1rm) stalledLifts.push({
       name: exMap[eid]?.n || eid,
       e1rm: data[data.length - 1].e1rm
     });else progressingCount++;
   });
-  const PRIMARY = ['Chest', 'Back', 'Quads', 'Hamstrings', 'Glutes', 'Calves', 'Shoulders', 'Triceps', 'Biceps', 'Legs'];
+  const PRIMARY = MUSCLE_GROUPS;
   const volStatus = (m, v) => {
     if (!PRIMARY.includes(m)) return null;
     if (v < 8) return {
@@ -6870,6 +6958,11 @@ const LibraryCard = ({
   const delCustom = () => {
     if (!confirm('Delete "' + ex.n + '" from your exercises?')) return;
     sv('customExercises', ld('customExercises', []).filter(c => c.id !== ex.id));
+    const sw = ld('swaps', {});
+    Object.keys(sw).forEach(k => {
+      if (sw[k] === ex.id) delete sw[k];
+    });
+    sv('swaps', sw);
     window.location.reload();
   };
   return React.createElement("div", {
@@ -7255,12 +7348,12 @@ const markBackedUp = () => {
 };
 const BACKUP_SHAPES = {
   list: ['history', 'weightLog', 'runLog', 'customExercises', 'dorsiflex'],
-  record: ['prs', 'e1rmLog', 'exHistory', 'proteinLog', 'weekDone', 'swaps', 'measurements'],
+  record: ['prs', 'e1rmLog', 'exHistory', 'proteinLog', 'weekDone', 'swaps'],
   number: ['bodyweight', 'weightGoal', 'restTime', 'weeklyGoal']
 };
 const backupValueProblem = (key, raw) => {
   const name = key.slice(P.length);
-  const strict = BACKUP_SHAPES.list.includes(name) || BACKUP_SHAPES.record.includes(name) || BACKUP_SHAPES.number.includes(name) || /^(dayLog_|setsOverride_|dayCheckin_)/.test(name) || name === 'phase';
+  const strict = BACKUP_SHAPES.list.includes(name) || BACKUP_SHAPES.record.includes(name) || BACKUP_SHAPES.number.includes(name) || /^(dayLog_|setsOverride_|dayCheckin_)/.test(name) || name === 'phase' || name === 'measurements';
   let v;
   try {
     v = JSON.parse(raw);
@@ -7270,9 +7363,19 @@ const backupValueProblem = (key, raw) => {
   const isRecord = v && typeof v === 'object' && !Array.isArray(v);
   if (BACKUP_SHAPES.list.includes(name) && !Array.isArray(v)) return 'should be a list';
   if ((BACKUP_SHAPES.record.includes(name) || /^(dayLog_|setsOverride_|dayCheckin_)/.test(name)) && !isRecord) return 'should be a record';
-  if (BACKUP_SHAPES.number.includes(name) && typeof v !== 'number') return 'should be a number';
+  if (BACKUP_SHAPES.number.includes(name) && typeof v !== 'number' && !(typeof v === 'string' && isFinite(parseFloat(v)))) return 'should be a number';
+  if (name === 'measurements' && !(v && typeof v === 'object')) return 'should be a record';
   if (name === 'phase' && ![1, 2, 3, 4].includes(v)) return 'should be 1-4';
   return null;
+};
+const normalizeBackupValue = (key, raw) => {
+  if (!BACKUP_SHAPES.number.includes(key.slice(P.length))) return raw;
+  try {
+    const v = JSON.parse(raw);
+    return typeof v === 'string' ? JSON.stringify(parseFloat(v)) : raw;
+  } catch (e) {
+    return raw;
+  }
 };
 const restoreBackupText = (text, showToast) => {
   let data;
@@ -7312,9 +7415,12 @@ const restoreBackupText = (text, showToast) => {
       at: new Date().toISOString(),
       prev
     }));
-  } catch (e) {}
+  } catch (e) {
+    showToast('Restore stopped — not enough space to keep an undo copy. Nothing was changed.');
+    return false;
+  }
   try {
-    keys.forEach(k => localStorage.setItem(k, data[k]));
+    keys.forEach(k => localStorage.setItem(k, normalizeBackupValue(k, data[k])));
   } catch (e) {
     keys.forEach(k => {
       if (prev[k] === null) {
@@ -7330,6 +7436,9 @@ const restoreBackupText = (text, showToast) => {
         } catch (x) {}
       }
     });
+    try {
+      localStorage.removeItem(PRE_RESTORE);
+    } catch (x) {}
     showToast('Restore failed — your existing data was kept' + (e && e.name === 'QuotaExceededError' ? ' (storage full)' : ''));
     return false;
   }
@@ -8049,18 +8158,6 @@ class ErrorBoundary extends React.Component {
         note: 'Copy failed.'
       }));
     };
-    const undo = () => {
-      try {
-        const s = JSON.parse(localStorage.getItem(PRE_RESTORE) || 'null');
-        if (s && s.prev) {
-          Object.entries(s.prev).forEach(([k, v]) => {
-            v === null ? localStorage.removeItem(k) : localStorage.setItem(k, v);
-          });
-          localStorage.removeItem(PRE_RESTORE);
-          location.reload();
-        }
-      } catch (e) {}
-    };
     return React.createElement("div", {
       style: {
         padding: 'max(48px,var(--safe-t)) 20px 20px',
@@ -8101,14 +8198,7 @@ class ErrorBoundary extends React.Component {
         marginBottom: 8
       },
       onClick: () => location.reload()
-    }, "Try Again"), hasRestoreSnapshot() && React.createElement("button", {
-      className: "btn btn-s",
-      style: {
-        width: '100%',
-        marginBottom: 8
-      },
-      onClick: undo
-    }, "Undo Last Restore"), React.createElement("div", {
+    }, "Try Again"), React.createElement("div", {
       style: {
         fontSize: 11,
         color: 'var(--t3)',

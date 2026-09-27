@@ -281,7 +281,7 @@ const EXDB_BASE=[
 {id:'copenadduct',n:'Copenhagen Adductor',m:'Adductors',t:'d',eq:'Bench',tags:['k','t'],note:'Side plank position, top leg on bench'},
 {id:'starplank',n:'Star Plank',m:'Core',t:'d',eq:'Bodyweight',tags:['k','t'],note:'Extend opposite arm & leg from plank'},
 {id:'staggerpallof',n:'Stagger Stance Pallof Pulses',m:'Core',t:'r',eq:'Cable',tags:['k','b','t'],note:'Split stance, pulse arms out'},
-{id:'anklejump',n:'Ankle Jumps + Alt Skipping',m:'Plyo',t:'r',eq:'Bodyweight',tags:['k','p','t'],note:'Quick reactive jumps, minimal knee bend'},
+{id:'anklejump',n:'Pogo Hops (Ankle Jumps)',m:'Plyo',t:'r',eq:'Bodyweight',tags:['k','p','t'],note:'Quick reactive pogo hops, stiff ankles, minimal knee bend'},
 {id:'eccstepdown',n:'Eccentric Step-Down',m:'Quads',t:'r',eq:'Step',tags:['k','e'],note:'4s lowering, single leg, 15cm step'},
 {id:'bulgsplit',n:'Bulgarian Split Squat',m:'Quads',t:'w',eq:'Dumbbell',tags:['k','e','b','t'],note:'SHALLOW RANGE ONLY - stop before pain, physio override. Rear foot elevated, 4s eccentric lowering'},
 {id:'slraise',n:'Straight Leg Raise',m:'Quads',t:'r',eq:'Bodyweight',tags:['k','e'],note:'Lock knee, lift to 45deg, 3s hold'},
@@ -294,7 +294,7 @@ const EXDB_BASE=[
 {id:'clamshell',n:'Clamshell',m:'Glutes',t:'r',eq:'Band',tags:['k'],note:'Band above knees, control motion'},
 {id:'tke',n:'Terminal Knee Extension',m:'VMO',t:'r',eq:'Band',tags:['k','e'],note:'Band behind knee, squeeze to full extension'},
 {id:'calfstand',n:'Standing Calf Raise',m:'Calves',t:'w',eq:'Machine',tags:['k'],note:'Gastrocnemius focus, 3s eccentric lowering, full ROM'},
-{id:'eccheeldrop',n:'Eccentric Heel Drop',m:'Calves',t:'r',eq:'Step',tags:['k','e'],note:'Rise on both feet, lower slowly on one - 4s eccentric'},
+{id:'eccheeldrop',n:'Eccentric Heel Drop',m:'Calves',t:'r',eq:'Step',tags:['k','e'],note:'Rise on both feet, lower slowly on one - 4s eccentric',lw:1},
 {id:'seatedcalf',n:'Seated Calf Raise',m:'Calves',t:'w',eq:'Machine',tags:['k'],note:'Soleus focus (bent-knee), 3s eccentric lowering - runner calf rebuild'},
 {id:'kbswing',n:'Kettlebell Swing',m:'Glutes',t:'w',eq:'Kettlebell',tags:['k','p'],note:'Power from hips, not arms'},
 {id:'dbbench',n:'Dumbbell Bench Press',m:'Chest',t:'w',eq:'Dumbbell',tags:['k'],note:''},
@@ -328,7 +328,7 @@ const EXDB_BASE=[
 {id:'abwheel',n:'Ab Wheel Rollout',m:'Core',t:'r',eq:'Ab Wheel',tags:['k'],note:'From knees, brace hard, do not let hips sag - strong anti-extension progression'},
 {id:'bosusquat',n:'BOSU Balance Squat',m:'Legs',t:'r',eq:'BOSU',tags:['k','b'],note:'Shallow squat, focus on stability'},
 {id:'slstand',n:'Single-Leg Balance Hold',m:'Balance',t:'d',eq:'Bodyweight',tags:['k','b'],note:'30-60s, eyes closed to progress'},
-{id:'boxstep',n:'Low Box Step-Up',m:'Quads',t:'r',eq:'Step',tags:['k','b'],note:'Low step, controlled, no push-off'},
+{id:'boxstep',n:'Low Box Step-Up',m:'Quads',t:'r',eq:'Step',tags:['k','b'],note:'Low step, controlled, no push-off',lw:1},
 {id:'rowing',n:'Rowing Machine',m:'Cardio',t:'c',eq:'Machine',tags:['k','f'],note:'500m intervals or steady state'},
 {id:'skierg',n:'SkiErg',m:'Cardio',t:'c',eq:'Machine',tags:['k','f'],note:'Full-body pull, 30s on / 30s off intervals'},
 {id:'jumpingjack',n:'Jumping Jacks',m:'Cardio',t:'d',eq:'Bodyweight',tags:['k','f'],note:'Low-impact option: step-out jacks'},
@@ -345,8 +345,8 @@ const EXDB_BASE=[
 {id:'dblunge',n:'Walking DB Lunge',m:'Quads',t:'w',eq:'Dumbbell',tags:['k','b'],note:'SHALLOW RANGE - controlled, upright, pain-free only. Only Phase 3+'},
 {id:'hanglegraise',n:'Hanging Leg Raise',m:'Core',t:'r',eq:'Bar',tags:['k'],note:'Full leg raise - progression from knee raise'},
 {id:'slhop',n:'Single-Leg Forward Hop',m:'Plyo',t:'r',eq:'Bodyweight',tags:['k','p','b'],note:'Stick the landing, 2s hold - sport-specific power'},
-{id:'suitcasecarry',n:'Suitcase Carry',m:'Core',t:'d',eq:'Dumbbell',tags:['k','b'],note:'Heavy DB one side, walk - anti-lateral flexion'},
-{id:'farmerwalk',n:'Farmer Walk',m:'Full Body',t:'d',eq:'Dumbbell',tags:['k','f'],note:'Heavy DBs both hands, walk 40m - metabolic + grip'},
+{id:'suitcasecarry',n:'Suitcase Carry',m:'Core',t:'d',eq:'Dumbbell',tags:['k','b'],note:'Heavy DB one side, walk - anti-lateral flexion',lw:1},
+{id:'farmerwalk',n:'Farmer Walk',m:'Full Body',t:'d',eq:'Dumbbell',tags:['k','f'],note:'Heavy DBs both hands, walk 40m - metabolic + grip',lw:1},
 {id:'kneetowall',n:'Knee-to-Wall Ankle Mob.',m:'Mobility',t:'r',eq:'Wall',tags:['k','e'],note:'Dorsiflexion stretch - knee tracks over 2nd toe, measure cm from wall'},
 {id:'bandlatwalk',n:'Banded Lateral Walk',m:'Glutes',t:'r',eq:'Band',tags:['k'],note:'Band above ankles, stay low, push knees out'},
 {id:'wallsit',n:'Wall Sit',m:'Quads',t:'d',eq:'Wall',tags:['k','e'],note:'Shallow angle - STOP before knee pain, physio override'},
@@ -358,7 +358,7 @@ const EXDB_BASE=[
 {id:'sidestep',n:'Side-Lying Adduction',m:'Adductors',t:'r',eq:'Bodyweight',tags:['k'],note:'Lie on side, lift bottom leg - controlled tempo'},
 {id:'cableadd',n:'Cable Hip Adduction',m:'Adductors',t:'w',eq:'Cable',tags:['k'],note:'Ankle strap, pull across body - full ROM control'},
 {id:'dbswing',n:'Dumbbell Swing',m:'Full Body',t:'w',eq:'Dumbbell',tags:['k','f'],note:'KB swing with DB - hip hinge explosive, metabolic'},
-{id:'sandbagcarry',n:'Sandbag Carry',m:'Full Body',t:'d',eq:'Sandbag',tags:['k','f'],note:'Bear hug carry, walk 40m - full body conditioning'},
+{id:'sandbagcarry',n:'Sandbag Carry',m:'Full Body',t:'d',eq:'Sandbag',tags:['k','f'],note:'Bear hug carry, walk 40m - full body conditioning',lw:1},
 {id:'revlunge',n:'Reverse Lunge',m:'Quads',t:'w',eq:'Dumbbell',tags:['k'],note:'Step BACK not forward - easier on knees, upright torso'},
 {id:'bandpull',n:'Band Pull-Apart',m:'Shoulders',t:'r',eq:'Band',tags:['k'],note:'Shoulder-width grip, pull band to chest - rear delt and posture'},
 {id:'goodmorning',n:'Good Morning',m:'Hamstrings',t:'w',eq:'Barbell',tags:['k'],note:'Light weight, hip hinge - hamstring stretch under load'},
@@ -366,7 +366,7 @@ const EXDB_BASE=[
 {id:'rdelt',n:'Rear-Delt Raise',m:'Shoulders',t:'w',eq:'Dumbbell',tags:['k'],note:'Hinge at the hips, raise DBs out to the sides - rear delts and posture'},
 {id:'inclinecurl',n:'Incline DB Curl',m:'Biceps',t:'w',eq:'Dumbbell',tags:['k'],note:'Seated on an incline bench, arms hanging back - full biceps stretch'},
 {id:'tibraise',n:'Tibialis Raise',m:'Shins',t:'r',eq:'Bodyweight',tags:['k','e'],note:'Heels down, lift toes toward shins - balances calf work and builds ankle resilience'},
-{id:'slcalf',n:'Single-Leg Calf Raise',m:'Calves',t:'r',eq:'Bodyweight',tags:['k','e'],note:'One leg, full range, 3s lower - per-side calf balance for the rebuild'},
+{id:'slcalf',n:'Single-Leg Calf Raise',m:'Calves',t:'r',eq:'Bodyweight',tags:['k','e'],note:'One leg, full range, 3s lower - per-side calf balance for the rebuild',lw:1},
 {id:'snapdown',n:'Snap-Down to Stick',m:'Plyo',t:'r',eq:'Bodyweight',tags:['k','p','b'],note:'Rise onto toes with arms up, then snap hips back into a quarter-squat and freeze 2s - quiet feet, knees over 2nd toe. Teaches landing before jumping'},
 {id:'latlinehop',n:'Lateral Line Hop',m:'Plyo',t:'r',eq:'Bodyweight',tags:['k','p','b'],note:'Two feet, hop side to side over a line - low, quick, off the balls of the feet; knees soft and in line with toes'},
 {id:'latstick',n:'Two-Foot Lateral Hop (Stick)',m:'Plyo',t:'r',eq:'Bodyweight',tags:['k','p','b'],note:'Hop sideways off both feet, land on BOTH feet and hold 2s - hips back, knees over 2nd toe, no caving. Lateral control before single-leg lateral work'},
@@ -404,7 +404,7 @@ const PROGRAM={
     {name:'Full Body A',focus:['Trap Bar','Press','Width'],supersets:[
       {label:'Warm-Up',type:'Easy cardio + ankle/knee prep',rest:0,exercises:[
         {eid:'rowing',sets:1,reps:'3 min easy',k:1,r35:'2 min easy',note:'Conversational pace - warm the knees up'},
-        {eid:'kneetowall',sets:1,reps:'12 each side',k:1,note:'Knee over 2nd toe, heel down, 2s hold - log cm from wall'},
+        {eid:'kneetowall',sets:1,reps:'12 each side',k:1,note:'Knee over 2nd toe, heel down, 2s hold - track cm in Progress'},
         {eid:'tke',sets:2,reps:'15 each leg',k:1,note:'Squeeze to full lockout, 2s hold - VMO on before loading'},
         {eid:'shortarcext',sets:1,reps:'15 each leg',k:2,note:'Towel roll under knee, 30deg to straight, 2s hold'},
         {eid:'bandlatwalk',sets:2,reps:'12 each side',k:3,note:'Band above knees, knees over toes - glute med'}
@@ -434,7 +434,7 @@ const PROGRAM={
     {name:'Full Body B',focus:['Step-Up','Hinge','Thickness'],supersets:[
       {label:'Warm-Up',type:'Easy cardio + ankle/knee prep',rest:0,exercises:[
         {eid:'skierg',sets:1,reps:'3 min easy',k:1,r35:'2 min easy',note:'Conversational pace - warm the knees up'},
-        {eid:'kneetowall',sets:1,reps:'12 each side',k:1,note:'Knee over 2nd toe, heel down, 2s hold - log cm from wall'},
+        {eid:'kneetowall',sets:1,reps:'12 each side',k:1,note:'Knee over 2nd toe, heel down, 2s hold - track cm in Progress'},
         {eid:'tke',sets:2,reps:'15 each leg',k:1,note:'Squeeze to full lockout, 2s hold - VMO on before loading'},
         {eid:'glutebridge',sets:2,reps:'12',k:3,note:'2s squeeze at the top - glutes on before step-ups'}
       ]},
@@ -463,7 +463,7 @@ const PROGRAM={
     {name:'Full Body C',focus:['Lunge','Incline','Ham Curl'],supersets:[
       {label:'Warm-Up',type:'Easy cardio + ankle/knee prep',rest:0,exercises:[
         {eid:'rowing',sets:1,reps:'3 min easy',k:1,r35:'2 min easy',note:'Conversational pace - warm the knees up'},
-        {eid:'kneetowall',sets:1,reps:'12 each side',k:1,note:'Knee over 2nd toe, heel down, 2s hold - log cm from wall'},
+        {eid:'kneetowall',sets:1,reps:'12 each side',k:1,note:'Knee over 2nd toe, heel down, 2s hold - track cm in Progress'},
         {eid:'tke',sets:2,reps:'15 each leg',k:1,note:'Squeeze to full lockout, 2s hold - VMO on before loading'},
         {eid:'clamshell',sets:2,reps:'12 each side',k:3,note:'Band above knees - glute med for knee tracking'}
       ]},
@@ -495,7 +495,7 @@ const PROGRAM={
     {name:'Full Body A',focus:['Trap Bar','Press','Width'],supersets:[
       {label:'Warm-Up',type:'Easy cardio + ankle/knee prep',rest:0,exercises:[
         {eid:'rowing',sets:1,reps:'3 min easy',k:1,r35:'2 min easy',note:'Conversational pace - warm the knees up'},
-        {eid:'kneetowall',sets:1,reps:'12 each side',k:1,note:'Knee over 2nd toe, heel down, 2s hold - log cm from wall'},
+        {eid:'kneetowall',sets:1,reps:'12 each side',k:1,note:'Knee over 2nd toe, heel down, 2s hold - track cm in Progress'},
         {eid:'tke',sets:2,reps:'15 each leg',k:1,note:'Squeeze to full lockout, 2s hold - VMO on before loading'},
         {eid:'shortarcext',sets:1,reps:'15 each leg',k:2,note:'Towel roll under knee, 30deg to straight, 2s hold'},
         {eid:'bandlatwalk',sets:1,reps:'12 each side',k:3,note:'Band above knees, knees over toes - glute med'}
@@ -525,7 +525,7 @@ const PROGRAM={
     {name:'Full Body B',focus:['Step-Up','Hinge','Thickness'],supersets:[
       {label:'Warm-Up',type:'Easy cardio + ankle/knee prep',rest:0,exercises:[
         {eid:'skierg',sets:1,reps:'3 min easy',k:1,r35:'2 min easy',note:'Conversational pace - warm the knees up'},
-        {eid:'kneetowall',sets:1,reps:'12 each side',k:1,note:'Knee over 2nd toe, heel down, 2s hold - log cm from wall'},
+        {eid:'kneetowall',sets:1,reps:'12 each side',k:1,note:'Knee over 2nd toe, heel down, 2s hold - track cm in Progress'},
         {eid:'tke',sets:2,reps:'15 each leg',k:1,note:'Squeeze to full lockout, 2s hold - VMO on before loading'},
         {eid:'glutebridge',sets:1,reps:'12',k:3,note:'2s squeeze at the top - glutes on before step-ups'}
       ]},
@@ -554,7 +554,7 @@ const PROGRAM={
     {name:'Full Body C',focus:['Lunge','Incline','Ham Curl'],supersets:[
       {label:'Warm-Up',type:'Easy cardio + ankle/knee prep',rest:0,exercises:[
         {eid:'rowing',sets:1,reps:'3 min easy',k:1,r35:'2 min easy',note:'Conversational pace - warm the knees up'},
-        {eid:'kneetowall',sets:1,reps:'12 each side',k:1,note:'Knee over 2nd toe, heel down, 2s hold - log cm from wall'},
+        {eid:'kneetowall',sets:1,reps:'12 each side',k:1,note:'Knee over 2nd toe, heel down, 2s hold - track cm in Progress'},
         {eid:'tke',sets:2,reps:'15 each leg',k:1,note:'Squeeze to full lockout, 2s hold - VMO on before loading'},
         {eid:'clamshell',sets:1,reps:'12 each side',k:3,note:'Band above knees - glute med for knee tracking'}
       ]},
@@ -586,7 +586,7 @@ const PROGRAM={
     {name:'Full Body A',focus:['Trap Bar','Press','Width'],supersets:[
       {label:'Warm-Up',type:'Easy cardio + ankle/knee prep',rest:0,exercises:[
         {eid:'rowing',sets:1,reps:'3 min easy',k:1,r35:'2 min easy',note:'Conversational pace - warm the knees up'},
-        {eid:'kneetowall',sets:1,reps:'12 each side',k:1,note:'Knee over 2nd toe, heel down, 2s hold - log cm from wall'},
+        {eid:'kneetowall',sets:1,reps:'12 each side',k:1,note:'Knee over 2nd toe, heel down, 2s hold - track cm in Progress'},
         {eid:'tke',sets:2,reps:'15 each leg',k:1,note:'Squeeze to full lockout, 2s hold - VMO on before loading'},
         {eid:'shortarcext',sets:1,reps:'15 each leg',k:2,note:'Towel roll under knee, 30deg to straight, 2s hold'},
         {eid:'bandlatwalk',sets:1,reps:'12 each side',k:3,note:'Band above knees, knees over toes - glute med'}
@@ -616,7 +616,7 @@ const PROGRAM={
     {name:'Full Body B',focus:['Step-Up','Hinge','Thickness'],supersets:[
       {label:'Warm-Up',type:'Easy cardio + ankle/knee prep',rest:0,exercises:[
         {eid:'skierg',sets:1,reps:'3 min easy',k:1,r35:'2 min easy',note:'Conversational pace - warm the knees up'},
-        {eid:'kneetowall',sets:1,reps:'12 each side',k:1,note:'Knee over 2nd toe, heel down, 2s hold - log cm from wall'},
+        {eid:'kneetowall',sets:1,reps:'12 each side',k:1,note:'Knee over 2nd toe, heel down, 2s hold - track cm in Progress'},
         {eid:'tke',sets:2,reps:'15 each leg',k:1,note:'Squeeze to full lockout, 2s hold - VMO on before loading'},
         {eid:'glutebridge',sets:1,reps:'12',k:3,note:'2s squeeze at the top - glutes on before step-ups'}
       ]},
@@ -645,7 +645,7 @@ const PROGRAM={
     {name:'Full Body C',focus:['Lunge','Incline','Ham Curl'],supersets:[
       {label:'Warm-Up',type:'Easy cardio + ankle/knee prep',rest:0,exercises:[
         {eid:'rowing',sets:1,reps:'3 min easy',k:1,r35:'2 min easy',note:'Conversational pace - warm the knees up'},
-        {eid:'kneetowall',sets:1,reps:'12 each side',k:1,note:'Knee over 2nd toe, heel down, 2s hold - log cm from wall'},
+        {eid:'kneetowall',sets:1,reps:'12 each side',k:1,note:'Knee over 2nd toe, heel down, 2s hold - track cm in Progress'},
         {eid:'tke',sets:2,reps:'15 each leg',k:1,note:'Squeeze to full lockout, 2s hold - VMO on before loading'},
         {eid:'clamshell',sets:1,reps:'12 each side',k:3,note:'Band above knees - glute med for knee tracking'}
       ]},
@@ -677,7 +677,7 @@ const PROGRAM={
     {name:'Full Body A',focus:['Trap Bar','Press','Width'],supersets:[
       {label:'Warm-Up',type:'Easy cardio + ankle/knee prep',rest:0,exercises:[
         {eid:'rowing',sets:1,reps:'3 min easy',k:1,r35:'2 min easy',note:'Conversational pace - warm the knees up'},
-        {eid:'kneetowall',sets:1,reps:'12 each side',k:1,note:'Knee over 2nd toe, heel down, 2s hold - log cm from wall'},
+        {eid:'kneetowall',sets:1,reps:'12 each side',k:1,note:'Knee over 2nd toe, heel down, 2s hold - track cm in Progress'},
         {eid:'tke',sets:2,reps:'15 each leg',k:1,note:'Squeeze to full lockout, 2s hold - VMO on before loading'},
         {eid:'shortarcext',sets:1,reps:'15 each leg',k:2,note:'Towel roll under knee, 30deg to straight, 2s hold'},
         {eid:'bandlatwalk',sets:2,reps:'12 each side',k:3,note:'Band above knees, knees over toes - glute med'}
@@ -707,7 +707,7 @@ const PROGRAM={
     {name:'Full Body B',focus:['Step-Up','Hinge','Thickness'],supersets:[
       {label:'Warm-Up',type:'Easy cardio + ankle/knee prep',rest:0,exercises:[
         {eid:'skierg',sets:1,reps:'3 min easy',k:1,r35:'2 min easy',note:'Conversational pace - warm the knees up'},
-        {eid:'kneetowall',sets:1,reps:'12 each side',k:1,note:'Knee over 2nd toe, heel down, 2s hold - log cm from wall'},
+        {eid:'kneetowall',sets:1,reps:'12 each side',k:1,note:'Knee over 2nd toe, heel down, 2s hold - track cm in Progress'},
         {eid:'tke',sets:2,reps:'15 each leg',k:1,note:'Squeeze to full lockout, 2s hold - VMO on before loading'},
         {eid:'glutebridge',sets:2,reps:'12',k:3,note:'2s squeeze at the top - glutes on before step-ups'}
       ]},
@@ -736,7 +736,7 @@ const PROGRAM={
     {name:'Full Body C',focus:['Lunge','Incline','Ham Curl'],supersets:[
       {label:'Warm-Up',type:'Easy cardio + ankle/knee prep',rest:0,exercises:[
         {eid:'rowing',sets:1,reps:'3 min easy',k:1,r35:'2 min easy',note:'Conversational pace - warm the knees up'},
-        {eid:'kneetowall',sets:1,reps:'12 each side',k:1,note:'Knee over 2nd toe, heel down, 2s hold - log cm from wall'},
+        {eid:'kneetowall',sets:1,reps:'12 each side',k:1,note:'Knee over 2nd toe, heel down, 2s hold - track cm in Progress'},
         {eid:'tke',sets:2,reps:'15 each leg',k:1,note:'Squeeze to full lockout, 2s hold - VMO on before loading'},
         {eid:'clamshell',sets:2,reps:'12 each side',k:3,note:'Band above knees - glute med for knee tracking'}
       ]},
@@ -892,7 +892,8 @@ const SetLogger=({ex,exData,sets,onUpdate,onDone,onSetsDelta})=>{
   const isBand=!!info&&info.eq==='Band';
   // Always build a dense copy so editing a later set first can't leave gaps in the saved list
   const upd=(i,patch)=>{const d=Array.from({length:Math.max(exData.length,i+1)},(_,j)=>exData[j]||{...EMPTY_SET});d[i]={...d[i],...patch};return d};
-  const needsWeight=info&&(info.t==='w'||['Cable','Machine','Dumbbell','Barbell','Kettlebell'].includes(info.eq));
+  // lw = can be loaded (DB/backpack step-ups, heel drops, carries): shows an optional kg box
+  const needsWeight=info&&(info.t==='w'||!!info.lw||['Cable','Machine','Dumbbell','Barbell','Kettlebell'].includes(info.eq));
   const exHist=ld('exHistory',{});
   const lastSession=exHist[ex.eid]||null;
   const target=(needsWeight&&!isDuration)?suggestTarget(lastSession,parseRepRange(ex.reps),info&&info.eq):null;
@@ -922,13 +923,13 @@ const SetLogger=({ex,exData,sets,onUpdate,onDone,onSetsDelta})=>{
           <span style={{fontSize:10,color:'var(--t3)'}}>tap to fill</span>
         </div>
       )}
-      {isDuration && <div style={{marginBottom:8}}><CountdownTimer duration={ex.reps} /></div>}
+      {(isDuration||/\d\s*min\b/.test(String(ex.reps))) && <div style={{marginBottom:8}}><CountdownTimer duration={ex.reps} /></div>}
       {Array.from({length:sets}).map((_,i)=>{
         const s=exData[i]||{w:'',r:'',done:false};
         return (
           <div key={i} className="set-row">
             <div className="set-num" style={s.done?{background:'var(--grn)',color:'#000'}:{}}>{s.done?'✓':i+1}</div>
-            {needsWeight && !isDuration && (
+            {needsWeight && (!isDuration||info.lw) && (
               <input className={'inp'+(s.done?' done':'')} type="number" inputMode="decimal" placeholder="kg" value={s.w}
                 onChange={e=>onUpdate(upd(i,{w:e.target.value}))} />
             )}
@@ -970,9 +971,9 @@ const ExCard=({ex,exData,sets,open,onToggle,rowId,onUpdate,onDone,onSwap,onSetsD
   const info=exMap[ex.eid];
   if(!info)return null;
   const doneList=(exData||[]).filter(s=>s&&s.done);
-  const doneSets=doneList.length;
+  const doneSets=Math.min(doneList.length,sets);
   const pct=sets>0?Math.round(doneSets/sets*100):0;
-  const isDone=pct===100;
+  const isDone=sets>0&&doneList.length>=sets;
   const isDur=info.t==='d'||info.t==='c';
   const needW=info.t==='w'||['Cable','Machine','Dumbbell','Barbell','Kettlebell'].includes(info.eq);
   const summary=doneList.map(s=>(needW&&s.w)?(s.w+'×'+s.r):((s.b?bandLabel(s.b)+' ':'')+s.r+(isDur?'s':''))).join(' · ');
@@ -990,7 +991,7 @@ const ExCard=({ex,exData,sets,open,onToggle,rowId,onUpdate,onDone,onSwap,onSetsD
           </div>
           {(!open&&doneSets>0&&summary)
             ? <div className="ex-info" style={{fontSize:12,color:'var(--grn)',fontWeight:600}}>{summary}</div>
-            : <div className="ex-info" style={{fontSize:12}}>{ex.sets}×{ex.reps}{ex.note?' · '+ex.note:''}</div>}
+            : <div className="ex-info" style={{fontSize:12}}>{sets}×{ex.reps}{ex.note?' · '+ex.note:''}</div>}
         </div>
         <span style={{fontSize:14,color:'var(--t3)',flexShrink:0,paddingLeft:8}}>{open?'▾':'▸'}</span>
       </div>
@@ -1003,12 +1004,17 @@ const ExCard=({ex,exData,sets,open,onToggle,rowId,onUpdate,onDone,onSwap,onSetsD
           </div>
           {showSwap && (
             <div style={{padding:'8px 16px',background:'var(--c2)',borderRadius:8,margin:'4px 16px',maxHeight:200,overflowY:'auto'}}>
+              {ex.origEid&&ex.origEid!==ex.eid&&exMap[ex.origEid]&&(
+                <div style={{padding:'6px 0',borderBottom:'0.5px solid var(--sep)',cursor:'pointer',fontSize:13,color:'var(--grn)',fontWeight:600}}
+                  onClick={()=>{onSwap(ex.origEid,ex.origEid);setShowSwap(false)}}>↺ Back to {exMap[ex.origEid].n}</div>
+              )}
+              <div style={{fontSize:10,color:'var(--t3)',padding:'4px 0'}}>Swaps apply everywhere this exercise appears.</div>
               {Object.entries(swapByEq).map(([eq,exs])=>(
                 <div key={eq}>
                   <div style={{fontSize:11,fontWeight:600,color:'var(--org)',padding:'6px 0 2px'}}>{eq}</div>
                   {exs.map(s=>(
                     <div key={s.id} style={{padding:'5px 0',borderBottom:'0.5px solid var(--sep)',cursor:'pointer',fontSize:13}}
-                      onClick={()=>{onSwap(ex.eid,s.id);setShowSwap(false)}}>{s.n}</div>
+                      onClick={()=>{onSwap(ex.origEid||ex.eid,s.id);setShowSwap(false)}}>{s.n}</div>
                   ))}
                 </div>
               ))}
@@ -1057,7 +1063,8 @@ const DayView=({day,phase,onBack})=>{
   const dayKeyCI=day.name.replace(/\s/g,'')+'_p'+phase;
   const[kneePre,setKneePre]=useState(()=>{const c=ld('dayCheckin_'+dayKeyCI,{});return c.knee||0});
   const[calfPre,setCalfPre]=useState(()=>{const c=ld('dayCheckin_'+dayKeyCI,{});return c.calf||0});
-  const restEnabled=ld('restEnabled',true);
+  const[restEnabled,setRestEnabled]=useState(()=>ld('restEnabled',true));
+  const restMul=REST_SCALES[ld('restScale','1')]||1;
   const timer=useSessionTimer();
   const bw=ld('bodyweight',80);
   const dayKey=day.name.replace(/\s/g,'')+'_p'+phase;
@@ -1067,12 +1074,16 @@ const DayView=({day,phase,onBack})=>{
   useEffect(()=>{sv('setsOverride_'+dayKey,setsOverride)},[setsOverride,dayKey]);
   useEffect(()=>{sv('dayCheckin_'+dayKeyCI,{knee:kneePre,calf:calfPre})},[kneePre,calfPre,dayKeyCI]);
 
-  const handleSwap=(oldId,newId)=>{const s={...swaps,[oldId]:newId};setSwaps(s);sv('swaps',s)};
-  const getEid=(eid)=>swaps[eid]||eid;
+  // Picking the program's own exercise again clears the swap
+  const handleSwap=(origId,newId)=>{const s={...swaps};if(newId===origId)delete s[origId];else s[origId]=newId;setSwaps(s);sv('swaps',s)};
+  const dayIds=dayExerciseIds(day);
+  const getEid=(eid)=>resolveSwap(eid,swaps,dayIds);
 
   const allExercises=day.supersets.flatMap(ss=>ss.exercises);
-  const totalSets=allExercises.reduce((a,ex)=>(setsOverride[ex.eid]||ex.sets)+a,0);
-  const doneSets=allExercises.reduce((a,ex)=>{const d=logData[getEid(ex.eid)]||[];return a+d.filter(s=>s.done).length},0);
+  const planned=(ex)=>setsOverride[getEid(ex.eid)]||ex.sets;
+  const doneOf=(ex)=>(logData[getEid(ex.eid)]||[]).filter(s=>s&&s.done).length;
+  const totalSets=allExercises.reduce((a,ex)=>a+planned(ex),0);
+  const doneSets=allExercises.reduce((a,ex)=>a+Math.min(planned(ex),doneOf(ex)),0);
   const pct=totalSets>0?Math.round(doneSets/totalSets*100):0;
 
   const totalVolume=allExercises.reduce((a,ex)=>{
@@ -1082,7 +1093,7 @@ const DayView=({day,phase,onBack})=>{
 
   const handleSetDone=(ex,setData,allData,rowId)=>{
     const info=exMap[getEid(ex.eid)];
-    if(info&&info.t==='w'&&setData.w&&setData.r&&!setData.warmup){
+    if(info&&(info.t==='w'||(info.lw&&info.t==='r'))&&setData.w&&setData.r&&!setData.warmup){
       const prs=ld('prs',{});
       const key=getEid(ex.eid);
       const e1rm=est1RM(parseFloat(setData.w),parseInt(setData.r));
@@ -1106,23 +1117,36 @@ const DayView=({day,phase,onBack})=>{
     hist[eid]=(allData||[]).filter(s=>s.done);
     sv('exHistory',hist);
     // Block-aware rest: use this superset's rest; skip for warm-up/mobility (rest:0)
-    const restSec=Math.round((ex.rest||0)*(REST_SCALES[ld('restScale','1')]||1));
-    if(restEnabled && restSec>0){setRestSecs(restSec);setRestKey(k=>k+1)}
-    // Auto-advance: if this exercise is now fully done, open + scroll the next unfinished one
-    const targetSets=setsOverride[eid]||ex.sets;
-    const doneN=(allData||[]).filter(s=>s.done).length;
-    if(doneN>=targetSets){
-      const rows=[];
-      day.supersets.forEach((ss,si)=>ss.exercises.forEach((e,ei)=>{
-        const rid=si+'_'+ei;const eeid=getEid(e.eid);const tset=setsOverride[eeid]||e.sets;
-        const dc=(rid===rowId)?doneN:((logData[eeid]||[]).filter(s=>s.done).length);
-        rows.push({rid,complete:dc>=tset});
-      }));
-      const ci=rows.findIndex(r=>r.rid===rowId);
-      const next=rows.slice(ci+1).find(r=>!r.complete)||rows.find(r=>!r.complete&&r.rid!==rowId);
-      if(next){setOpenRow(next.rid);setTimeout(()=>{const el=document.getElementById('row-'+next.rid);if(el)el.scrollIntoView({behavior:'smooth',block:'center'})},300)}
-      else setOpenRow(null);
+    const restSec=Math.round((ex.rest||0)*restMul);
+    const startRest=()=>{if(restEnabled&&restSec>0){setRestSecs(restSec);setRestKey(k=>k+1)}};
+    // Supersets run in rounds: A1 -> B1 -> rest -> A2 -> B2 ... Rest only comes at the end of a round;
+    // warm-ups (rest 0) and single-exercise blocks just go straight through.
+    const doneN=(allData||[]).filter(s=>s&&s.done).length;
+    const [si,ei]=String(rowId).split('_').map(Number);
+    const block=day.supersets[si];
+    const left=(e,j)=>{const id=getEid(e.eid);const done=(j===ei)?doneN:((logData[id]||[]).filter(s=>s&&s.done).length);return (setsOverride[id]||e.sets)-done};
+    const goTo=(rid)=>{setOpenRow(rid);setTimeout(()=>{const el=document.getElementById('row-'+rid);if(el)el.scrollIntoView({behavior:'smooth',block:'center'})},300)};
+    if(block&&block.rest>0&&block.exercises.length>1){
+      const n=block.exercises.length;
+      let nxt=-1;
+      for(let k=1;k<=n;k++){const j=(ei+k)%n;if(left(block.exercises[j],j)>0){nxt=j;break}}
+      if(nxt>ei){goTo(si+'_'+nxt);return}          // same round: straight to the next exercise, no rest
+      startRest();
+      if(nxt>=0){goTo(si+'_'+nxt);return}          // round done: rest, then start the next round
+    } else {
+      startRest();
+      if(left(block?block.exercises[ei]:ex,ei)>0)return; // more sets of this exercise
     }
+    // Block finished: open the next unfinished exercise anywhere in the day
+    const rows=[];
+    day.supersets.forEach((ss,bi)=>ss.exercises.forEach((e,j)=>{
+      const id=getEid(e.eid);const rid=bi+'_'+j;
+      const dc=(rid===rowId)?doneN:((logData[id]||[]).filter(s=>s&&s.done).length);
+      rows.push({rid,complete:dc>=(setsOverride[id]||e.sets)});
+    }));
+    const ci=rows.findIndex(r=>r.rid===rowId);
+    const next=rows.slice(ci+1).find(r=>!r.complete)||rows.find(r=>!r.complete&&r.rid!==rowId);
+    if(next)goTo(next.rid);else setOpenRow(null);
   };
 
   const finishWorkout=()=>{
@@ -1135,8 +1159,10 @@ const DayView=({day,phase,onBack})=>{
       const pr=prs[getEid(ex.eid)];
       if(pr&&pr.date===today())newPRs++;
     });
-    const record={day:day.name,phase,trainPhase:ld('phase',1),date:today(),duration:timer.elapsed,pain,rpe,notes,pct,exercises:exDone,
-      totalExercises:allExercises.length,volume:totalVolume,calories:kcal,newPRs,kneePre,calfPre};
+    const doneMap={};allExercises.forEach(ex=>{const id=getEid(ex.eid);const n=Math.min(planned(ex),doneOf(ex));if(n)doneMap[id]=(doneMap[id]||0)+n});
+    const record={day:day.name,phase,trainPhase:ld('phase',1),len:ld('sessionLen','m45'),date:today(),duration:timer.elapsed,pain,rpe,notes,pct,exercises:exDone,
+      totalExercises:allExercises.length,volume:totalVolume,calories:kcal,newPRs,kneePre,calfPre,doneSets:doneMap};
+    try{localStorage.removeItem(PRE_RESTORE)}catch(e){} // new training since a restore: undoing it would lose this workout
     const history=ld('history',[]);
     history.unshift(record);
     sv('history',history);
@@ -1162,7 +1188,7 @@ const DayView=({day,phase,onBack})=>{
           <div style={{display:'flex',flexDirection:'column',alignItems:'flex-end',gap:4}}>
             <div className="session-timer">{fmtTime(timer.elapsed)}</div>
             <button className="btn btn-s" style={{padding:'2px 8px',fontSize:10}}
-              onClick={()=>{const v=!ld('restEnabled',true);sv('restEnabled',v);window.location.reload()}}>{restEnabled?'Rest: ON':'Rest: OFF'}</button>
+              onClick={()=>{const v=!restEnabled;setRestEnabled(v);sv('restEnabled',v);if(!v)setRestSecs(null)}}>{restEnabled?'Rest: ON':'Rest: OFF'}</button>
           </div>
         </div>
         <div className="prg"><div className="prg-f" style={{width:pct+'%'}} /></div>
@@ -1222,20 +1248,21 @@ const DayView=({day,phase,onBack})=>{
                 <span className="ss-type" style={{background:isFinisher?'var(--red-d)':'var(--blu)',color:isFinisher?'var(--red)':'#fff'}}>
                   {isFinisher?ss.type:ss.type||'Strength'}
                 </span>
-                <span style={{fontSize:11,color:'var(--t3)',marginLeft:'auto'}}>Rest: {ss.rest}s</span>
+                <span style={{fontSize:11,color:'var(--t3)',marginLeft:'auto'}}>Rest: {Math.round((ss.rest||0)*restMul)}s</span>
               </div>
               {ss.exercises.map((ex,ei)=>{
                 const eid=getEid(ex.eid);
                 const sets=setsOverride[eid]||ex.sets;
                 const rowId=si+'_'+ei;
-                return <ExCard key={eid+ei} ex={{...ex,eid,rest:ss.rest}} exData={logData[eid]||[]} sets={sets}
+                return <ExCard key={eid+ei} ex={{...ex,eid,origEid:ex.eid,rest:ss.rest}} exData={logData[eid]||[]} sets={sets}
                   rowId={rowId} open={openRow===rowId} onToggle={()=>setOpenRow(openRow===rowId?null:rowId)}
                   onUpdate={d=>{const l={...logData};l[eid]=d;setLogData(l)}}
                   onDone={handleSetDone}
                   onSwap={handleSwap}
                   onSetsDelta={delta=>{
                     const cur=setsOverride[eid]||ex.sets;
-                    const next=Math.max(1,cur+delta);
+                    const logged=(logData[eid]||[]).reduce((m,s,i)=>s&&s.done?i+1:m,0); // never hide a logged set
+                    const next=Math.max(1,logged,cur+delta);
                     setSetsOverride(p=>({...p,[eid]:next}));
                   }} />;
               })}
@@ -1303,7 +1330,7 @@ const PLYO_DAYS={
   {name:'Plyo Power',focus:['Landing','Ankles','Calves'],optional:true,gate:'knee',calfGate:true,supersets:[
     {label:'Warm-Up',type:'Pulse + Ankle/Quad Prep · calf >2/5: skip hops, heel drops only',rest:0,exercises:[
       {eid:'rowing',sets:1,reps:'3 min easy',note:'Sprung floor/turf, trainers on. Not within 48h of a Full day'},
-      {eid:'kneetowall',sets:1,reps:'10 each side',note:'Knee tracks over 2nd toe - note the cm from the wall'},
+      {eid:'kneetowall',sets:1,reps:'10 each side',note:'Knee tracks over 2nd toe - track cm in Progress'},
       {eid:'tibraise',sets:1,reps:'20',note:'Back to a wall, toes up - shins ready for landings'},
       {eid:'wallsit',sets:1,reps:'30-45s',note:'Shallow angle, quad prep - pain should drop, not rise'},
       {eid:'bandlatwalk',sets:1,reps:'10 each way',note:'Band above ankles, knees out - glutes stop knee caving'}
@@ -1322,7 +1349,7 @@ const PLYO_DAYS={
   {name:'Plyo Power',focus:['Bounce','Lateral','Calves'],optional:true,gate:'knee',calfGate:true,supersets:[
     {label:'Warm-Up',type:'Pulse + Ankle/Quad Prep · calf >2/5: skip hops, heel drops only',rest:0,exercises:[
       {eid:'rowing',sets:1,reps:'3 min easy',note:'Sprung floor/turf, trainers on. Not within 48h of a Full day'},
-      {eid:'kneetowall',sets:1,reps:'10 each side',note:'Knee tracks over 2nd toe - note the cm from the wall'},
+      {eid:'kneetowall',sets:1,reps:'10 each side',note:'Knee tracks over 2nd toe - track cm in Progress'},
       {eid:'tibraise',sets:1,reps:'20',note:'Back to a wall, toes up - shins ready for landings'},
       {eid:'wallsit',sets:1,reps:'30-45s',note:'Shallow angle, quad prep - pain should drop, not rise'},
       {eid:'snapdown',sets:1,reps:'5',note:'Landing rehearsal: 5 landings, stick 2s'}
@@ -1344,7 +1371,7 @@ const PLYO_DAYS={
   {name:'Plyo Power',focus:['Single-Leg','Power','Landing'],optional:true,gate:'knee',calfGate:true,supersets:[
     {label:'Warm-Up',type:'Pulse + Ankle/Quad Prep · calf >2/5: skip hops, heel drops only',rest:0,exercises:[
       {eid:'rowing',sets:1,reps:'3 min easy',note:'Sprung floor/turf, trainers on. Not within 48h of a Full day'},
-      {eid:'kneetowall',sets:1,reps:'10 each side',note:'Knee tracks over 2nd toe - note the cm from the wall'},
+      {eid:'kneetowall',sets:1,reps:'10 each side',note:'Knee tracks over 2nd toe - track cm in Progress'},
       {eid:'tibraise',sets:1,reps:'20',note:'Back to a wall, toes up - shins ready for landings'},
       {eid:'wallsit',sets:1,reps:'30-45s',note:'Shallow angle, quad prep - pain should drop, not rise'},
       {eid:'anklejump',sets:1,reps:'20',note:'POGO HOPS ONLY (no skipping). Primer: stiff ankles. Only if 20+ pain-free SL calf raises each side and calf <=2/5'}
@@ -1366,7 +1393,7 @@ const PLYO_DAYS={
   {name:'Plyo Power',focus:['Power','Springs','Calves'],optional:true,gate:'knee',calfGate:true,supersets:[
     {label:'Warm-Up',type:'Pulse + Ankle/Quad Prep · calf >2/5: skip hops, heel drops only',rest:0,exercises:[
       {eid:'rowing',sets:1,reps:'3 min easy',note:'Sprung floor/turf, trainers on. Not within 48h of a Full day'},
-      {eid:'kneetowall',sets:1,reps:'10 each side',note:'Knee tracks over 2nd toe - note the cm from the wall'},
+      {eid:'kneetowall',sets:1,reps:'10 each side',note:'Knee tracks over 2nd toe - track cm in Progress'},
       {eid:'tibraise',sets:1,reps:'20',note:'Back to a wall, toes up - shins ready for landings'},
       {eid:'wallsit',sets:1,reps:'30-45s',note:'Shallow angle, quad prep - pain should drop, not rise'},
       {eid:'anklejump',sets:1,reps:'20',note:'POGO HOPS ONLY (no skipping). Primer: stiff ankles. Only if 20+ pain-free SL calf raises each side and calf <=2/5'}
@@ -1392,7 +1419,7 @@ const BAND_DAYS={
   1:
   {name:'Band Full Body',focus:['Bands','Full-Body','Anywhere'],optional:true,supersets:[
     {label:'Warm-Up',type:'Kit: loop band, tube band + handles, door anchor, chair, step',rest:0,exercises:[
-      {eid:'kneetowall',sets:1,reps:'10 each side',note:'Knee tracks over 2nd toe - note the cm from the wall'},
+      {eid:'kneetowall',sets:1,reps:'10 each side',note:'Knee tracks over 2nd toe - track cm in Progress'},
       {eid:'tke',sets:2,reps:'15 each side',note:'Medium band - Loop round a table/bed leg at ankle height, band behind the knee, 2s lockout'},
       {eid:'bandlatwalk',sets:1,reps:'10 each way',note:'Light band - Band above the knees, knees out - glutes keep knees tracking'}
     ]},
@@ -1417,7 +1444,7 @@ const BAND_DAYS={
   2:
   {name:'Band Full Body',focus:['Bands','Full-Body','Anywhere'],optional:true,supersets:[
     {label:'Warm-Up',type:'Kit: loop band, tube band + handles, door anchor, chair, step',rest:0,exercises:[
-      {eid:'kneetowall',sets:1,reps:'10 each side',note:'Knee tracks over 2nd toe - note the cm from the wall'},
+      {eid:'kneetowall',sets:1,reps:'10 each side',note:'Knee tracks over 2nd toe - track cm in Progress'},
       {eid:'tke',sets:2,reps:'15 each side',note:'Medium band - Loop round a table/bed leg at ankle height, band behind the knee, 2s lockout'},
       {eid:'bandlatwalk',sets:1,reps:'10 each way',note:'Medium band - Band above the ankles, knees out - glutes keep knees tracking'}
     ]},
@@ -1443,7 +1470,7 @@ const BAND_DAYS={
   3:
   {name:'Band Full Body',focus:['Bands','Full-Body','Anywhere'],optional:true,supersets:[
     {label:'Warm-Up',type:'Kit: loop band, tube band + handles, door anchor, chair, step',rest:0,exercises:[
-      {eid:'kneetowall',sets:1,reps:'10 each side',note:'Knee tracks over 2nd toe - note the cm from the wall'},
+      {eid:'kneetowall',sets:1,reps:'10 each side',note:'Knee tracks over 2nd toe - track cm in Progress'},
       {eid:'tke',sets:2,reps:'15 each side',note:'Heavy band - Loop round a table/bed leg at ankle height, band behind the knee, 2s lockout'},
       {eid:'bandbridge',sets:1,reps:'15',note:'Medium band - Loop above the knees, push knees out, 2s squeeze'}
     ]},
@@ -1468,7 +1495,7 @@ const BAND_DAYS={
   4:
   {name:'Band Full Body',focus:['Bands','Full-Body','Anywhere'],optional:true,supersets:[
     {label:'Warm-Up',type:'Kit: loop band, tube band + handles, door anchor, chair, step',rest:0,exercises:[
-      {eid:'kneetowall',sets:1,reps:'10 each side',note:'Knee tracks over 2nd toe - note the cm from the wall'},
+      {eid:'kneetowall',sets:1,reps:'10 each side',note:'Knee tracks over 2nd toe - track cm in Progress'},
       {eid:'tke',sets:2,reps:'15 each side',note:'Heavy band - Loop round a table/bed leg at ankle height, band behind the knee, 2s lockout'},
       {eid:'bandbridge',sets:1,reps:'15',note:'Medium band - Loop above the knees, push knees out, 2s squeeze'}
     ]},
@@ -1629,8 +1656,13 @@ const sessionCoverage=(day)=>{
   }));
   return {direct:MUSCLE_GROUPS.filter(g=>direct.has(g)),any:MUSCLE_GROUPS.filter(g=>any.has(g))};
 };
+// Swaps are keyed by the program's original exercise id and apply wherever that exercise appears.
+// A swap is ignored if its target no longer exists (deleted custom exercise) or is already in the same
+// day (it would create two rows sharing one set log).
+const dayExerciseIds=(day)=>new Set(day.supersets.flatMap(ss=>ss.exercises.map(e=>e.eid)));
+const resolveSwap=(eid,swaps,dayIds)=>{const t=swaps&&swaps[eid];return (t&&t!==eid&&exMap[t]&&!(dayIds&&dayIds.has(t)))?t:eid};
 // Apply the user's exercise swaps to a day (keeping the original id for muscle lookups)
-const applySwaps=(day,swaps=ld('swaps',{}))=>({...day,supersets:day.supersets.map(ss=>({...ss,exercises:ss.exercises.map(ex=>swaps[ex.eid]?{...ex,eid:swaps[ex.eid],origEid:ex.eid}:ex)}))});
+const applySwaps=(day,swaps=ld('swaps',{}))=>{const ids=dayExerciseIds(day);return {...day,supersets:day.supersets.map(ss=>({...ss,exercises:ss.exercises.map(ex=>{const t=resolveSwap(ex.eid,swaps,ids);return t!==ex.eid?{...ex,eid:t,origEid:ex.eid}:ex})}))}};
 const MuscleChips=({day})=>{
   const c=sessionCoverage(day);
   return (
@@ -1686,10 +1718,11 @@ const WorkoutTab=({onOpenDay,showToast})=>{
   const dayPct=(day,ph=phase)=>{
     const logData=cleanLog(ld('dayLog_'+day.name.replace(/\s/g,'')+'_p'+ph,{}));
     const setsOvr=ld('setsOverride_'+day.name.replace(/\s/g,'')+'_p'+ph,{});
-    const swapMap=ld('swaps',{});const id=(eid)=>swapMap[eid]||eid;
+    const swapMap=ld('swaps',{});const ids=dayExerciseIds(day);const id=(eid)=>resolveSwap(eid,swapMap,ids);
     const allEx=day.supersets.flatMap(s=>s.exercises);
-    const total=allEx.reduce((a,ex)=>(setsOvr[id(ex.eid)]||ex.sets)+a,0);
-    const done=allEx.reduce((a,ex)=>{const d=logData[id(ex.eid)]||[];return a+d.filter(s=>s.done).length},0);
+    const plan=(ex)=>setsOvr[id(ex.eid)]||ex.sets;
+    const total=allEx.reduce((a,ex)=>a+plan(ex),0);
+    const done=allEx.reduce((a,ex)=>{const d=logData[id(ex.eid)]||[];return a+Math.min(plan(ex),d.filter(s=>s.done).length)},0);
     return total>0?Math.round(done/total*100):0;
   };
 
@@ -1993,22 +2026,25 @@ const ProgressTab=({showToast})=>{
   const acwrPct=Math.min(100,Math.max(0,(parseFloat(acwr)/2)*100));
 
   const recentHist=history.filter(h=>(new Date()-new Date(h.date))/86400000<7);
+  // Direct sets per muscle group this week. Uses the sets actually logged (v20+ records); older records
+  // fall back to the planned day.
   const muscleVol={};
+  const addSets=(eid,n)=>{const m=MUSCLE_MAP[eid];const groups=m?m[0]:musclesFromText((exMap[eid]||{}).m);groups.forEach(g=>{muscleVol[g]=(muscleVol[g]||0)+n})};
   recentHist.forEach(h=>{
+    if(h.doneSets&&typeof h.doneSets==='object'){Object.entries(h.doneSets).forEach(([eid,n])=>addSets(eid,Number(n)||0));return}
     const dayData=dayForHistory(h);
-    if(dayData){
-      dayData.supersets.flatMap(s=>s.exercises).forEach(ex=>{
-        const info=exMap[ex.eid];
-        if(info){muscleVol[info.m]=(muscleVol[info.m]||0)+ex.sets}
-      });
-    }
+    if(dayData)dayData.supersets.flatMap(s=>s.exercises).forEach(ex=>addSets(ex.eid,ex.sets));
   });
   const maxVol=Math.max(1,...Object.values(muscleVol));
 
   const prList=Object.entries(prs).map(([eid,data])=>({eid,name:exMap[eid]?.n||eid,...data})).sort((a,b)=>new Date(b.date)-new Date(a.date));
 
   const e1rmLog=ld('e1rmLog',{});
-  const e1rmExercises=Object.entries(e1rmLog).filter(([,data])=>data.length>=2).sort((a,b)=>b[1].length-a[1].length).slice(0,8);
+  // Most recently trained lifts first, so lifts dropped from the program don't crowd out the current ones
+  const lastLogged=(d)=>(d[d.length-1]&&d[d.length-1].date)||'';
+  const recentCutoff=new Date(Date.now()-56*86400000).toISOString().slice(0,10);
+  const e1rmExercises=Object.entries(e1rmLog).filter(([,data])=>Array.isArray(data)&&data.length>=2)
+    .sort((a,b)=>lastLogged(b[1]).localeCompare(lastLogged(a[1]))||b[1].length-a[1].length).slice(0,8);
 
   const checkinHistory=history.filter(h=>h.kneePre!==undefined).slice(0,20);
 
@@ -2073,13 +2109,13 @@ const ProgressTab=({showToast})=>{
   // --- Stall detection: no e1RM improvement in last 3 sessions ---
   const stalledLifts=[];let progressingCount=0;
   Object.entries(e1rmLog).forEach(([eid,data])=>{
-    if(data.length<3)return;
+    if(!Array.isArray(data)||data.length<3||lastLogged(data)<recentCutoff)return; // not trained in 8 weeks
     if(data[data.length-1].e1rm<=data[data.length-3].e1rm)stalledLifts.push({name:exMap[eid]?.n||eid,e1rm:data[data.length-1].e1rm});
     else progressingCount++;
   });
 
   // --- Weekly volume vs growth landmarks (~10-20 sets/wk primary muscles) ---
-  const PRIMARY=['Chest','Back','Quads','Hamstrings','Glutes','Calves','Shoulders','Triceps','Biceps','Legs'];
+  const PRIMARY=MUSCLE_GROUPS;
   const volStatus=(m,v)=>{if(!PRIMARY.includes(m))return null;if(v<8)return{c:'var(--org)',l:'low'};if(v>22)return{c:'var(--red)',l:'high'};return{c:'var(--grn)',l:'ok'};};
 
   return (
@@ -2419,7 +2455,12 @@ const LibraryCard=({ex})=>{
   const altsByEq={};
   alts.forEach(a=>{if(!altsByEq[a.eq])altsByEq[a.eq]=[];altsByEq[a.eq].push(a)});
   const typeLabel=ex.t==='w'?'Weighted':(ex.t==='d'||ex.t==='c')?'Timed':'Bodyweight';
-  const delCustom=()=>{if(!confirm('Delete "'+ex.n+'" from your exercises?'))return;sv('customExercises',ld('customExercises',[]).filter(c=>c.id!==ex.id));window.location.reload()};
+  const delCustom=()=>{
+    if(!confirm('Delete "'+ex.n+'" from your exercises?'))return;
+    sv('customExercises',ld('customExercises',[]).filter(c=>c.id!==ex.id));
+    const sw=ld('swaps',{});Object.keys(sw).forEach(k=>{if(sw[k]===ex.id)delete sw[k]});sv('swaps',sw); // workouts go back to the original exercise
+    window.location.reload();
+  };
   return (
     <div className="card" style={{padding:14}}>
       <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start'}}>
@@ -2574,20 +2615,27 @@ const markBackedUp=()=>{try{sv('lastBackup',today())}catch(e){}};
 // Shapes the app relies on — a wrong shape here would crash a screen, so the whole restore is refused
 const BACKUP_SHAPES={
   list:['history','weightLog','runLog','customExercises','dorsiflex'],
-  record:['prs','e1rmLog','exHistory','proteinLog','weekDone','swaps','measurements'],
+  record:['prs','e1rmLog','exHistory','proteinLog','weekDone','swaps'],
   number:['bodyweight','weightGoal','restTime','weeklyGoal'],
 };
 const backupValueProblem=(key,raw)=>{
   const name=key.slice(P.length);
-  const strict=BACKUP_SHAPES.list.includes(name)||BACKUP_SHAPES.record.includes(name)||BACKUP_SHAPES.number.includes(name)||/^(dayLog_|setsOverride_|dayCheckin_)/.test(name)||name==='phase';
+  const strict=BACKUP_SHAPES.list.includes(name)||BACKUP_SHAPES.record.includes(name)||BACKUP_SHAPES.number.includes(name)||/^(dayLog_|setsOverride_|dayCheckin_)/.test(name)||name==='phase'||name==='measurements';
   let v;
   try{v=JSON.parse(raw)}catch(e){return strict?'is not valid data':null}
   const isRecord=v&&typeof v==='object'&&!Array.isArray(v);
   if(BACKUP_SHAPES.list.includes(name)&&!Array.isArray(v))return 'should be a list';
   if((BACKUP_SHAPES.record.includes(name)||/^(dayLog_|setsOverride_|dayCheckin_)/.test(name))&&!isRecord)return 'should be a record';
-  if(BACKUP_SHAPES.number.includes(name)&&typeof v!=='number')return 'should be a number';
+  // Older versions saved some numbers as text ("82.5") and measurements as a list — both still load fine
+  if(BACKUP_SHAPES.number.includes(name)&&typeof v!=='number'&&!(typeof v==='string'&&isFinite(parseFloat(v))))return 'should be a number';
+  if(name==='measurements'&&!(v&&typeof v==='object'))return 'should be a record';
   if(name==='phase'&&![1,2,3,4].includes(v))return 'should be 1-4';
   return null;
+};
+// Store legacy numeric strings as numbers so maths on them can't misbehave
+const normalizeBackupValue=(key,raw)=>{
+  if(!BACKUP_SHAPES.number.includes(key.slice(P.length)))return raw;
+  try{const v=JSON.parse(raw);return typeof v==='string'?JSON.stringify(parseFloat(v)):raw}catch(e){return raw}
 };
 const restoreBackupText=(text,showToast)=>{
   let data;
@@ -2604,12 +2652,14 @@ const restoreBackupText=(text,showToast)=>{
     +'\n\nItems in the backup overwrite the same items here; anything else is kept. You can undo this in Settings.';
   if(!confirm(msg))return false;
   const prev={};keys.forEach(k=>{prev[k]=localStorage.getItem(k)});
-  try{localStorage.setItem(PRE_RESTORE,JSON.stringify({at:new Date().toISOString(),prev}))}catch(e){}
-  try{keys.forEach(k=>localStorage.setItem(k,data[k]))}
+  try{localStorage.setItem(PRE_RESTORE,JSON.stringify({at:new Date().toISOString(),prev}))}
+  catch(e){showToast('Restore stopped — not enough space to keep an undo copy. Nothing was changed.');return false}
+  try{keys.forEach(k=>localStorage.setItem(k,normalizeBackupValue(k,data[k])))}
   catch(e){
     // Roll back: drop keys that didn't exist before (frees space), then put the old values back
     keys.forEach(k=>{if(prev[k]===null){try{localStorage.removeItem(k)}catch(x){}}});
     keys.forEach(k=>{if(prev[k]!==null){try{localStorage.setItem(k,prev[k])}catch(x){}}});
+    try{localStorage.removeItem(PRE_RESTORE)}catch(x){}
     showToast('Restore failed — your existing data was kept'+(e&&e.name==='QuotaExceededError'?' (storage full)':''));
     return false;
   }
@@ -2918,10 +2968,6 @@ class ErrorBoundary extends React.Component{
       (navigator.clipboard?navigator.clipboard.writeText(text):Promise.reject())
         .then(()=>this.setState({note:'Backup copied — paste it into Notes before anything else.'}),()=>this.setState({note:'Copy failed.'}));
     };
-    const undo=()=>{
-      try{const s=JSON.parse(localStorage.getItem(PRE_RESTORE)||'null');
-        if(s&&s.prev){Object.entries(s.prev).forEach(([k,v])=>{v===null?localStorage.removeItem(k):localStorage.setItem(k,v)});localStorage.removeItem(PRE_RESTORE);location.reload()}}catch(e){}
-    };
     return (
       <div style={{padding:'max(48px,var(--safe-t)) 20px 20px',color:'var(--t1)',maxWidth:500,margin:'0 auto'}}>
         <div style={{fontSize:22,fontWeight:700,marginBottom:8}}>Something went wrong</div>
@@ -2929,7 +2975,6 @@ class ErrorBoundary extends React.Component{
         <button className="btn btn-g" style={{width:'100%',marginBottom:8}} onClick={copy}>Copy Backup</button>
         {this.state.note&&<div style={{fontSize:12,color:'var(--t2)',marginBottom:8}}>{this.state.note}</div>}
         <button className="btn btn-s" style={{width:'100%',marginBottom:8}} onClick={()=>location.reload()}>Try Again</button>
-        {hasRestoreSnapshot()&&<button className="btn btn-s" style={{width:'100%',marginBottom:8}} onClick={undo}>Undo Last Restore</button>}
         <div style={{fontSize:11,color:'var(--t3)',marginTop:12,wordBreak:'break-word'}}>{String((this.state.err&&this.state.err.message)||this.state.err)}</div>
       </div>
     );

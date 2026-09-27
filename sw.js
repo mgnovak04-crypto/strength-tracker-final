@@ -2,7 +2,7 @@
 // App shell is cache-first: launching never waits on the network, so weak gym signal can't hang it on a
 // black screen. Every launch re-checks sw.js; a new version installs in the background (fresh copies via
 // cache:'reload'), takes over, and the app offers a reload / applies it next launch.
-const CACHE = 'ironclad-20.0.0';
+const CACHE = 'ironclad-20.0.0-1350fce90b';
 const CORE = ["./","./index.html","./manifest.webmanifest","./vendor/react.production.min.js","./vendor/react-dom.production.min.js","./icons/apple-touch-icon.png","./icons/icon-192.png","./icons/icon-512.png"];
 const SCOPE = new URL(self.registration.scope).pathname;
 self.addEventListener('install', e => {

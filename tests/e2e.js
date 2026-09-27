@@ -52,6 +52,17 @@ const assert = (cond, msg) => { if (!cond) throw new Error(msg); };
   const tab = async (page, name) => { await page.locator('.tab', { hasText: name }).click(); await page.waitForTimeout(250); };
   const openDay = async (page, name) => { await page.locator('.card h3', { hasText: name }).first().click(); await page.waitForSelector('.ss-label'); };
   const back = async (page) => { await page.locator('button', { hasText: 'Back' }).first().click(); await page.waitForSelector('.tabs'); };
+  // Fill and log one set in the currently open exercise (kg 40 if there's a kg box, reps 10)
+  const logOpenSet = async (page, idx = 0) => {
+    const row = page.locator('.log-area .set-row').nth(idx);
+    const inputs = row.locator('input');
+    const n = await inputs.count();
+    for (let i = 0; i < n; i++) await inputs.nth(i).fill(n > 1 && i === 0 ? '40' : '10');
+    if (await row.locator('select').count()) await row.locator('select').selectOption('M');
+    await row.locator('button', { hasText: 'Log' }).click();
+  };
+  // First superset (rest > 0, 2+ exercises) of Full Body A at 45 min
+  const firstSuperset = (page) => page.evaluate(() => { const d = trimDay(getProgramDays(ld('phase', 1))[0], 'm45'); const ss = d.supersets.find(s => s.rest > 0 && s.exercises.length > 1); return { a: exMap[ss.exercises[0].eid].n, b: exMap[ss.exercises[1].eid].n, rest: ss.rest }; });
 
   // ---------------- installable app / offline ----------------
   await test('built page is pre-compiled (no in-browser Babel, React served locally)', async () => {
@@ -170,27 +181,31 @@ const assert = (cond, msg) => { if (!cond) throw new Error(msg); };
     await setRow.locator('input').last().fill('12');
     await setRow.locator('button', { hasText: 'Log' }).click();
     if (await page.locator('.rest-overlay').count()) await page.locator('.rest-overlay .rest-btn', { hasText: 'Skip' }).click();
-    await row.click(); // collapse
+    await page.waitForTimeout(300); // logging moves on to the next exercise, which collapses this row
     const summary = await page.locator('.ex-row', { hasText: bandName }).first().innerText();
     assert(summary.includes('Medium 12'), 'collapsed summary missing tension: ' + summary.replace(/\s+/g, ' '));
     await ctx.close();
   });
 
   // ---------------- core workout flow regressions ----------------
-  await test('logging a set starts a rest timer that counts down (no reset bug)', async () => {
+  await test('supersets run in rounds (A1 -> B1 -> rest) and the rest timer counts down', async () => {
     const { ctx, page } = await fresh();
     await openDay(page, 'Full Body A');
-    const first = await page.evaluate(() => { const d = trimDay(getProgramDays(ld('phase', 1))[0], ld('sessionLen', 'm45')); return exMap[d.supersets.find(s => s.rest > 0).exercises.find(e => exMap[e.eid].t === 'w').eid].n; });
-    await page.locator('.ex-row', { hasText: first }).first().click();
-    const setRow = page.locator('.log-area .set-row').first();
-    const inputs = setRow.locator('input');
-    await inputs.nth(0).fill('40'); await inputs.nth(1).fill('10');
-    await setRow.locator('button', { hasText: 'Log' }).click();
+    const ss = await firstSuperset(page);
+    await page.locator('.ex-row', { hasText: ss.a }).first().click();
+    await logOpenSet(page);
+    await page.waitForTimeout(500);
+    assert(await page.locator('.rest-overlay').count() === 0, 'rested between A1 and B1');
+    assert((await page.locator('.log-area').first().innerText()).includes(ss.b), 'did not move on to the second exercise of the superset');
+    await logOpenSet(page);
     await page.waitForSelector('.rest-overlay');
     const a = parseInt(await page.locator('.rest-overlay .big').innerText());
+    assert(Math.abs(a - ss.rest) <= 1, `rest ${a}s, block says ${ss.rest}s`);
     await page.waitForTimeout(3200);
     const b = parseInt(await page.locator('.rest-overlay .big').innerText());
     assert(b <= a - 2, `rest timer did not count down (${a} -> ${b})`);
+    await page.locator('.rest-overlay .rest-btn', { hasText: 'Skip' }).click();
+    assert((await page.locator('.log-area').first().innerText()).includes(ss.a), 'round 2 should start back on the first exercise');
     await ctx.close();
   });
 
@@ -379,22 +394,129 @@ const assert = (cond, msg) => { if (!cond) throw new Error(msg); };
     await ctx.close();
   });
 
-  await test('rest setting really scales the rest timer ("Longer" = 1.5x the block rest)', async () => {
+  await test('rest setting really scales the rest timer and the block header ("Longer" = 1.5x)', async () => {
     const { ctx, page } = await fresh();
     await tab(page, 'Settings');
     await page.locator('button', { hasText: 'Longer' }).click();
     await tab(page, 'Workout');
     await openDay(page, 'Full Body A');
-    const info = await page.evaluate(() => { const d = trimDay(getProgramDays(ld('phase', 1))[0], 'm45'); const ss = d.supersets.find(s => s.rest > 0); const e = ss.exercises.find(x => exMap[x.eid].t === 'w'); return { n: exMap[e.eid].n, rest: ss.rest }; });
-    await page.locator('.ex-row', { hasText: info.n }).first().click();
-    const row = page.locator('.log-area .set-row').first();
-    await row.locator('input').nth(0).fill('40'); await row.locator('input').nth(1).fill('10');
-    await row.locator('button', { hasText: 'Log' }).click();
+    const ss = await firstSuperset(page);
+    const want = Math.round(ss.rest * 1.5);
+    assert((await text(page)).includes('Rest: ' + want + 's'), 'block header not scaled');
+    await page.locator('.ex-row', { hasText: ss.a }).first().click();
+    await logOpenSet(page); await page.waitForTimeout(300); await logOpenSet(page);
     await page.waitForSelector('.rest-overlay');
     const shown = parseInt(await page.locator('.rest-overlay .big').innerText());
-    const want = Math.round(info.rest * 1.5);
-    assert(Math.abs(shown - want) <= 1, `rest ${shown}s, expected ~${want}s (block ${info.rest}s x1.5)`);
+    assert(Math.abs(shown - want) <= 1, `rest ${shown}s, expected ~${want}s`);
     await ctx.close();
+  });
+
+  // ---------------- release-review fixes ----------------
+  await test('swaps: no duplicate rows from old swaps, swapping back really undoes, deleted targets fall back', async () => {
+    const { ctx, page } = await fresh(() => localStorage.setItem('ic17_swaps', JSON.stringify({ tke: 'shortarcext', calfstand: 'custom_gone' })));
+    await openDay(page, 'Full Body A');
+    const names = await page.locator('.ex-row .ex-name').allInnerTexts();
+    assert(names.filter(n => n.includes('Short-Arc')).length <= 1, 'duplicate Short-Arc rows: ' + names.join(','));
+    assert(names.some(n => n.includes('Terminal Knee')), 'swap onto an exercise already in the day should be ignored');
+    assert(names.some(n => n.includes('Standing Calf')), 'swap to a missing exercise should fall back to the original');
+    // swap Rope Pushdown -> something else, then back
+    await page.locator('.ex-row', { hasText: 'Rope Pushdown' }).first().click();
+    await page.locator('button', { hasText: 'Swap' }).first().click();
+    const opt = page.locator('div[style*="cursor: pointer"]', { hasText: 'Overhead Tricep Extension' }).first();
+    await opt.click(); await page.waitForTimeout(200);
+    assert((await page.locator('.ex-row .ex-name').allInnerTexts()).some(n => n.includes('Overhead Tricep')), 'swap did not apply');
+    // the row stays open after a swap, so its Swap button is right there
+    await page.locator('button', { hasText: 'Swap' }).first().click();
+    await page.locator('div', { hasText: /^↺ Back to Rope Pushdown$/ }).first().click();
+    await page.waitForTimeout(200);
+    assert((await page.locator('.ex-row .ex-name').allInnerTexts()).some(n => n.includes('Rope Pushdown')), 'swap back did not restore');
+    const sw = await page.evaluate(() => JSON.parse(localStorage.getItem('ic17_swaps')));
+    assert(!('ropepush' in sw) && !('ohext' in sw), 'swap map not cleaned: ' + JSON.stringify(sw));
+    await ctx.close();
+  });
+
+  await test('Rest ON/OFF mid-workout keeps you in the workout and the session clock running', async () => {
+    const { ctx, page } = await fresh();
+    await openDay(page, 'Full Body A');
+    await page.waitForTimeout(2200);
+    await page.locator('button', { hasText: 'Rest: ON' }).click();
+    await page.waitForTimeout(400);
+    assert(await page.locator('button', { hasText: 'Rest: OFF' }).count() === 1, 'toggle did not flip');
+    const clock = await page.locator('.session-timer').innerText();
+    assert(clock !== '0:00' && (await text(page)).includes('Pre-Workout Check-In'), 'left the workout / clock reset: ' + clock);
+    await ctx.close();
+  });
+
+  await test('progress never shows over 100% (old boards, sets lowered below logged)', async () => {
+    const { ctx, page } = await fresh(() => localStorage.setItem('ic17_dayLog_FullBodyA_p1', JSON.stringify({ kneetowall: [1, 2, 3, 4].map(() => ({ w: '', r: '10', done: true })) })));
+    const pctText = await page.locator('.card', { has: page.locator('h3', { hasText: 'Full Body A' }) }).innerText();
+    const m = pctText.match(/(\d+)%/);
+    assert(!m || parseInt(m[1]) <= 100, 'day card shows ' + (m && m[0]));
+    await openDay(page, 'Full Body A');
+    const row = await page.locator('.ex-row', { hasText: 'Knee-to-Wall' }).first().innerText();
+    assert(!/\d{3}%/.test(row) && row.includes('✓'), 'row: ' + row.replace(/\s+/g, ' '));
+    await ctx.close();
+  });
+
+  await test('loaded step-ups/heel drops/carries have a kg box; KB EMOM gets a countdown', async () => {
+    const { ctx, page } = await fresh();
+    await openDay(page, 'Full Body B');
+    await page.locator('.ex-row', { hasText: 'Low Box Step-Up' }).first().click();
+    assert(await page.locator('.log-area input[placeholder="kg"]').count() > 0, 'step-up has no kg box');
+    await back(page);
+    await openDay(page, 'Full Body C');
+    await page.locator('.ex-row', { hasText: 'Kettlebell Swing' }).first().click();
+    const t = await page.locator('.log-area').first().innerText();
+    assert(/Start [23]:00/.test(t), 'KB EMOM has no countdown: ' + t.replace(/\s+/g, ' ').slice(0, 120));
+    await ctx.close();
+  });
+
+  await test('backups from older versions (text numbers, measurement lists) restore and are normalised', async () => {
+    const { ctx, page } = await fresh();
+    await tab(page, 'Settings');
+    await page.locator('button', { hasText: 'Paste Backup' }).click();
+    await page.locator('textarea').fill(JSON.stringify({ ic17_bodyweight: '"82.5"', ic17_measurements: JSON.stringify([{ date: '2025-01-01', waist: 90 }]), ic17_history: '[]' }));
+    page.once('dialog', d => d.accept());
+    await page.locator('button', { hasText: 'Restore From Paste' }).click();
+    await page.waitForTimeout(1500); await page.waitForSelector('.tabs');
+    const bw = await page.evaluate(() => JSON.parse(localStorage.getItem('ic17_bodyweight')));
+    assert(bw === 82.5, 'bodyweight not restored as a number: ' + JSON.stringify(bw));
+    await ctx.close();
+  });
+
+  await test('restore undo expires once you train again; the crash screen has no one-tap wipe', async () => {
+    const { ctx, page } = await fresh(() => localStorage.setItem('ic17__preRestore', JSON.stringify({ at: 'x', prev: { ic17_history: null } })));
+    await openDay(page, 'Core Focus');
+    await page.locator('button', { hasText: 'Save Workout' }).click();
+    await page.waitForTimeout(400);
+    assert(await page.evaluate(() => localStorage.getItem('ic17__preRestore') === null), 'snapshot survived a new workout');
+    await page.evaluate(() => { localStorage.setItem('ic17__preRestore', JSON.stringify({ at: 'x', prev: {} })); localStorage.setItem('ic17_weekDone', 'null'); });
+    await page.reload({ waitUntil: 'networkidle' });
+    const t = await text(page);
+    assert(t.includes('Something went wrong') && !t.includes('Undo Last Restore'), 'crash screen offers undo');
+    await ctx.close();
+  });
+
+  await test('Progress: recent lifts lead 1RM trends; weekly volume counts sets actually done', async () => {
+    const { ctx, page } = await fresh(() => {
+      const d = (n) => new Date(Date.now() - n * 86400000).toISOString().slice(0, 10);
+      const old = Array.from({ length: 30 }, (_, i) => ({ date: '2025-0' + (1 + (i % 9)) + '-1' + (i % 9), e1rm: 60 + i, w: 50, r: 5 }));
+      const log = {}; ['bbench', 'nordicham', 'johnsoncalf', 'cablefly', 'skierswing', 'farmerwalk', 'tbarrow', 'dbohp'].forEach(k => { log[k] = old; });
+      log.revlunge = [{ date: d(9), e1rm: 50, w: 20, r: 10 }, { date: d(2), e1rm: 54, w: 22, r: 10 }];
+      localStorage.setItem('ic17_e1rmLog', JSON.stringify(log));
+      localStorage.setItem('ic17_history', JSON.stringify([{ day: 'Full Body A', phase: 1, trainPhase: 1, date: d(1), pct: 60, doneSets: { latraise: 3 } }]));
+    });
+    await tab(page, 'Progress');
+    const t = await text(page);
+    assert(t.includes('Reverse Lunge'), 'current lift missing from 1RM trends');
+    const vol = t.slice(t.indexOf('Muscle Group Volume'));
+    assert(/Shoulders\s*3/.test(vol) && !/Glutes/.test(vol.split('Strength Progression')[0] || vol), 'volume not from logged sets: ' + vol.slice(0, 200).replace(/\s+/g, ' '));
+    await ctx.close();
+  });
+
+  await test('service worker cache name carries a content hash (any change reaches phones)', async () => {
+    const sw = fs.readFileSync(path.join(ROOT, 'sw.js'), 'utf8');
+    assert(/const CACHE = 'ironclad-[\d.]+-[0-9a-f]{10}'/.test(sw), 'no content hash in cache name');
   });
 
   await browser.close();
