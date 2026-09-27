@@ -1,0 +1,16 @@
+{
+  "name": "ironclad-pro",
+  "version": "19.6.0",
+  "private": true,
+  "description": "IronClad Pro — knee-safe full-body strength tracker (installable PWA)",
+  "scripts": {
+    "build": "node build.js",
+    "test": "node build.js && node tests/e2e.js",
+    "assets": "node tools/render-assets.js"
+  },
+  "devDependencies": {
+    "@babel/standalone": "7.29.9",
+    "react": "18.3.1",
+    "react-dom": "18.3.1"
+  }
+}

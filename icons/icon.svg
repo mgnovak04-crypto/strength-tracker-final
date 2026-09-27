@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
+  <defs>
+    <linearGradient id="tri" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#009A44"/><stop offset="0.5" stop-color="#FFFFFF"/><stop offset="1" stop-color="#FF8C00"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0.5" cy="0.42" r="0.6">
+      <stop offset="0" stop-color="#16261c"/><stop offset="1" stop-color="#000"/>
+    </radialGradient>
+  </defs>
+  <rect width="1024" height="1024" fill="url(#glow)"/>
+  <!-- shield -->
+  <path d="M512 150 L800 250 V520 C800 700 672 820 512 884 C352 820 224 700 224 520 V250 Z"
+        fill="#0b0b0b" stroke="url(#tri)" stroke-width="44" stroke-linejoin="round"/>
+  <!-- dumbbell -->
+  <g fill="#FFFFFF" transform="translate(512 518) scale(0.86) translate(-512 -518)">
+    <rect x="340" y="495" width="344" height="46" rx="12"/>
+    <rect x="300" y="420" width="58" height="196" rx="16"/>
+    <rect x="252" y="452" width="46" height="132" rx="14"/>
+    <rect x="666" y="420" width="58" height="196" rx="16"/>
+    <rect x="726" y="452" width="46" height="132" rx="14"/>
+  </g>
+  <!-- tricolor bar under dumbbell -->
+  <rect x="392" y="636" width="80" height="22" rx="11" fill="#009A44"/>
+  <rect x="472" y="636" width="80" height="22" fill="#FFFFFF"/>
+  <rect x="552" y="636" width="80" height="22" rx="11" fill="#FF8C00"/>
+</svg>
