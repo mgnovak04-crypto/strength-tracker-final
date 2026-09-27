@@ -3,7 +3,14 @@
 Knee-safe, full-body strength, fat-loss and rehab tracker. Runs as an installable iPhone app (PWA) from GitHub Pages and works offline.
 
 ## Install on iPhone
-Open the site in **Safari** → **Share** → **Add to Home Screen**. It then launches full-screen with its own icon and works with no signal.
+Open the site in **Safari** → **Share** → **Add to Home Screen**, then **open the new icon once while you have signal**. After that first launch it opens full-screen with its own icon and works with no signal.
+
+### Moving your data from an older copy
+A Home Screen app keeps its **own** storage, separate from Safari and from any other icon, so a new icon starts empty. Move your data like this:
+1. Open the app **where your data is now** (the old icon or the Safari tab) while online, so it updates.
+2. **Settings → Copy Backup**, and paste it into Notes. You can also use **Export Backup → Save to Files** as a second copy.
+3. Add the new icon (above), open it, and tap **Paste Backup** on the welcome card (or **Settings → Paste Backup**) → **Restore**. Check your workouts are there.
+4. **Only then** delete the old icon. Removing an icon permanently deletes its data.
 
 ## Editing the app
 - Edit **`src/index.html`** — the app source (React + JSX in a single file).

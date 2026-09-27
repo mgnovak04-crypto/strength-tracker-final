@@ -1,6 +1,6 @@
 {
   "name": "ironclad-pro",
-  "version": "19.6.0",
+  "version": "20.0.0",
   "private": true,
   "description": "IronClad Pro — knee-safe full-body strength tracker (installable PWA)",
   "scripts": {

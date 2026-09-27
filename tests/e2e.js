@@ -9,9 +9,13 @@ const { chromium } = require('playwright');
 
 const ROOT = path.join(__dirname, '..');
 const TYPES = { '.html': 'text/html', '.js': 'application/javascript', '.json': 'application/json', '.webmanifest': 'application/manifest+json', '.png': 'image/png', '.svg': 'image/svg+xml' };
+// NET.slow stalls the app page (simulates one bar of gym signal); NET.override serves alternate content
+const NET = { slow: false, override: {} };
 const server = http.createServer((req, res) => {
   let p = decodeURIComponent(req.url.split('?')[0]);
   if (p.endsWith('/')) p += 'index.html';
+  if (NET.override[p] !== undefined) { res.writeHead(200, { 'Content-Type': 'application/javascript' }); return res.end(NET.override[p]); }
+  if (NET.slow && p.endsWith('index.html')) { setTimeout(() => { try { res.writeHead(504); res.end(); } catch (e) {} }, 20000); return; }
   const file = path.join(ROOT, p);
   if (!file.startsWith(ROOT) || !fs.existsSync(file) || fs.statSync(file).isDirectory()) { res.writeHead(404); return res.end('not found'); }
   res.writeHead(200, { 'Content-Type': TYPES[path.extname(file)] || 'application/octet-stream' });
@@ -232,6 +236,164 @@ const assert = (cond, msg) => { if (!cond) throw new Error(msg); };
     for (const t of ['Progress', 'Library', 'Settings', 'Workout']) await tab(page, t);
     assert(errors.length === 0, errors[0]);
     assert((await text(page)).includes('v' + SHORT), 'version not shown');
+    await ctx.close();
+  });
+
+  // ---------------- review fixes ----------------
+  await test('logging set 2 before set 1 no longer breaks the app, and old broken logs heal', async () => {
+    const { ctx, page, errors } = await fresh();
+    await openDay(page, 'Full Body A');
+    const name = await page.evaluate(() => { const d = trimDay(getProgramDays(ld('phase', 1))[0], ld('sessionLen', 'm45')); return exMap[d.supersets.find(s => s.rest > 0).exercises.find(e => exMap[e.eid].t === 'w').eid].n; });
+    await page.locator('.ex-row', { hasText: name }).first().click();
+    const second = page.locator('.log-area .set-row').nth(1);
+    await second.locator('input').nth(0).fill('50'); await second.locator('input').nth(1).fill('8');
+    await second.locator('button', { hasText: 'Log' }).click();
+    if (await page.locator('.rest-overlay').count()) await page.locator('.rest-overlay .rest-btn', { hasText: 'Skip' }).click();
+    const holes = await page.evaluate(() => Object.values(JSON.parse(localStorage.getItem('ic17_dayLog_FullBodyA_p1') || '{}')).some(a => a.some(x => !x)));
+    assert(!holes, 'set list saved with gaps');
+    // a log saved by an older build with a gap in it
+    await page.evaluate(() => localStorage.setItem('ic17_dayLog_FullBodyA_p1', JSON.stringify({ trapbar: [null, { w: '60', r: '10', done: true }] })));
+    await page.reload({ waitUntil: 'networkidle' }); await page.waitForSelector('.tabs');
+    await openDay(page, 'Full Body A');
+    assert(errors.length === 0, errors[0]);
+    await ctx.close();
+  });
+
+  await test('a crash shows a recovery screen (not a blank page)', async () => {
+    const ctx = await browser.newContext({ viewport: { width: 390, height: 844 } });
+    const page = await ctx.newPage();
+    await page.goto(BASE, { waitUntil: 'networkidle' });
+    await page.evaluate(() => localStorage.setItem('ic17_weekDone', 'null'));
+    await page.reload({ waitUntil: 'networkidle' });
+    const t = await text(page);
+    assert(t.includes('Something went wrong') && t.includes('Copy Backup') && t.includes('Try Again'), 'no recovery screen: ' + t.slice(0, 80));
+    await ctx.close();
+  });
+
+  await test('restore refuses a malformed backup and changes nothing', async () => {
+    const { ctx, page } = await fresh(() => localStorage.setItem('ic17_history', JSON.stringify([{ day: 'Full Body A', phase: 1, date: '2026-03-01', pct: 100 }])));
+    let dialogs = 0; page.on('dialog', d => { dialogs++; d.dismiss(); });
+    await tab(page, 'Settings');
+    await page.locator('button', { hasText: 'Paste Backup' }).click();
+    await page.locator('textarea').fill(JSON.stringify({ ic17_history: '{}' }));
+    await page.locator('button', { hasText: 'Restore From Paste' }).click();
+    await page.waitForTimeout(300);
+    assert((await text(page)).includes('should be a list'), 'no validation message');
+    assert(dialogs === 0, 'asked to confirm an invalid backup');
+    assert(await page.evaluate(() => JSON.parse(localStorage.getItem('ic17_history')).length === 1), 'data changed');
+    await ctx.close();
+  });
+
+  await test('restore compares backup vs phone, warns about newer data, and can be undone', async () => {
+    const { ctx, page } = await fresh(() => localStorage.setItem('ic17_history', JSON.stringify([{ day: 'Full Body B', phase: 1, date: '2026-03-10', pct: 100 }])));
+    await tab(page, 'Settings');
+    await page.locator('button', { hasText: 'Paste Backup' }).click();
+    await page.locator('textarea').fill(JSON.stringify({ ic17_history: JSON.stringify([{ day: 'Full Body A', phase: 1, date: '2026-02-01', pct: 100 }, { day: 'Full Body C', phase: 1, date: '2026-01-20', pct: 100 }]) }));
+    let msg = '';
+    page.once('dialog', d => { msg = d.message(); d.accept(); });
+    await page.locator('button', { hasText: 'Restore From Paste' }).click();
+    await page.waitForTimeout(1500); await page.waitForSelector('.tabs');
+    assert(msg.includes('Backup: 2 workouts') && msg.includes('This phone: 1 workout') && msg.includes('NEWER'), 'confirm message: ' + msg);
+    assert(await page.evaluate(() => JSON.parse(localStorage.getItem('ic17_history')).length === 2), 'restore not applied');
+    await tab(page, 'Settings');
+    page.once('dialog', d => d.accept());
+    await page.locator('button', { hasText: 'Undo Last Restore' }).click();
+    await page.waitForTimeout(1500); await page.waitForSelector('.tabs');
+    const h = await page.evaluate(() => JSON.parse(localStorage.getItem('ic17_history')));
+    assert(h.length === 1 && h[0].date === '2026-03-10', 'undo did not bring the phone data back');
+    await ctx.close();
+  });
+
+  await test('first launch offers to restore a backup; "starting fresh" hides it for good', async () => {
+    const { ctx, page } = await fresh();
+    assert((await text(page)).includes('Moving from another copy'), 'no first-run restore card');
+    await page.locator('button', { hasText: "I'm starting fresh" }).click();
+    await page.reload({ waitUntil: 'networkidle' }); await page.waitForSelector('.tabs');
+    assert(!(await text(page)).includes('Moving from another copy'), 'card came back');
+    await ctx.close();
+    const seeded = await fresh(() => localStorage.setItem('ic17_history', JSON.stringify([{ day: 'Full Body A', phase: 1, date: '2026-03-01', pct: 100 }])));
+    assert(!(await text(seeded.page)).includes('Moving from another copy'), 'card shown to an existing user');
+    await seeded.ctx.close();
+  });
+
+  await test('timed exercises in minutes show minutes ("3 min easy" = Start 3:00)', async () => {
+    const { ctx, page } = await fresh();
+    await openDay(page, 'Full Body A');
+    await page.locator('.ex-row', { hasText: 'Rowing Machine' }).first().click();
+    const t = await page.locator('.log-area .cd-timer').first().innerText();
+    assert(t.includes('3:00'), 'timer shows: ' + t);
+    await ctx.close();
+  });
+
+  await test('Plyo also warns when calf tightness is 3+/5', async () => {
+    const { ctx, page } = await fresh();
+    await openDay(page, 'Plyo Power');
+    await page.locator('.pain-row').nth(1).locator('.pain-dot').nth(3).click();
+    assert((await text(page)).includes('Calf tightness 3/5'), 'no calf warning');
+    await ctx.close();
+  });
+
+  await test('weak signal: once installed the app opens instantly even if the network stalls', async () => {
+    const { ctx, page } = await fresh();
+    await page.evaluate(() => navigator.serviceWorker.ready);
+    await page.reload({ waitUntil: 'networkidle' });
+    NET.slow = true;
+    const t0 = Date.now();
+    await page.reload({ waitUntil: 'domcontentloaded', timeout: 15000 });
+    await page.waitForSelector('.tabs', { timeout: 15000 });
+    const ms = Date.now() - t0;
+    NET.slow = false;
+    assert(ms < 4000, `took ${ms}ms with a stalled network`);
+    await ctx.close();
+  });
+
+  await test('a new version installs in the background and offers a reload', async () => {
+    const { ctx, page } = await fresh();
+    await page.evaluate(() => navigator.serviceWorker.ready);
+    await page.reload({ waitUntil: 'networkidle' });
+    const sw = fs.readFileSync(path.join(ROOT, 'sw.js'), 'utf8');
+    NET.override['/sw.js'] = sw.replace(/const CACHE = '([^']+)'/, "const CACHE = '$1-next'");
+    await page.evaluate(() => navigator.serviceWorker.getRegistration().then(r => r.update()));
+    await page.waitForSelector('.update-pill', { timeout: 15000 });
+    await page.locator('.update-pill').click();
+    await page.waitForSelector('.tabs');
+    delete NET.override['/sw.js'];
+    await ctx.close();
+  });
+
+  await test('finished sessions record the training phase (for Plyo/Band history)', async () => {
+    const { ctx, page } = await fresh(() => localStorage.setItem('ic17_phase', '2'));
+    await openDay(page, 'Core Focus');
+    await page.locator('button', { hasText: 'Save Workout' }).click();
+    await page.waitForTimeout(400);
+    const rec = await page.evaluate(() => JSON.parse(localStorage.getItem('ic17_history'))[0]);
+    assert(rec && rec.trainPhase === 2 && rec.phase === 'core', 'record: ' + JSON.stringify(rec));
+    await ctx.close();
+  });
+
+  await test('optional sessions fit an add-on slot (Core ~35, Plyo and Band under 40 min)', async () => {
+    const { ctx, page } = await fresh();
+    const t = await page.evaluate(() => [1, 2, 3, 4].flatMap(ph => [['core', estDayMinutes(getCoreDay())], ['plyo', estDayMinutes(getPlyoDay(ph))], ['band', estDayMinutes(getBandDay(ph))]]));
+    const bad = t.filter(([, m]) => m > 40 || m < 22);
+    assert(bad.length === 0, 'out of range: ' + JSON.stringify(bad));
+    await ctx.close();
+  });
+
+  await test('rest setting really scales the rest timer ("Longer" = 1.5x the block rest)', async () => {
+    const { ctx, page } = await fresh();
+    await tab(page, 'Settings');
+    await page.locator('button', { hasText: 'Longer' }).click();
+    await tab(page, 'Workout');
+    await openDay(page, 'Full Body A');
+    const info = await page.evaluate(() => { const d = trimDay(getProgramDays(ld('phase', 1))[0], 'm45'); const ss = d.supersets.find(s => s.rest > 0); const e = ss.exercises.find(x => exMap[x.eid].t === 'w'); return { n: exMap[e.eid].n, rest: ss.rest }; });
+    await page.locator('.ex-row', { hasText: info.n }).first().click();
+    const row = page.locator('.log-area .set-row').first();
+    await row.locator('input').nth(0).fill('40'); await row.locator('input').nth(1).fill('10');
+    await row.locator('button', { hasText: 'Log' }).click();
+    await page.waitForSelector('.rest-overlay');
+    const shown = parseInt(await page.locator('.rest-overlay .big').innerText());
+    const want = Math.round(info.rest * 1.5);
+    assert(Math.abs(shown - want) <= 1, `rest ${shown}s, expected ~${want}s (block ${info.rest}s x1.5)`);
     await ctx.close();
   });
 
